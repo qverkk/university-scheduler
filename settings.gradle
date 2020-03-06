@@ -1,3 +1,4 @@
 rootProject.name = 'university-scheduler'
 include 'university-scheduler-api'
 include 'university-scheduler-database'
+include 'university-scheduler-window'
