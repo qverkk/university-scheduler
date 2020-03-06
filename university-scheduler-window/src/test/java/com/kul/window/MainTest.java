@@ -1,4 +1,4 @@
-package com.kul;
+package com.kul.window;
 
 import org.junit.jupiter.api.Test;
 
