@@ -1,2 +1,3 @@
 rootProject.name = 'university-scheduler'
-include 'api'
+include 'university-scheduler-api'
+include 'university-scheduler-database'
