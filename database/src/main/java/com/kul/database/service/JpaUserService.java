@@ -4,6 +4,7 @@ import com.kul.database.constants.JwtUtils;
 import com.kul.database.constants.SecurityConstants;
 import com.kul.database.model.Authority;
 import com.kul.database.model.User;
+import com.kul.database.model.UserLogin;
 import com.kul.database.repository.AuthorityRepository;
 import com.kul.database.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -32,7 +33,7 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public String authenticate(User user) {
+    public String authenticate(UserLogin user) {
         User repositoryUser = userRepository.findByUsername(user.getUsername());
         if (repositoryUser == null) {
             return null;
@@ -72,7 +73,8 @@ public class JpaUserService implements UserService {
         user.setEnabled(false);
         user.setUsername(passwordEncoder.encode(user.getPassword()));
         if (authorityRepository.findByAuthority(user.getAuthority().getAuthority()) == null) {
-            authorityRepository.save(new Authority(null, user.getAuthority().getAuthority()));
+            Authority authority = authorityRepository.save(new Authority(null, user.getAuthority().getAuthority()));
+            user.setAuthority(authority);
         }
         userRepository.save(user);
         return true;

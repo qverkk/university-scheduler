@@ -29,4 +29,14 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+
+    testImplementation("org.assertj:assertj-core:3.11.1")
+    testImplementation("io.rest-assured:rest-assured:4.1.2")
+    testImplementation("io.rest-assured:json-path:4.1.2")
+    testImplementation("io.rest-assured:json-schema-validator:4.1.2")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+test {
+    useJUnitPlatform()
 }

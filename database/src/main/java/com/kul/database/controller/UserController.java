@@ -1,6 +1,7 @@
 package com.kul.database.controller;
 
 import com.kul.database.model.User;
+import com.kul.database.model.UserLogin;
 import com.kul.database.service.JpaUserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class UserController {
     @PostMapping(
             value = "/auth"
     )
-    public String authUser(@RequestBody User user) {
+    public String authUser(@RequestBody UserLogin user) {
         return service.authenticate(user);
     }
 
