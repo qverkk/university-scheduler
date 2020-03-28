@@ -1,12 +1,19 @@
 package com.kul.database;
 
+import com.kul.database.constants.JwtUtils;
+import com.kul.database.filter.JwtAuthorizationFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -23,6 +30,7 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +43,43 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String DEFAULT_INCLUDE_PATTERN = "/.*";
 
+    private final AuthenticationManager authenticationManager;
+    private final DataSource dataSource;
+    private final UserDetailsService userDetailsService;
+
+    public Main(AuthenticationManager authenticationManager, DataSource dataSource, UserDetailsService userDetailsService) {
+        this.authenticationManager = authenticationManager;
+        this.dataSource = dataSource;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder())
+                .and()
+                .authenticationProvider(authProvider())
+                .jdbcAuthentication()
+                .dataSource(dataSource);
+    }
+
+    private DaoAuthenticationProvider authProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return super.userDetailsService();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and()
@@ -44,10 +89,14 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
                         "/webjars/springfox-swagger-ui/**",
                         "/swagger-resources/**",
                         "/v2/api-docs",
-                        "/swagger-ui.html"
+                        "/swagger-ui.html",
+                        "/auth/auth",
+                        "/auth/register",
+                        "/auth/login"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .addFilter(new JwtAuthorizationFilter(authenticationManager))
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
