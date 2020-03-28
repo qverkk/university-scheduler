@@ -2,6 +2,7 @@ package com.kul.database;
 
 import com.kul.database.constants.JwtUtils;
 import com.kul.database.filter.JwtAuthorizationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -43,15 +44,12 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String DEFAULT_INCLUDE_PATTERN = "/.*";
 
-    private final AuthenticationManager authenticationManager;
-    private final DataSource dataSource;
-    private final UserDetailsService userDetailsService;
-
-    public Main(AuthenticationManager authenticationManager, DataSource dataSource, UserDetailsService userDetailsService) {
-        this.authenticationManager = authenticationManager;
-        this.dataSource = dataSource;
-        this.userDetailsService = userDetailsService;
-    }
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private DataSource dataSource;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -63,7 +61,8 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
                 .dataSource(dataSource);
     }
 
-    private DaoAuthenticationProvider authProvider() {
+    @Bean
+    public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -71,11 +70,13 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     }
 
     @Bean
+    @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Bean
+    @Override
     public UserDetailsService userDetailsService() {
         return super.userDetailsService();
     }
