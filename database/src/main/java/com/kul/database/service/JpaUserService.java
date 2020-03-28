@@ -2,14 +2,17 @@ package com.kul.database.service;
 
 import com.kul.database.constants.JwtUtils;
 import com.kul.database.constants.SecurityConstants;
+import com.kul.database.model.Authorities;
 import com.kul.database.model.Authority;
 import com.kul.database.model.User;
 import com.kul.database.model.UserLogin;
+import com.kul.database.repository.AuthoritiesRepository;
 import com.kul.database.repository.AuthorityRepository;
 import com.kul.database.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,15 +24,17 @@ import org.springframework.stereotype.Service;
 public class JpaUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthorityRepository authorityRepository;
-    private final AuthenticationManager authenticationManager;
+    private final AuthoritiesRepository authoritiesRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthorityRepository authorityRepository;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    public JpaUserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, AuthenticationManager authenticationManager) {
+    public JpaUserService(UserRepository userRepository, AuthoritiesRepository authoritiesRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authorityRepository = authorityRepository;
-        this.authenticationManager = authenticationManager;
+        this.authoritiesRepository = authoritiesRepository;
     }
 
     @Override
@@ -71,12 +76,13 @@ public class JpaUserService implements UserService {
         }
         user.setId(null);
         user.setEnabled(false);
-        user.setUsername(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (authorityRepository.findByAuthority(user.getAuthority().getAuthority()) == null) {
             Authority authority = authorityRepository.save(new Authority(null, user.getAuthority().getAuthority()));
             user.setAuthority(authority);
         }
         userRepository.save(user);
+        authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority().getAuthority()));
         return true;
     }
 }

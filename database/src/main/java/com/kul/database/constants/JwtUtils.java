@@ -1,19 +1,25 @@
 package com.kul.database.constants;
 
 import com.kul.database.model.Authority;
-import com.kul.database.model.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class JwtUtils {
 
     public static String generateToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Authority authority = user.getAuthority();
+        List<String> authority = user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
         byte[] signinKey = SecurityConstants.JWT_SECRET.getBytes();
         String token = Jwts.builder()

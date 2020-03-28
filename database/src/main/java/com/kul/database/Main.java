@@ -70,13 +70,11 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     }
 
     @Bean
-    @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Bean
-    @Override
     public UserDetailsService userDetailsService() {
         return super.userDetailsService();
     }
@@ -91,9 +89,9 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
                         "/swagger-resources/**",
                         "/v2/api-docs",
                         "/swagger-ui.html",
-                        "/auth/auth",
-                        "/auth/register",
-                        "/auth/login"
+                        "/auth/auth*",
+                        "/auth/register*",
+                        "/auth/login*"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()

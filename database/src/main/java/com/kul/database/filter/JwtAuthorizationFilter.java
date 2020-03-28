@@ -50,11 +50,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .build()
                     .parseClaimsJws(token.replace("Bearer ", ""));
             String username = parsedToken.getBody().getSubject();
-            List<SimpleGrantedAuthority> authorities = Arrays.asList(parsedToken.getBody().get("rol").toString().split(",")).stream()
-                    .map(SimpleGrantedAuthority::new)
+            List<String> list = (List<String>) parsedToken.getBody().get("rol");
+            List<SimpleGrantedAuthority> result = list.stream().map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
+//            List<SimpleGrantedAuthority> authorities = Arrays.asList(parsedToken.getBody().get("rol").toString().split(",")).stream()
+//                    .map(SimpleGrantedAuthority::new)
+//                    .collect(Collectors.toList());
             if (!username.isEmpty()) {
-                return new UsernamePasswordAuthenticationToken(username, null, authorities);
+                return new UsernamePasswordAuthenticationToken(username, null, result);
             }
 
         } catch (Exception e) {

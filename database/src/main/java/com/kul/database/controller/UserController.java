@@ -26,7 +26,8 @@ public class UserController {
             value = "/auth"
     )
     public String authUser(@RequestBody UserLogin user) {
-        return service.authenticate(user);
+        String token = service.authenticate(user);
+        return token;
     }
 
     @GetMapping(
