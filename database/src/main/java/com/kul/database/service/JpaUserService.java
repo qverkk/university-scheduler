@@ -1,10 +1,14 @@
 package com.kul.database.service;
 
 import com.kul.database.constants.JwtUtils;
+import com.kul.database.constants.SecurityConstants;
 import com.kul.database.model.Authority;
 import com.kul.database.model.User;
 import com.kul.database.repository.AuthorityRepository;
 import com.kul.database.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,13 +44,23 @@ public class JpaUserService implements UserService {
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = JwtUtils.generateToken(authentication);
-        return token;
+        return JwtUtils.generateToken(authentication);
     }
 
     @Override
     public User loginWithToken(String token) {
-        return null;
+        byte[] signinKey = SecurityConstants.JWT_SECRET.getBytes();
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(signinKey)
+                    .build()
+                    .parseClaimsJws(token.replace("Bearer ", ""));
+            String username = claims.getBody().getSubject();
+            return userRepository.findByUsername(username);
+        } catch (Exception e) {
+            System.err.println("Unable to authenticate user");
+            return null;
+        }
     }
 
     @Override
