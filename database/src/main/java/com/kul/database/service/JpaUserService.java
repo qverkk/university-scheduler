@@ -1,5 +1,6 @@
 package com.kul.database.service;
 
+import com.kul.database.constants.AuthorityEnum;
 import com.kul.database.constants.JwtUtils;
 import com.kul.database.constants.SecurityConstants;
 import com.kul.database.model.Authorities;
@@ -19,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 @Service("User service")
 public class JpaUserService implements UserService {
 
@@ -33,6 +36,20 @@ public class JpaUserService implements UserService {
     public JpaUserService(UserRepository userRepository, AuthoritiesRepository authoritiesRepository) {
         this.userRepository = userRepository;
         this.authoritiesRepository = authoritiesRepository;
+    }
+
+    @PostConstruct
+    public void init() {
+        User user = new User(
+                null,
+                "admin",
+                "admin",
+                "admin",
+                "admin",
+                true,
+                AuthorityEnum.ADMIN
+        );
+        registerUser(user);
     }
 
     @Override
@@ -78,7 +95,11 @@ public class JpaUserService implements UserService {
             return false;
         }
         user.setId(null);
-        user.setEnabled(false);
+        if (!user.getUsername().equals("admin")) {
+            user.setEnabled(false);
+        } else {
+            user.setEnabled(true);
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
