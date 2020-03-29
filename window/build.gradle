@@ -12,5 +12,6 @@ repositories {
 }
 
 dependencies {
+    compile project(":api")
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
 }
