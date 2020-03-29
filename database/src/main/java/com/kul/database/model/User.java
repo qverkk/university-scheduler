@@ -1,10 +1,14 @@
 package com.kul.database.model;
 
+import com.kul.database.constants.AuthorityEnum;
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Entity(name = "scheduler_users")
+@Entity(name = "users")
 @AllArgsConstructor
 @Getter
 @Setter
@@ -19,6 +23,5 @@ public class User {
     private String firstName;
     private String lastName;
     private Boolean enabled;
-    @OneToOne
-    private Authority authority;
+    private AuthorityEnum authority;
 }

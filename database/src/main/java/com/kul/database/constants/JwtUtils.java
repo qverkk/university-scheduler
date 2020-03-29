@@ -1,6 +1,5 @@
 package com.kul.database.constants;
 
-import com.kul.database.model.Authority;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

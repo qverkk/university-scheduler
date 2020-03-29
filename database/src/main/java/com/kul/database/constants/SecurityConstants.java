@@ -6,7 +6,7 @@ public class SecurityConstants {
 
     public static String TOKEN_HEADER = "Authorization";
     public static String TOKEN_PREFIX = "Bearer ";
-    public static String TOKEN_TYPE ="JWT";
-    public static String TOKEN_ISSUER ="secure-api";
-    public static String TOKEN_AUDIENCE ="secure-app";
+    public static String TOKEN_TYPE = "JWT";
+    public static String TOKEN_ISSUER = "secure-api";
+    public static String TOKEN_AUDIENCE = "secure-app";
 }

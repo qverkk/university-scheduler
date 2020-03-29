@@ -1,13 +1,12 @@
 package com.kul.database;
 
-import com.kul.database.constants.JwtUtils;
 import com.kul.database.filter.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,11 +44,16 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     private static final String DEFAULT_INCLUDE_PATTERN = "/.*";
 
     @Autowired
+    @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
     @Autowired
     private DataSource dataSource;
     @Autowired
     private UserDetailsService userDetailsService;
+
+    public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -69,6 +73,7 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
         return authProvider;
     }
 
+    @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
@@ -150,9 +155,5 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
 
     private ApiKey apiKey() {
         return new ApiKey("JWT", AUTHORIZATION_HEADER, "header");
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
     }
 }

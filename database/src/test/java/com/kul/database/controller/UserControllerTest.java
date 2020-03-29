@@ -2,24 +2,18 @@ package com.kul.database.controller;
 
 import com.google.gson.Gson;
 import com.kul.database.constants.AuthorityEnum;
-import com.kul.database.model.Authority;
 import com.kul.database.model.User;
 import com.kul.database.model.UserLogin;
-import jdk.nashorn.internal.objects.annotations.Getter;
-import jdk.nashorn.internal.objects.annotations.Setter;
 import org.junit.Assert;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
 import static io.restassured.RestAssured.given;
@@ -55,7 +49,7 @@ class UserControllerTest {
                 "marek",
                 "filipowicz",
                 false,
-                new Authority(null, AuthorityEnum.ADMIN)
+                AuthorityEnum.ADMIN
         );
     }
 
