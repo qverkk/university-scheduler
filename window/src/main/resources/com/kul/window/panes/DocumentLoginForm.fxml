@@ -13,7 +13,9 @@
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.kul.window.login.LoginController">
     <children>
-        <ImageView fitHeight="400.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true"/>
+        <ImageView fitHeight="400.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../images/logo_kul.jpg"/>
+        </ImageView>
         <AnchorPane layoutX="365.0" layoutY="20.0" prefHeight="360.0" prefWidth="321.0"
                     style="-fx-background-color: #4169E1;">
             <children>

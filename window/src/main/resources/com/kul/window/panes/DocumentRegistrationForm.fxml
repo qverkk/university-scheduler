@@ -32,9 +32,7 @@
             </children>
         </AnchorPane>
         <ImageView fitHeight="113.0" fitWidth="365.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@../images/logo_kul.jpg"/>
-            </image>
+            <Image url="@../images/logo_kul.jpg"/>
         </ImageView>
         <Label layoutX="51.0" layoutY="153.0" text="Welcome to University Scheduler" textFill="#323232">
             <font>
