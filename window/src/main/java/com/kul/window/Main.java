@@ -15,7 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/DocumentLoginForm.fxml"));
-        primaryStage.setTitle("Register panel");
+        primaryStage.setTitle("Registration panel");
         primaryStage.setScene(new Scene(root, 700, 400));
         primaryStage.show();
     }
