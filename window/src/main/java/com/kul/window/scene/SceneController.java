@@ -3,6 +3,7 @@ package com.kul.window.scene;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class SceneController {
 
     private void showScene(String fileName, String windowName, int width, int height) throws IOException {
         Stage primaryStage = new Stage();
+        primaryStage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
         Parent root = FXMLLoader.load(getClass().getResource(fileName));
         primaryStage.setTitle(windowName);
         primaryStage.setScene(new Scene(root, width, height));
