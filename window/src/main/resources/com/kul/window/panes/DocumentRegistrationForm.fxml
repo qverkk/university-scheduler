@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.paint.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
@@ -27,7 +28,7 @@
                                 <JFXTextField focusColor="#17bf2d" promptText="repeat password" unFocusColor="#e8e6e6" />
                                 <JFXTextField focusColor="#17bf2d" promptText="e-mail" unFocusColor="#e8e6e6" />
                                 <JFXTextField focusColor="#17bf2d" promptText="repeat e-mail" unFocusColor="#e8e6e6" />
-                                <JFXButton style="-fx-background-color: #5dade2;" text="Sign Up" />
+                                <JFXButton style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6" />
                             </children>
                         </VBox>
                     </children>
@@ -48,6 +49,6 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <JFXButton layoutX="157.0" layoutY="302.0" style="-fx-background-color: #5dade2;" text="Sign In" />
+      <JFXButton layoutX="157.0" layoutY="302.0" style="-fx-background-color: #5dade2;" text="Sign In" textFill="#e8e6e6" />
     </children>
 </AnchorPane>
