@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -44,8 +46,8 @@ class UserControllerTest {
         gson = new Gson();
         user = new User(
                 null,
-                "qverkk",
-                "qverkk",
+                "qverkk@gmail.com",
+                "qverkkqverkk",
                 "marek",
                 "filipowicz",
                 false,
@@ -81,8 +83,8 @@ class UserControllerTest {
 
     @Test
     @Order(3)
-    public void test_get_auth_token() throws Exception {
-        UserLogin userLogin = new UserLogin("qverkk", "qverkk");
+    public void test_get_auth_token_for_admin() throws Exception {
+        UserLogin userLogin = new UserLogin("admin@admin.com", "admin");
         String json = gson.toJson(userLogin);
         MvcResult result = this.mockMvc.perform(
                 post("/auth/auth")
@@ -91,15 +93,14 @@ class UserControllerTest {
         ).andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
-        String resultToken = result.getResponse().getContentAsString();
-        token = resultToken;
-        Assert.assertNotEquals(token, "");
+        token = result.getResponse().getContentAsString();
+        Assert.assertFalse(token.isEmpty());
 
     }
 
     @Test
     @Order(4)
-    public void test_user_login_success() throws Exception {
+    public void test_admin_login_success() throws Exception {
         MvcResult result = this.mockMvc.perform(
                 get("/auth/login")
                         .param("token", UserControllerTest.token)
@@ -108,10 +109,30 @@ class UserControllerTest {
                 .andReturn();
         String jsonResponse = result.getResponse().getContentAsString();
         User responseUser = gson.fromJson(jsonResponse, User.class);
-        Assert.assertEquals(user.getUsername(), responseUser.getUsername());
-        Assert.assertTrue(passwordEncoder.matches(user.getPassword(), responseUser.getPassword()));
-        Assert.assertEquals(user.getFirstName(), responseUser.getFirstName());
-        Assert.assertEquals(user.getLastName(), responseUser.getLastName());
+        System.out.println(jsonResponse);
+        Assert.assertEquals("admin@admin.com", responseUser.getUsername());
+        Assert.assertTrue(passwordEncoder.matches("admin", responseUser.getPassword()));
+        Assert.assertEquals("admin", responseUser.getFirstName());
+        Assert.assertEquals("admin", responseUser.getLastName());
+    }
+
+    @Test
+    @Order(5)
+    public void test_get_user_token_disabled() throws Exception {
+        UserLogin userLogin = new UserLogin("qverkk", "qverkkqverkk");
+        String json = gson.toJson(userLogin);
+        MvcResult result = this.mockMvc.perform(
+                post("/auth/auth")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(json)
+        ).andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        token = result.getResponse().getContentAsString();
+        Assert.assertEquals("", token);
+//        Optional<DisabledException> resultException = Optional.ofNullable((DisabledException) result.getResolvedException());
+//        Assert.assertTrue(resultException.isPresent());
     }
 
     @AfterAll

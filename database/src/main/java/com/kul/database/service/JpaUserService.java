@@ -14,6 +14,7 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +43,7 @@ public class JpaUserService implements UserService {
     public void init() {
         User user = new User(
                 null,
-                "admin",
+                "admin@admin.com",
                 "admin",
                 "admin",
                 "admin",
@@ -67,6 +68,10 @@ public class JpaUserService implements UserService {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return JwtUtils.generateToken(authentication);
+        } catch (DisabledException e) {
+            System.out.println("TODO: Add catching of exceptions in tests");
+            e.printStackTrace();
+            return "";
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,6 +89,7 @@ public class JpaUserService implements UserService {
             String username = claims.getBody().getSubject();
             return userRepository.findByUsername(username);
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Unable to authenticate user");
             return null;
         }
@@ -95,7 +101,7 @@ public class JpaUserService implements UserService {
             return false;
         }
         user.setId(null);
-        if (!user.getUsername().equals("admin")) {
+        if (!user.getUsername().equals("admin@admin.com")) {
             user.setEnabled(false);
         } else {
             user.setEnabled(true);
