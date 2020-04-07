@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -15,10 +14,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/DocumentLoginForm.fxml"));
-        primaryStage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
+        Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/MainWindow.fxml"));
         primaryStage.setTitle("Login panel");
-        primaryStage.setScene(new Scene(root, 700, 400));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 }

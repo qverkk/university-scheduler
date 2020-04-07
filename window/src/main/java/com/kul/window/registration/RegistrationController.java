@@ -1,5 +1,7 @@
 package com.kul.window.registration;
 
+import com.kul.window.MainController;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 import java.net.URL;
@@ -12,8 +14,19 @@ import java.util.ResourceBundle;
  **/
 
 public class RegistrationController implements Initializable {
+    private MainController mainController;
+
+    @FXML
+    private void goToLoginForm() {
+        mainController.setLoginControls();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 }
