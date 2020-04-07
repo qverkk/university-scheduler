@@ -1,12 +1,10 @@
 package com.kul.database.service;
 
 import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
 
 public interface UserService {
-    String authenticate(UserLogin user);
-
-    User loginWithToken(String token);
-
-    Boolean registerUser(User user);
+    void enableUser(Long id);
+    void deleteUser(Long id);
+    Boolean isUserEnabled(Long id);
+    User getUserById(Long id);
 }
