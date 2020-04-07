@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 @Service("User service")
-public class JpaUserService implements UserService {
+public class JpaAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final AuthoritiesRepository authoritiesRepository;
@@ -34,7 +34,7 @@ public class JpaUserService implements UserService {
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
 
-    public JpaUserService(UserRepository userRepository, AuthoritiesRepository authoritiesRepository) {
+    public JpaAuthService(UserRepository userRepository, AuthoritiesRepository authoritiesRepository) {
         this.userRepository = userRepository;
         this.authoritiesRepository = authoritiesRepository;
     }

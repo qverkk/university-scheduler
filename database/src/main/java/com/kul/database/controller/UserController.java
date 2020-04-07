@@ -1,39 +1,20 @@
 package com.kul.database.controller;
 
-import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
-import com.kul.database.service.JpaUserService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(value = "/user")
 public class UserController {
 
-    private final JpaUserService service;
-
-    public UserController(JpaUserService service) {
-        this.service = service;
-    }
-
     @PostMapping(
-            value = "/register"
+            value = "/enable/{id}"
     )
-    public Boolean registerUser(@RequestBody User user) {
-        return service.registerUser(user);
-    }
+    public Boolean enableUser(HttpServletRequest request, @PathVariable String id) {
+        Principal principal = request.getUserPrincipal();
 
-    @PostMapping(
-            value = "/auth"
-    )
-    public String authUser(@RequestBody UserLogin user) {
-        String token = service.authenticate(user);
-        return token;
-    }
-
-    @GetMapping(
-            value = "/login"
-    )
-    public User loginWithToken(@RequestParam String token) {
-        return service.loginWithToken(token);
+        return false;
     }
 }
