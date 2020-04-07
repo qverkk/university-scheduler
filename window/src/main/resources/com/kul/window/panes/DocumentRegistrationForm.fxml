@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <ImageView fitHeight="400.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true" />
+        <AnchorPane layoutX="365.0" layoutY="19.0" prefHeight="360.0" prefWidth="321.0" style="-fx-background-color: #4169E1;">
+            <children>
+                <JFXScrollPane layoutX="47.0" layoutY="9.0" prefHeight="200.0" prefWidth="221.0">
+                    <children>
+                        <VBox prefHeight="360.0" prefWidth="320.0" style="-fx-background-color: #4169E1;">
+                            <children>
+                                <JFXTextField focusColor="#17bf2d" promptText="imię" unFocusColor="#e8e6e6" />
+                                <JFXTextField focusColor="#17bf2d" promptText="nazwisko" unFocusColor="#e8e6e6" />
+                                <JFXTextField focusColor="#17bf2d" promptText="nickname" unFocusColor="#e8e6e6" />
+                                <JFXTextField focusColor="#17bf2d" promptText="password" unFocusColor="#e8e6e6" />
+                                <JFXTextField focusColor="#17bf2d" promptText="repeat password" unFocusColor="#e8e6e6" />
+                                <JFXTextField focusColor="#17bf2d" promptText="e-mail" unFocusColor="#e8e6e6" />
+                                <JFXTextField focusColor="#17bf2d" promptText="repeat e-mail" unFocusColor="#e8e6e6" />
+                                <JFXButton style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6" />
+                            </children>
+                        </VBox>
+                    </children>
+                </JFXScrollPane>
+            </children>
+        </AnchorPane>
+        <ImageView fitHeight="113.0" fitWidth="365.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/logo_kul.jpg" />
+         </image></ImageView>
+      <Label layoutX="51.0" layoutY="201.0" text="Welcome to University Scheduler" textFill="#323232">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="51.0" layoutY="250.0" text="If you already have an account, go to login">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <JFXButton layoutX="157.0" layoutY="302.0" style="-fx-background-color: #5dade2;" text="Sign In" textFill="#e8e6e6" />
+    </children>
+</AnchorPane>
