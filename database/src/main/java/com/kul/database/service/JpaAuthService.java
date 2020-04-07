@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-@Service("User service")
+@Service("Auth service")
 public class JpaAuthService implements AuthService {
 
     private final UserRepository userRepository;
