@@ -17,6 +17,7 @@ import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -43,6 +44,11 @@ public class RegistrationController implements Initializable {
     @FXML
     private JFXTextField repeatPasswordField;
 
+    @FXML
+    private Label usernameError;
+    @FXML
+    private Label registrationSuccess;
+
     private boolean canRegister() {
         return firstnameField.validate() &&
                 lastnameField.validate() &&
@@ -54,6 +60,8 @@ public class RegistrationController implements Initializable {
 
     @FXML
     void performRegister() {
+        registrationSuccess.setVisible(false);
+        usernameError.setVisible(false);
         if (!canRegister()) {
             return;
         }
@@ -72,9 +80,9 @@ public class RegistrationController implements Initializable {
         );
         try {
             boolean registered = Boolean.parseBoolean(authentication.register(user));
-            System.out.println("Registered");
+            registrationSuccess.setVisible(true);
         } catch (FeignException.Conflict conflict) {
-            System.out.println("User already exist");
+            usernameError.setVisible(true);
         }
     }
 

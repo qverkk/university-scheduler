@@ -3,8 +3,10 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kul.window.registration.RegistrationController">
    <children>
@@ -22,8 +24,12 @@
                      </VBox.margin></JFXTextField>
                   <JFXTextField fx:id="usernameField" focusColor="#17bf2d" promptText="Username (e-mail)" unFocusColor="#e8e6e6">
                      <VBox.margin>
-                        <Insets bottom="20.0" />
+                        <Insets />
                      </VBox.margin></JFXTextField>
+                  <Label fx:id="usernameError" alignment="CENTER" text="Username already taken" textFill="#751815" visible="false">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font></Label>
                   <JFXTextField fx:id="repeatUsernameField" focusColor="#17bf2d" promptText="Repeat username (e-mail)" unFocusColor="#e8e6e6">
                      <VBox.margin>
                         <Insets bottom="20.0" />
@@ -42,6 +48,10 @@
                         <Insets />
                      </VBox.margin>
                   </JFXButton>
+                  <Label fx:id="registrationSuccess" text="SUCCESS! Go and login" textFill="#29cf2e" visible="false">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font></Label>
                   <JFXButton id="sign-up-btn" onAction="#goToLoginForm" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Back to login" textFill="#e8e6e6" />
                </children>
                <padding>
