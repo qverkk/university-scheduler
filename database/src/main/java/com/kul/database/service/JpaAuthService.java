@@ -13,6 +13,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.PostConstruct;
 
@@ -57,10 +59,10 @@ public class JpaAuthService implements AuthService {
     public String authenticate(UserLogin user) {
         User repositoryUser = userRepository.findByUsername(user.getUsername());
         if (repositoryUser == null) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't exist");
         }
         if (!passwordEncoder.matches(user.getPassword(), repositoryUser.getPassword())) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Passwords don't match!");
         }
         try {
             Authentication authentication = authenticationManager.authenticate(

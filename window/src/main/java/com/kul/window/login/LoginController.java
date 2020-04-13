@@ -1,9 +1,17 @@
 package com.kul.window.login;
 
-import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
+import com.kul.api.data.Constants;
+import com.kul.api.http.requests.AuthRequest;
+import com.kul.api.model.UserLogin;
 import com.kul.window.MainController;
+import feign.Feign;
+import feign.FeignException;
+import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,15 +25,55 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     @FXML
-    private JFXButton loginBtn;
+    private JFXTextField usernameField;
     @FXML
-    private JFXButton registrationBtn;
+    private JFXPasswordField passwordField;
+
+    @FXML
+    private Label usernameError;
+    @FXML
+    private Label passwordError;
 
     private MainController mainController;
 
     @FXML
-    public void goToSignUpPanelFromLogin() {
+    void goToSignUpPanelFromLogin() {
         mainController.setRegisterControls();
+    }
+
+    @FXML
+    void forgotPassword() {
+        System.out.println("Forgot password");
+    }
+
+    @FXML
+    void performSignIn() {
+        AuthRequest authentication = Feign.builder()
+                .encoder(new GsonEncoder())
+                .target(AuthRequest.class, Constants.HOST_URL);
+        try {
+            resetErrorFields();
+            String token = authentication.generateToken(
+                    new UserLogin(
+                            usernameField.getText(),
+                            passwordField.getText()
+                    )
+            );
+            mainController.removeNodes();
+        } catch (FeignException.NotFound error) {
+            usernameError.setVisible(true);
+            usernameError.setText("User doesn't exist");
+        } catch (FeignException.Unauthorized unauthorized) {
+            passwordError.setVisible(true);
+            passwordError.setText("Password isn't correct");
+        }
+    }
+
+    private void resetErrorFields() {
+        usernameError.setVisible(false);
+        usernameError.setText("");
+        passwordError.setVisible(false);
+        passwordError.setText("");
     }
 
     @Override
