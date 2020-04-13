@@ -100,7 +100,7 @@ public class JpaAuthService implements AuthService {
     @Override
     public Boolean registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
         }
         user.setId(null);
         if (!user.getUsername().equals("admin@admin.com")) {
