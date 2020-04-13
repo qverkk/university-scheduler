@@ -14,5 +14,4 @@ repositories {
 dependencies {
     compile project(":api")
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
-    compile 'com.jfoenix:jfoenix:8.0.8'
 }

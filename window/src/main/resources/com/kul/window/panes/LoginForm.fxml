@@ -19,27 +19,33 @@
             <Insets bottom="30.0" />
          </VBox.margin>
       </Label>
-      <JFXTextField focusColor="#17bf2d" prefHeight="25.0" prefWidth="179.0" promptText="username" unFocusColor="#e8e6e6">
+      <JFXTextField fx:id="usernameField" focusColor="#17bf2d" prefHeight="25.0" prefWidth="179.0" promptText="username" unFocusColor="#e8e6e6">
          <VBox.margin>
-            <Insets bottom="10.0" />
+            <Insets bottom="5.0" />
          </VBox.margin>
       </JFXTextField>
-      <JFXPasswordField focusColor="#17bf2d" prefHeight="25.0" prefWidth="179.0" promptText="password" unFocusColor="#e8e6e6">
+      <Label fx:id="usernameError" alignment="CENTER" style="-fx-text-fill: red;" visible="false" />
+      <JFXPasswordField fx:id="passwordField" focusColor="#17bf2d" prefHeight="25.0" prefWidth="179.0" promptText="password" unFocusColor="#e8e6e6">
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </JFXPasswordField>
+      <Label fx:id="passwordError" alignment="CENTER" style="-fx-text-fill: red;" visible="false">
          <VBox.margin>
             <Insets bottom="30.0" />
          </VBox.margin>
-      </JFXPasswordField>
-      <JFXButton style="-fx-background-color: #5dade2;" text="Sign In" textFill="#e8e6e6">
+      </Label>
+      <JFXButton onAction="#performSignIn" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign In" textFill="#e8e6e6">
          <VBox.margin>
             <Insets bottom="10.0" />
          </VBox.margin>
       </JFXButton>
-      <JFXButton id="sign-up-btn" onAction="#goToSignUpPanelFromLogin" style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6">
+      <JFXButton id="sign-up-btn" onAction="#goToSignUpPanelFromLogin" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6">
          <VBox.margin>
             <Insets bottom="50.0" />
          </VBox.margin>
       </JFXButton>
-      <Hyperlink text="Forgot Password?" textFill="#e8e6e6" />
+      <Hyperlink alignment="CENTER" onAction="#forgotPassword" prefWidth="300.0" text="Forgot Password?" textFill="#e8e6e6" />
    </children>
    <padding>
       <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />

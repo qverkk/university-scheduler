@@ -1,10 +1,25 @@
 package com.kul.window.login;
 
-import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
+import com.kul.api.data.Constants;
+import com.kul.api.http.requests.AuthRequest;
+import com.kul.api.model.UserLogin;
 import com.kul.window.MainController;
+import feign.Feign;
+import feign.FeignException;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -17,15 +32,62 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     @FXML
-    private JFXButton loginBtn;
+    private JFXTextField usernameField;
     @FXML
-    private JFXButton registrationBtn;
+    private JFXPasswordField passwordField;
+
+    @FXML
+    private Label usernameError;
+    @FXML
+    private Label passwordError;
 
     private MainController mainController;
 
     @FXML
-    public void goToSignUpPanelFromLogin() {
+    void goToSignUpPanelFromLogin() {
         mainController.setRegisterControls();
+    }
+
+    @FXML
+    void forgotPassword() {
+        System.out.println("Forgot password");
+    }
+
+    @FXML
+    void performSignIn() {
+        AuthRequest authentication = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(AuthRequest.class, Constants.HOST_URL);
+        try {
+            resetErrorFields();
+            String token = authentication.generateToken(
+                    new UserLogin(
+                            usernameField.getText(),
+                            passwordField.getText()
+                    )
+            );
+            Constants.loggedInUser = authentication.login(token);
+            openApplication();
+            Stage stage = (Stage) passwordError.getScene().getWindow();
+            stage.close();
+            mainController.removeNodes();
+        } catch (FeignException.NotFound error) {
+            usernameError.setVisible(true);
+            usernameError.setText("User doesn't exist");
+        } catch (FeignException.Unauthorized unauthorized) {
+            passwordError.setVisible(true);
+            passwordError.setText("Password isn't correct");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void resetErrorFields() {
+        usernameError.setVisible(false);
+        usernameError.setText("");
+        passwordError.setVisible(false);
+        passwordError.setText("");
     }
 
     @Override
@@ -35,5 +97,14 @@ public class LoginController implements Initializable {
 
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
+    }
+
+    private void openApplication() throws IOException {
+        Stage stage = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
+        stage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
+        stage.setTitle("KUL Scheduler");
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 }

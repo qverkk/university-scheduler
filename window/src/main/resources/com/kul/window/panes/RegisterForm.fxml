@@ -1,36 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXScrollPane?>
+<?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kul.window.registration.RegistrationController">
+<VBox stylesheets="@../style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kul.window.registration.RegistrationController">
    <children>
-      <JFXScrollPane prefHeight="360.0" prefWidth="321.0">
-         <children>
+      <ScrollPane prefWidth="338.0">
+         <content>
             <VBox alignment="TOP_CENTER" prefHeight="360.0" prefWidth="320.0" spacing="10.0" style="-fx-background-color: #4169E1;">
                <children>
-                  <JFXTextField focusColor="#17bf2d" promptText="imię" unFocusColor="#e8e6e6" />
-                  <JFXTextField focusColor="#17bf2d" promptText="nazwisko" unFocusColor="#e8e6e6" />
-                  <JFXTextField focusColor="#17bf2d" promptText="nickname" unFocusColor="#e8e6e6" />
-                  <JFXTextField focusColor="#17bf2d" promptText="password" unFocusColor="#e8e6e6" />
-                  <JFXTextField focusColor="#17bf2d" promptText="repeat password" unFocusColor="#e8e6e6" />
-                  <JFXTextField focusColor="#17bf2d" promptText="e-mail" unFocusColor="#e8e6e6" />
-                  <JFXTextField focusColor="#17bf2d" promptText="repeat e-mail" unFocusColor="#e8e6e6" />
-                  <JFXButton style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6">
+                  <JFXTextField fx:id="firstnameField" focusColor="#17bf2d" promptText="Firstname" unFocusColor="#e8e6e6">
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin></JFXTextField>
+                  <JFXTextField fx:id="lastnameField" focusColor="#17bf2d" promptText="Lastname" unFocusColor="#e8e6e6">
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin></JFXTextField>
+                  <JFXTextField fx:id="usernameField" focusColor="#17bf2d" promptText="Username (e-mail)" unFocusColor="#e8e6e6">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></JFXTextField>
+                  <Label fx:id="usernameError" alignment="CENTER" text="Username already taken" textFill="#751815" visible="false">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font></Label>
+                  <JFXTextField fx:id="repeatUsernameField" focusColor="#17bf2d" promptText="Repeat username (e-mail)" unFocusColor="#e8e6e6">
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </JFXTextField>
+                  <JFXPasswordField fx:id="passwordField" promptText="Password">
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </JFXPasswordField>
+                  <JFXPasswordField fx:id="repeatPasswordField" promptText="Repeat password">
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </JFXPasswordField>
+                  <JFXButton onAction="#performRegister" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
                   </JFXButton>
-                  <JFXButton id="sign-up-btn" onAction="#goToLoginForm" style="-fx-background-color: #5dade2;" text="Back to login" textFill="#e8e6e6" />
+                  <Label fx:id="registrationSuccess" text="SUCCESS! Go and login" textFill="#29cf2e" visible="false">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font></Label>
+                  <JFXButton id="sign-up-btn" onAction="#goToLoginForm" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Back to login" textFill="#e8e6e6" />
                </children>
                <padding>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                </padding>
             </VBox>
-         </children>
-      </JFXScrollPane>
+         </content>
+      </ScrollPane>
    </children>
 </VBox>

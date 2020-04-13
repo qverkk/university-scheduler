@@ -17,32 +17,45 @@ public class MainController implements Initializable {
     @FXML
     private Pane controlsPane;
 
+    private Node loginNode;
+    private Node registerNode;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setLoginControls();
     }
 
     public void setLoginControls() {
-        setControls("/com/kul/window/panes/LoginForm.fxml");
+        setControls("/com/kul/window/panes/LoginForm.fxml", loginNode);
     }
 
     public void setRegisterControls() {
-        setControls("/com/kul/window/panes/RegisterForm.fxml");
+        setControls("/com/kul/window/panes/RegisterForm.fxml", registerNode);
     }
 
-    private void setControls(String fxmlPath) {
+    private void setControls(String fxmlPath, Node node) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Node node = loader.load();
-            Object controller = loader.getController();
-            if ("/com/kul/window/panes/LoginForm.fxml".equals(fxmlPath)) {
-                ((LoginController) controller).setMainController(this);
-            } else {
-                ((RegistrationController) controller).setMainController(this);
+            controlsPane.getChildren().clear();
+            if (node == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                node = loader.load();
+                Object controller = loader.getController();
+                if ("/com/kul/window/panes/LoginForm.fxml".equals(fxmlPath)) {
+                    ((LoginController) controller).setMainController(this);
+                    loginNode = node;
+                } else {
+                    ((RegistrationController) controller).setMainController(this);
+                    registerNode = node;
+                }
             }
             controlsPane.getChildren().add(node);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void removeNodes() {
+        registerNode = null;
+        loginNode = null;
     }
 }
