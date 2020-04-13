@@ -1,5 +1,6 @@
 package com.kul.window.registration;
 
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RegexValidator;
@@ -45,6 +46,8 @@ public class RegistrationController implements Initializable {
     private JFXPasswordField passwordField;
     @FXML
     private JFXPasswordField repeatPasswordField;
+    @FXML
+    private JFXComboBox<AuthorityEnum> authorityCb;
 
     @FXML
     private Label usernameError;
@@ -78,7 +81,7 @@ public class RegistrationController implements Initializable {
                 firstnameField.getText(),
                 lastnameField.getText(),
                 false,
-                AuthorityEnum.DZIEKANAT
+                authorityCb.getSelectionModel().getSelectedItem()
         );
         try {
             boolean registered = Boolean.parseBoolean(authentication.register(user));
@@ -95,11 +98,17 @@ public class RegistrationController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        addAuthoritiesToComboBox();
         addRequiredValidator();
         addUsernameValidator();
         addUserDetailsValidator();
         addPasswordValidator();
         addFocusPropertyListeners();
+    }
+
+    private void addAuthoritiesToComboBox() {
+        authorityCb.getItems().addAll(AuthorityEnum.DZIEKANAT, AuthorityEnum.PROWADZACY);
+        authorityCb.getSelectionModel().selectFirst();
     }
 
     private void addPasswordValidator() {
