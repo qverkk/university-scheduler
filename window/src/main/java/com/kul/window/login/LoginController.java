@@ -8,11 +8,18 @@ import com.kul.api.model.UserLogin;
 import com.kul.window.MainController;
 import feign.Feign;
 import feign.FeignException;
+import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -50,6 +57,7 @@ public class LoginController implements Initializable {
     void performSignIn() {
         AuthRequest authentication = Feign.builder()
                 .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
                 .target(AuthRequest.class, Constants.HOST_URL);
         try {
             resetErrorFields();
@@ -59,6 +67,10 @@ public class LoginController implements Initializable {
                             passwordField.getText()
                     )
             );
+            Constants.loggedInUser = authentication.login(token);
+            openApplication();
+            Stage stage = (Stage) passwordError.getScene().getWindow();
+            stage.close();
             mainController.removeNodes();
         } catch (FeignException.NotFound error) {
             usernameError.setVisible(true);
@@ -66,6 +78,8 @@ public class LoginController implements Initializable {
         } catch (FeignException.Unauthorized unauthorized) {
             passwordError.setVisible(true);
             passwordError.setText("Password isn't correct");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -83,5 +97,14 @@ public class LoginController implements Initializable {
 
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
+    }
+
+    private void openApplication() throws IOException {
+        Stage stage = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
+        stage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
+        stage.setTitle("KUL Scheduler");
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 }
