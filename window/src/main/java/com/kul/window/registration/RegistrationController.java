@@ -4,10 +4,17 @@ import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.kul.api.data.Constants;
+import com.kul.api.http.requests.AuthRequest;
+import com.kul.api.model.AuthorityEnum;
+import com.kul.api.model.User;
 import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidator;
 import com.kul.api.validators.UserDetailsValidator;
 import com.kul.window.MainController;
+import feign.Feign;
+import feign.FeignException;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
@@ -36,9 +43,39 @@ public class RegistrationController implements Initializable {
     @FXML
     private JFXTextField repeatPasswordField;
 
+    private boolean canRegister() {
+        return firstnameField.validate() &&
+                lastnameField.validate() &&
+                usernameField.validate() &&
+                repeatUsernameField.validate() &&
+                passwordField.validate() &&
+                repeatPasswordField.validate();
+    }
+
     @FXML
     void performRegister() {
-
+        if (!canRegister()) {
+            return;
+        }
+        AuthRequest authentication = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(AuthRequest.class, Constants.HOST_URL);
+        User user = new User(
+                null,
+                usernameField.getText(),
+                passwordField.getText(),
+                firstnameField.getText(),
+                lastnameField.getText(),
+                false,
+                AuthorityEnum.DZIEKANAT
+        );
+        try {
+            boolean registered = Boolean.parseBoolean(authentication.register(user));
+            System.out.println("Registered");
+        } catch (FeignException.Conflict conflict) {
+            System.out.println("User already exist");
+        }
     }
 
     @FXML
