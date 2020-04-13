@@ -1,0 +1,14 @@
+.error-label {
+    -fx-text-fill: darkorange;
+}
+
+.main-menu {
+    -fx-background-color: white;
+}
+
+.jfx-text-field, .jfx-password-field {
+    -fx-prompt-text-fill: #e8e6e6;
+    -jfx-focus-color: #e8e6e6;
+    -jfx-unfocus-color: #e8e6e6;
+    -fx-text-inner-color: #e8e6e6;
+}

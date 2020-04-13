@@ -1,5 +1,6 @@
 package com.kul.window.registration;
 
+import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
@@ -18,6 +19,7 @@ import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -40,9 +42,9 @@ public class RegistrationController implements Initializable {
     @FXML
     private JFXTextField repeatUsernameField;
     @FXML
-    private JFXTextField passwordField;
+    private JFXPasswordField passwordField;
     @FXML
-    private JFXTextField repeatPasswordField;
+    private JFXPasswordField repeatPasswordField;
 
     @FXML
     private Label usernameError;
@@ -158,10 +160,14 @@ public class RegistrationController implements Initializable {
         addFocusPropertyListener(repeatPasswordField);
     }
 
-    private void addFocusPropertyListener(JFXTextField node) {
+    private void addFocusPropertyListener(TextField node) {
         node.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue) {
-                node.validate();
+                if (node instanceof JFXTextField) {
+                    ((JFXTextField) node).validate();
+                } else if (node instanceof JFXPasswordField) {
+                    ((JFXPasswordField) node).validate();
+                }
             }
         });
     }

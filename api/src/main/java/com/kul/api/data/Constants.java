@@ -14,10 +14,10 @@ public class Constants {
     // $                 # end-of-string
     public static final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{12,64}$";
 
-    public static final String PASSWORD_PROMPT = "a digit must occur at least once\n" +
-            "a lower case letter must occur at least once\n" +
-            "an upper case letter must occur at least once\n" +
-            "a special character must occur at least once\n" +
-            "no whitespace allowed in the entire string\n" +
-            "minimum of 12 characters and maximum of 64";
+    public static final String PASSWORD_PROMPT = "minimum 1 digit\n" +
+            "minimum 1 lower case letter\n" +
+            "minimum 1 upper case letter\n" +
+            "minimum 1 special character\n" +
+            "no whitespace allowed\n" +
+            "length between 12 and 64";
 }
