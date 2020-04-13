@@ -17,6 +17,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -40,6 +41,8 @@ public class LoginController implements Initializable {
     private Label usernameError;
     @FXML
     private Label passwordError;
+    @FXML
+    private Text accountLockError;
 
     private MainController mainController;
 
@@ -78,6 +81,9 @@ public class LoginController implements Initializable {
         } catch (FeignException.Unauthorized unauthorized) {
             passwordError.setVisible(true);
             passwordError.setText("Password isn't correct");
+        } catch (FeignException.NotAcceptable notAcceptable) {
+            accountLockError.setVisible(true);
+            accountLockError.setText("Account is locked. Please contact an admin.");
         } catch (IOException e) {
             e.printStackTrace();
         }

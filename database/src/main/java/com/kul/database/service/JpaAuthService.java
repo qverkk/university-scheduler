@@ -71,9 +71,7 @@ public class JpaAuthService implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return JwtUtils.generateToken(authentication);
         } catch (DisabledException e) {
-            System.out.println("TODO: Add catching of exceptions in tests");
-            e.printStackTrace();
-            return "";
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Account isn't enabled");
         } catch (Exception e) {
             e.printStackTrace();
         }
