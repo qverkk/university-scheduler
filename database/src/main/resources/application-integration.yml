@@ -1,0 +1,10 @@
+logging:
+  level:
+    org.zalando.logbook.Logbook: TRACE
+logbook:
+  format:
+    style: http
+  obfuscate:
+    headers:
+      - Authorization
+      - Cookie
