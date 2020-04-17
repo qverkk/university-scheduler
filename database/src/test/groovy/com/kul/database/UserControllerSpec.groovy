@@ -5,13 +5,11 @@ import spock.lang.Stepwise
 
 import static com.kul.database.abilities.dtos.NewUserRequests.aDisabledDeaneryUser
 import static com.kul.database.abilities.dtos.UserLoginRequests.aUser
-import static org.hamcrest.Matchers.contains
-import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalTo
-import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE
+import static org.hamcrest.Matchers.hasSize
+import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
-import static org.springframework.http.HttpStatus.UNAUTHORIZED
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 @Stepwise
@@ -27,8 +25,9 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
 
         then:
             response.statusCode(UNPROCESSABLE_ENTITY.value())
-                    .body(containsString("\"message\":\"Email should be valid\""))
-            response.extract()
+                    .body("errors", hasSize(1))
+                    .body("errors[0].message", equalTo("Email should be valid"))
+                    .body("errors[0].code", equalTo("ConstraintViolationException"))
     }
 
     def 'should respond 404 when user does not exist'() {
@@ -52,7 +51,6 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
         then:
             response.statusCode(OK.value())
                     .body(equalTo("true"))
-            response.extract()
     }
 
     def 'should respond 401 when regular user has disabled token and trying to authenticate'() {
@@ -63,7 +61,7 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
             def response = authenticateUser(request)
 
         then:
-            response.statusCode(NOT_ACCEPTABLE.value())
+            response.statusCode(FORBIDDEN.value())
     }
 
     // etc.

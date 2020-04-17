@@ -11,7 +11,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class MyEndpointExceptionAdvisor extends ResponseEntityExceptionHandler {
+public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<EndpointErrors> handle(ConstraintViolationException exception, WebRequest webRequest) {
