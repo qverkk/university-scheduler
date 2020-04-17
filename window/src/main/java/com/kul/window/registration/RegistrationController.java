@@ -8,6 +8,7 @@ import com.jfoenix.validation.RequiredFieldValidator;
 import com.kul.api.data.Constants;
 import com.kul.api.http.requests.AuthRequest;
 import com.kul.api.model.AuthorityEnum;
+import com.kul.api.model.Displayable;
 import com.kul.api.model.User;
 import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidator;
@@ -47,7 +48,7 @@ public class RegistrationController implements Initializable {
     @FXML
     private JFXPasswordField repeatPasswordField;
     @FXML
-    private JFXComboBox<AuthorityEnum> authorityCb;
+    private JFXComboBox<Displayable<AuthorityEnum>> authorityCb;
 
     @FXML
     private Label usernameError;
@@ -81,7 +82,7 @@ public class RegistrationController implements Initializable {
                 firstnameField.getText(),
                 lastnameField.getText(),
                 false,
-                authorityCb.getSelectionModel().getSelectedItem()
+                authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
         try {
             boolean registered = Boolean.parseBoolean(authentication.register(user));
@@ -107,8 +108,15 @@ public class RegistrationController implements Initializable {
     }
 
     private void addAuthoritiesToComboBox() {
-        authorityCb.getItems().addAll(AuthorityEnum.DZIEKANAT, AuthorityEnum.PROWADZACY);
+        authorityCb.getItems().addAll(
+                getDisplayableFor(AuthorityEnum.DZIEKANAT),
+                getDisplayableFor(AuthorityEnum.PROWADZACY)
+        );
         authorityCb.getSelectionModel().selectFirst();
+    }
+
+    private Displayable<AuthorityEnum> getDisplayableFor(AuthorityEnum authority) {
+        return new Displayable<>(authority, authority.displayName);
     }
 
     private void addPasswordValidator() {

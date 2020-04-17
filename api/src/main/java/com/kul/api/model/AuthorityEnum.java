@@ -1,12 +1,12 @@
 package com.kul.api.model;
 
-public enum AuthorityEnum {
-    ADMIN,
-    DZIEKANAT,
-    PROWADZACY;
+import lombok.AllArgsConstructor;
 
-    @Override
-    public String toString() {
-        return name().charAt(0) + name().substring(1).toLowerCase();
-    }
+@AllArgsConstructor
+public enum AuthorityEnum {
+    ADMIN("Admin"),
+    DZIEKANAT("Dziekanat"),
+    PROWADZACY("Prowadzący");
+
+    public final String displayName;
 }
