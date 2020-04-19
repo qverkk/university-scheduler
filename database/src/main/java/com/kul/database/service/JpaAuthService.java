@@ -6,6 +6,7 @@ import com.kul.database.constants.SecurityConstants;
 import com.kul.database.model.Authorities;
 import com.kul.database.model.User;
 import com.kul.database.model.UserLogin;
+import com.kul.database.model.UserLoginResponse;
 import com.kul.database.repository.AuthoritiesRepository;
 import com.kul.database.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -71,7 +72,7 @@ public class JpaAuthService implements AuthService {
     }
 
     @Override
-    public User loginWithToken(String token) {
+    public UserLoginResponse loginWithToken(String token) {
         byte[] signinKey = SecurityConstants.JWT_SECRET.getBytes();
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
@@ -79,7 +80,14 @@ public class JpaAuthService implements AuthService {
                     .build()
                     .parseClaimsJws(token.replace("Bearer ", ""));
             String username = claims.getBody().getSubject();
-            return userRepository.findByUsername(username);
+
+            final User user = userRepository.findByUsername(username);
+            return new UserLoginResponse(
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getAuthority()
+            );
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Unable to authenticate user");

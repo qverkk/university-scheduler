@@ -1,7 +1,10 @@
 package com.kul.api.validators;
 
 import com.jfoenix.validation.base.ValidatorBase;
+import com.kul.api.data.Constants;
 import javafx.scene.control.TextInputControl;
+
+import java.util.regex.Pattern;
 
 public class UserDetailsValidator extends ValidatorBase {
 
@@ -26,13 +29,13 @@ public class UserDetailsValidator extends ValidatorBase {
         String text = input.getText();
         hasErrors.set(false);
 
-        if (!text.matches("\\w+")) {
-            hasErrors.set(true);
-            return;
-        }
         if (text.length() < min || text.length() > max) {
             hasErrors.set(true);
             return;
+        }
+
+        if (!Constants.SIMPLE_STRING_PATTERN.matcher(text).matches()) {
+            hasErrors.set(true);
         }
     }
 }

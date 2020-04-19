@@ -1,15 +1,18 @@
 package com.kul.database.controller;
 
+import com.kul.database.model.TokenRequest;
 import com.kul.database.model.User;
 import com.kul.database.model.UserLogin;
+import com.kul.database.model.UserLoginResponse;
+import com.kul.database.service.AuthService;
 import com.kul.database.service.JpaAuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+class AuthController {
 
-    private final JpaAuthService service;
+    private final AuthService service;
 
     public AuthController(JpaAuthService service) {
         this.service = service;
@@ -29,10 +32,10 @@ public class AuthController {
         return service.authenticate(user);
     }
 
-    @GetMapping(
+    @PostMapping(
             value = "/login"
     )
-    public User loginWithToken(@RequestParam String token) {
-        return service.loginWithToken(token);
+    public UserLoginResponse loginWithToken(@RequestBody TokenRequest token) {
+        return service.loginWithToken(token.getToken());
     }
 }

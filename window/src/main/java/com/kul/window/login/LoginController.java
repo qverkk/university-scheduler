@@ -4,8 +4,11 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.kul.api.data.Constants;
 import com.kul.api.http.requests.AuthRequest;
+import com.kul.api.model.TokenRequest;
 import com.kul.api.model.UserLogin;
+import com.kul.api.model.UserLoginResponse;
 import com.kul.window.MainController;
+import com.kul.window.application.ApplicationController;
 import feign.Feign;
 import feign.FeignException;
 import feign.gson.GsonDecoder;
@@ -70,8 +73,9 @@ public class LoginController implements Initializable {
                             passwordField.getText()
                     )
             );
-            Constants.loggedInUser = authentication.login(token);
-            openApplication();
+            final UserLoginResponse loggedInUser = authentication.login(new TokenRequest(token));
+            openApplication(loggedInUser);
+
             Stage stage = (Stage) passwordError.getScene().getWindow();
             stage.close();
             mainController.removeNodes();
@@ -81,7 +85,7 @@ public class LoginController implements Initializable {
         } catch (FeignException.Unauthorized unauthorized) {
             passwordError.setVisible(true);
             passwordError.setText("Password isn't correct");
-        } catch (FeignException.NotAcceptable notAcceptable) {
+        } catch (FeignException.Forbidden forbidden) {
             accountLockError.setVisible(true);
             accountLockError.setText("Account is locked. Please contact an admin.");
         } catch (IOException e) {
@@ -105,9 +109,13 @@ public class LoginController implements Initializable {
         this.mainController = mainController;
     }
 
-    private void openApplication() throws IOException {
+    private void openApplication(UserLoginResponse loggedInUser) throws IOException {
         Stage stage = new Stage();
-        Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
+        loader.setController(new ApplicationController(loggedInUser));
+
+        Parent root = loader.load();
         stage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
         stage.setTitle("KUL Scheduler");
         stage.setScene(new Scene(root));

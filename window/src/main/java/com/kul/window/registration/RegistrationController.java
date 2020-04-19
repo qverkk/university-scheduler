@@ -3,13 +3,12 @@ package com.kul.window.registration;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.kul.api.data.Constants;
 import com.kul.api.http.requests.AuthRequest;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
-import com.kul.api.model.User;
+import com.kul.api.model.UserRegistration;
 import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidator;
 import com.kul.api.validators.UserDetailsValidator;
@@ -75,7 +74,7 @@ public class RegistrationController implements Initializable {
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(AuthRequest.class, Constants.HOST_URL);
-        User user = new User(
+        UserRegistration user = new UserRegistration(
                 null,
                 usernameField.getText(),
                 passwordField.getText(),
@@ -147,8 +146,11 @@ public class RegistrationController implements Initializable {
     }
 
     private void addUsernameValidator() {
-        RegexValidator usernameValidator = new RegexValidator("Invalid email, example: example@gmail.com");
-        usernameValidator.setRegexPattern(Constants.EMAIL_REGEX);
+        MatchingValidator usernameValidator = new MatchingValidator(
+                "Invalid email, example: example@gmail.com",
+                () -> Constants.EMAIL_VALIDATOR.isValid(usernameField.getText())
+        );
+
         usernameField.getValidators().add(usernameValidator);
 
         MatchingValidator matchingValidator = new MatchingValidator(

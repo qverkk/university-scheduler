@@ -1,9 +1,10 @@
 package com.kul.api.http.requests;
 
-import com.kul.api.model.User;
+import com.kul.api.model.TokenRequest;
 import com.kul.api.model.UserLogin;
+import com.kul.api.model.UserLoginResponse;
+import com.kul.api.model.UserRegistration;
 import feign.Headers;
-import feign.Param;
 import feign.RequestLine;
 
 public interface AuthRequest {
@@ -13,10 +14,9 @@ public interface AuthRequest {
 
     @RequestLine("POST /auth/register")
     @Headers("Content-Type: application/json")
-    String register(User user);
+    String register(UserRegistration user);
 
-
-    @RequestLine("GET /auth/login?token={token}")
+    @RequestLine("POST /auth/login")
     @Headers("Content-Type: application/json")
-    User login(@Param("token") String token);
+    UserLoginResponse login(TokenRequest token);
 }

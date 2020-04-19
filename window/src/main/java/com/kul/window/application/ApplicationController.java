@@ -1,7 +1,6 @@
 package com.kul.window.application;
 
-import com.kul.api.data.Constants;
-import com.kul.api.model.User;
+import com.kul.api.model.UserLoginResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -14,9 +13,14 @@ public class ApplicationController implements Initializable {
     @FXML
     private Label usernameLabel;
 
+    private final UserLoginResponse user;
+
+    public ApplicationController(UserLoginResponse user) {
+        this.user = user;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        User user = Constants.loggedInUser;
         usernameLabel.setText(
                 String.format("%s %s", user.getFirstName(), user.getLastName())
         );
