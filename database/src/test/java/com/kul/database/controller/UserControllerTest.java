@@ -3,7 +3,7 @@ package com.kul.database.controller;
 import com.google.gson.Gson;
 import com.kul.database.constants.AuthorityEnum;
 import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
+import com.kul.database.model.UserLoginRequest;
 import org.junit.Assert;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,7 @@ class UserControllerTest {
     @Test
     @Order(2)
     public void get_regular_user_token_disabled_exception() throws Exception {
-        UserLogin userLogin = new UserLogin(user.getUsername(), user.getPassword());
+        UserLoginRequest userLogin = new UserLoginRequest(user.getUsername(), user.getPassword());
         String json = gson.toJson(userLogin);
         MvcResult result = this.mockMvc.perform(
                 post("/auth/auth")
@@ -89,7 +89,7 @@ class UserControllerTest {
     @Test
     @Order(3)
     public void get_admin_token() throws Exception {
-        UserLogin userLogin = new UserLogin("admin@admin.com", "admin");
+        UserLoginRequest userLogin = new UserLoginRequest("admin@admin.com", "admin");
         String json = gson.toJson(userLogin);
         MvcResult result = this.mockMvc.perform(
                 post("/auth/auth")

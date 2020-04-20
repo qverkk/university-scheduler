@@ -25,14 +25,14 @@ class AuthController {
     @PostMapping(
             value = "/auth"
     )
-    public String authUser(@RequestBody UserLogin user) {
-        return service.authenticate(user);
+    public UserLoginResponse authUser(@RequestBody UserLoginRequest user) {
+        return new UserLoginResponse(service.authenticate(user));
     }
 
     @PostMapping(
             value = "/login"
     )
-    public UserLoginResponse loginWithToken(@RequestBody TokenRequest token) {
+    public UserLoginWithTokenResponse loginWithToken(@RequestBody TokenRequest token) {
         return service.loginWithToken(token.getToken());
     }
 }

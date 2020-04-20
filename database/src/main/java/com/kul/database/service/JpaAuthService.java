@@ -53,7 +53,7 @@ public class JpaAuthService implements AuthService {
     }
 
     @Override
-    public String authenticate(UserLogin user) {
+    public String authenticate(UserLoginRequest user) {
         User repositoryUser = userRepository.findByUsername(user.getUsername());
         if (repositoryUser == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't exist");
@@ -69,7 +69,7 @@ public class JpaAuthService implements AuthService {
     }
 
     @Override
-    public UserLoginResponse loginWithToken(String token) {
+    public UserLoginWithTokenResponse loginWithToken(String token) {
         byte[] signinKey = SecurityConstants.JWT_SECRET.getBytes();
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
@@ -79,7 +79,7 @@ public class JpaAuthService implements AuthService {
             String username = claims.getBody().getSubject();
 
             final User user = userRepository.findByUsername(username);
-            return new UserLoginResponse(
+            return new UserLoginWithTokenResponse(
                     user.getUsername(),
                     user.getFirstName(),
                     user.getLastName(),
