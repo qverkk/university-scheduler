@@ -1,9 +1,6 @@
 package com.kul.database.controller;
 
-import com.kul.database.model.TokenRequest;
-import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
-import com.kul.database.model.UserLoginResponse;
+import com.kul.database.model.*;
 import com.kul.database.service.AuthService;
 import com.kul.database.service.JpaAuthService;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +18,7 @@ class AuthController {
     @PostMapping(
             value = "/register"
     )
-    public Boolean registerUser(@RequestBody User user) {
+    public UserRegistrationResponse registerUser(@RequestBody User user) {
         return service.registerUser(user);
     }
 

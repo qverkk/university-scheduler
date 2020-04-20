@@ -1,6 +1,6 @@
 package com.kul.window.application;
 
-import com.kul.api.model.UserLoginResponse;
+import com.kul.api.domain.user.authorization.UserInfo;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -10,12 +10,12 @@ import java.util.ResourceBundle;
 
 public class ApplicationController implements Initializable {
 
+    private final UserInfo user;
+
     @FXML
     private Label usernameLabel;
 
-    private final UserLoginResponse user;
-
-    public ApplicationController(UserLoginResponse user) {
+    public ApplicationController(UserInfo user) {
         this.user = user;
     }
 

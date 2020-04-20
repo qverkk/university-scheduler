@@ -1,5 +1,7 @@
 package com.kul.window;
 
+import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
+import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.window.login.LoginController;
 import com.kul.window.registration.RegistrationController;
 import javafx.fxml.FXML;
@@ -14,11 +16,19 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
+    private final LoginController loginController;
+    private final RegistrationController registrationController;
+
     @FXML
     private Pane controlsPane;
 
     private Node loginNode;
     private Node registerNode;
+
+    public MainController(UserRegistration userRegistration, UserAuthorizationFacade userAuthorizationFacade) {
+        this.loginController = new LoginController(this, userAuthorizationFacade);
+        this.registrationController = new RegistrationController(this, userRegistration);
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -26,25 +36,23 @@ public class MainController implements Initializable {
     }
 
     public void setLoginControls() {
-        setControls("/com/kul/window/panes/LoginForm.fxml", loginNode);
+        setControls("/com/kul/window/panes/LoginForm.fxml", loginNode, loginController);
     }
 
     public void setRegisterControls() {
-        setControls("/com/kul/window/panes/RegisterForm.fxml", registerNode);
+        setControls("/com/kul/window/panes/RegisterForm.fxml", registerNode, registrationController);
     }
 
-    private void setControls(String fxmlPath, Node node) {
+    private void setControls(String fxmlPath, Node node, Initializable controller) {
         try {
             controlsPane.getChildren().clear();
             if (node == null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                loader.setController(controller);
                 node = loader.load();
-                Object controller = loader.getController();
                 if ("/com/kul/window/panes/LoginForm.fxml".equals(fxmlPath)) {
-                    ((LoginController) controller).setMainController(this);
                     loginNode = node;
                 } else {
-                    ((RegistrationController) controller).setMainController(this);
                     registerNode = node;
                 }
             }

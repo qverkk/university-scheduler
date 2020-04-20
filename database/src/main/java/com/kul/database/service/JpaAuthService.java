@@ -3,10 +3,7 @@ package com.kul.database.service;
 import com.kul.database.constants.AuthorityEnum;
 import com.kul.database.constants.JwtUtils;
 import com.kul.database.constants.SecurityConstants;
-import com.kul.database.model.Authorities;
-import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
-import com.kul.database.model.UserLoginResponse;
+import com.kul.database.model.*;
 import com.kul.database.repository.AuthoritiesRepository;
 import com.kul.database.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -96,7 +93,7 @@ public class JpaAuthService implements AuthService {
     }
 
     @Override
-    public Boolean registerUser(User user) {
+    public UserRegistrationResponse registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
         }
@@ -107,8 +104,8 @@ public class JpaAuthService implements AuthService {
             user.setEnabled(true);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
-        return true;
+        return new UserRegistrationResponse(savedUser.getId(), true);
     }
 }

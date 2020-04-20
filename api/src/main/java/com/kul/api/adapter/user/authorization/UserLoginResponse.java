@@ -1,12 +1,12 @@
-package com.kul.api.model;
+package com.kul.api.adapter.user.authorization;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-public class TokenRequest {
+public class UserLoginResponse {
     private String token;
 }

@@ -4,19 +4,17 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
+import com.kul.api.adapter.user.registration.UserRegistrationFacade;
 import com.kul.api.data.Constants;
-import com.kul.api.http.requests.AuthRequest;
+import com.kul.api.domain.user.registration.NewUser;
+import com.kul.api.domain.user.registration.RegistrationInfo;
+import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
-import com.kul.api.model.UserRegistration;
 import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidation;
 import com.kul.api.validators.UserDetailsValidator;
 import com.kul.window.MainController;
-import feign.Feign;
-import feign.FeignException;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -32,7 +30,9 @@ import java.util.ResourceBundle;
  **/
 
 public class RegistrationController implements Initializable {
+
     private MainController mainController;
+    private UserRegistration userRegistration;
 
     @FXML
     private JFXTextField firstnameField;
@@ -54,6 +54,11 @@ public class RegistrationController implements Initializable {
     @FXML
     private Label registrationSuccess;
 
+    public RegistrationController(MainController mainController, UserRegistration userRegistration) {
+        this.mainController = mainController;
+        this.userRegistration = userRegistration;
+    }
+
     private boolean canRegister() {
         return firstnameField.validate() &&
                 lastnameField.validate() &&
@@ -70,23 +75,18 @@ public class RegistrationController implements Initializable {
         if (!canRegister()) {
             return;
         }
-        AuthRequest authentication = Feign.builder()
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .target(AuthRequest.class, Constants.HOST_URL);
-        UserRegistration user = new UserRegistration(
-                null,
+        NewUser user = new NewUser(
                 usernameField.getText(),
                 passwordField.getText(),
                 firstnameField.getText(),
                 lastnameField.getText(),
-                false,
                 authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
-        try {
-            boolean registered = Boolean.parseBoolean(authentication.register(user));
+
+        final RegistrationInfo registrationInfo = new UserRegistration(new UserRegistrationFacade()).register(user);
+        if (registrationInfo.getSuccess()) {
             registrationSuccess.setVisible(true);
-        } catch (FeignException.Conflict conflict) {
+        } else {
             usernameError.setVisible(true);
         }
     }
@@ -189,9 +189,5 @@ public class RegistrationController implements Initializable {
                 }
             }
         });
-    }
-
-    public void setMainController(MainController mainController) {
-        this.mainController = mainController;
     }
 }
