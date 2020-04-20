@@ -7,6 +7,7 @@ import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.api.domain.user.authorization.UserAuthorization;
 import com.kul.api.domain.user.authorization.UserInfo;
 import feign.Feign;
+import feign.FeignException;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 
@@ -18,14 +19,22 @@ public class UserAuthorizationFacade implements UserAuthorization {
             .target(AuthEndpointClient.class, Constants.HOST_URL);
 
     @Override
-    public ExistingUserToken authenticate(ExistingUser existingUser) {
-        final UserLoginRequest userLoginRequest = new UserLoginRequest(
-                existingUser.getUsername(),
-                existingUser.getPassword()
-        );
+    public ExistingUserToken authenticate(ExistingUser existingUser) throws UserAccountDisabledException, UserLoginWrongPasswordException, UserLoginAccountDoesntExistException {
+        try {
+            final UserLoginRequest userLoginRequest = new UserLoginRequest(
+                    existingUser.getUsername(),
+                    existingUser.getPassword()
+            );
 
-        UserLoginResponse token = authentication.generateToken(userLoginRequest);
-        return new ExistingUserToken(token.getToken());
+            UserLoginResponse token = authentication.generateToken(userLoginRequest);
+            return new ExistingUserToken(token.getToken());
+        } catch (FeignException.NotFound error) {
+            throw new UserLoginAccountDoesntExistException();
+        } catch (FeignException.Unauthorized unauthorized) {
+            throw new UserLoginWrongPasswordException();
+        } catch (FeignException.Forbidden forbidden) {
+            throw new UserAccountDisabledException();
+        }
     }
 
     @Override

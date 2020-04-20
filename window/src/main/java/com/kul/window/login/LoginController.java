@@ -2,7 +2,10 @@ package com.kul.window.login;
 
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import com.kul.api.adapter.user.authorization.UserAccountDisabledException;
 import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
+import com.kul.api.adapter.user.authorization.UserLoginAccountDoesntExistException;
+import com.kul.api.adapter.user.authorization.UserLoginWrongPasswordException;
 import com.kul.api.domain.user.authorization.ExistingUser;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.api.domain.user.authorization.UserInfo;
@@ -75,13 +78,13 @@ public class LoginController implements Initializable {
             Stage stage = (Stage) passwordError.getScene().getWindow();
             stage.close();
             mainController.removeNodes();
-        } catch (FeignException.NotFound error) {
+        } catch (UserLoginAccountDoesntExistException accountDoesntExistException) {
             usernameError.setVisible(true);
             usernameError.setText("User doesn't exist");
-        } catch (FeignException.Unauthorized unauthorized) {
+        } catch (UserLoginWrongPasswordException passwordException) {
             passwordError.setVisible(true);
             passwordError.setText("Password isn't correct");
-        } catch (FeignException.Forbidden forbidden) {
+        } catch (UserAccountDisabledException userAccountDisabledException) {
             accountLockError.setVisible(true);
             accountLockError.setText("Account is locked. Please contact an admin.");
         } catch (IOException e) {
