@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<VBox alignment="CENTER" maxHeight="360.0" maxWidth="321.0" minHeight="360.0" minWidth="321.0" prefHeight="360.0" prefWidth="321.0" style="-fx-background-color: #4169E1;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kul.window.login.LoginController">
+<VBox alignment="CENTER" maxHeight="360.0" maxWidth="321.0" minHeight="360.0" minWidth="321.0" prefHeight="360.0" prefWidth="321.0" style="-fx-background-color: #4169E1;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label text="Sign In" textFill="#e8e6e6">
          <font>

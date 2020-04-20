@@ -3,7 +3,7 @@ package com.kul.database.controller;
 import com.google.gson.Gson;
 import com.kul.database.constants.AuthorityEnum;
 import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
+import com.kul.database.model.UserLoginRequest;
 import org.junit.Assert;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ class AuthControllerTest {
     @Test
     @Order(3)
     public void test_get_auth_token_for_admin() throws Exception {
-        UserLogin userLogin = new UserLogin("admin@admin.com", "admin");
+        UserLoginRequest userLogin = new UserLoginRequest("admin@admin.com", "admin");
         String json = gson.toJson(userLogin);
         MvcResult result = this.mockMvc.perform(
                 post("/auth/auth")
@@ -107,7 +107,6 @@ class AuthControllerTest {
                 .andReturn();
         String jsonResponse = result.getResponse().getContentAsString();
         User responseUser = gson.fromJson(jsonResponse, User.class);
-        System.out.println(jsonResponse);
         Assert.assertEquals("admin@admin.com", responseUser.getUsername());
         Assert.assertTrue(passwordEncoder.matches("admin", responseUser.getPassword()));
         Assert.assertEquals("admin", responseUser.getFirstName());
@@ -117,7 +116,7 @@ class AuthControllerTest {
     @Test
     @Order(5)
     public void test_get_user_token_disabled() throws Exception {
-        UserLogin userLogin = new UserLogin("qverkk", "qverkkqverkk");
+        UserLoginRequest userLogin = new UserLoginRequest("qverkk", "qverkkqverkk");
         String json = gson.toJson(userLogin);
         MvcResult result = this.mockMvc.perform(
                 post("/auth/auth")
@@ -129,8 +128,6 @@ class AuthControllerTest {
 
         token = result.getResponse().getContentAsString();
         Assert.assertEquals("", token);
-//        Optional<DisabledException> resultException = Optional.ofNullable((DisabledException) result.getResolvedException());
-//        Assert.assertTrue(resultException.isPresent());
     }
 
     @AfterAll

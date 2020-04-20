@@ -1,5 +1,6 @@
-package com.kul.api.model;
+package com.kul.api.adapter.user.registration;
 
+import com.kul.api.model.AuthorityEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class UserRegistrationRequest {
     private Long id;
     private String username;
     private String password;

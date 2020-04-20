@@ -50,7 +50,8 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
 
         then:
             response.statusCode(OK.value())
-                    .body(equalTo("true"))
+                    .body("newUserAssignedId", equalTo(2))
+                    .body("success", equalTo(true))
     }
 
     def 'should respond 401 when regular user has disabled token and trying to authenticate'() {
@@ -63,6 +64,4 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
         then:
             response.statusCode(FORBIDDEN.value())
     }
-
-    // etc.
 }

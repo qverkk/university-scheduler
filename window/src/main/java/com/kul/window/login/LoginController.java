@@ -2,14 +2,16 @@ package com.kul.window.login;
 
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import com.kul.api.data.Constants;
-import com.kul.api.http.requests.AuthRequest;
-import com.kul.api.model.UserLogin;
+import com.kul.api.adapter.user.authorization.UserAccountDisabledException;
+import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
+import com.kul.api.adapter.user.authorization.UserLoginAccountDoesntExistException;
+import com.kul.api.adapter.user.authorization.UserLoginWrongPasswordException;
+import com.kul.api.domain.user.authorization.ExistingUser;
+import com.kul.api.domain.user.authorization.ExistingUserToken;
+import com.kul.api.domain.user.authorization.UserInfo;
 import com.kul.window.MainController;
-import feign.Feign;
+import com.kul.window.application.ApplicationController;
 import feign.FeignException;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -32,11 +34,13 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
+    private final MainController mainController;
+    private final UserAuthorizationFacade userAuthorizationFacade;
+
     @FXML
     private JFXTextField usernameField;
     @FXML
     private JFXPasswordField passwordField;
-
     @FXML
     private Label usernameError;
     @FXML
@@ -44,7 +48,10 @@ public class LoginController implements Initializable {
     @FXML
     private Text accountLockError;
 
-    private MainController mainController;
+    public LoginController(MainController mainController, UserAuthorizationFacade userAuthorizationFacade) {
+        this.mainController = mainController;
+        this.userAuthorizationFacade = userAuthorizationFacade;
+    }
 
     @FXML
     void goToSignUpPanelFromLogin() {
@@ -53,35 +60,31 @@ public class LoginController implements Initializable {
 
     @FXML
     void forgotPassword() {
-        System.out.println("Forgot password");
+        // TODO: Add forgot password functionality
     }
 
     @FXML
     void performSignIn() {
-        AuthRequest authentication = Feign.builder()
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .target(AuthRequest.class, Constants.HOST_URL);
         try {
             resetErrorFields();
-            String token = authentication.generateToken(
-                    new UserLogin(
-                            usernameField.getText(),
-                            passwordField.getText()
-                    )
+            final ExistingUser existingUser = new ExistingUser(
+                    usernameField.getText(),
+                    passwordField.getText()
             );
-            Constants.loggedInUser = authentication.login(token);
-            openApplication();
+            final ExistingUserToken existingUserToken = userAuthorizationFacade.authenticate(existingUser);
+            final UserInfo userInfo = userAuthorizationFacade.loginWithToken(existingUserToken);
+            openApplication(userInfo);
+
             Stage stage = (Stage) passwordError.getScene().getWindow();
             stage.close();
             mainController.removeNodes();
-        } catch (FeignException.NotFound error) {
+        } catch (UserLoginAccountDoesntExistException accountDoesntExistException) {
             usernameError.setVisible(true);
             usernameError.setText("User doesn't exist");
-        } catch (FeignException.Unauthorized unauthorized) {
+        } catch (UserLoginWrongPasswordException passwordException) {
             passwordError.setVisible(true);
             passwordError.setText("Password isn't correct");
-        } catch (FeignException.NotAcceptable notAcceptable) {
+        } catch (UserAccountDisabledException userAccountDisabledException) {
             accountLockError.setVisible(true);
             accountLockError.setText("Account is locked. Please contact an admin.");
         } catch (IOException e) {
@@ -101,13 +104,13 @@ public class LoginController implements Initializable {
 
     }
 
-    public void setMainController(MainController mainController) {
-        this.mainController = mainController;
-    }
-
-    private void openApplication() throws IOException {
+    private void openApplication(UserInfo userInfo) throws IOException {
         Stage stage = new Stage();
-        Parent root = FXMLLoader.load(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
+        loader.setController(new ApplicationController(userInfo));
+
+        Parent root = loader.load();
         stage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
         stage.setTitle("KUL Scheduler");
         stage.setScene(new Scene(root));

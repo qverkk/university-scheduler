@@ -1,4 +1,4 @@
-package com.kul.api.model;
+package com.kul.api.domain.user.authorization;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLogin {
+public class ExistingUser {
     private String username;
     private String password;
 }

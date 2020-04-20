@@ -1,12 +1,14 @@
 package com.kul.database.service;
 
 import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
+import com.kul.database.model.UserLoginRequest;
+import com.kul.database.model.UserLoginWithTokenResponse;
+import com.kul.database.model.UserRegistrationResponse;
 
 public interface AuthService {
-    String authenticate(UserLogin user);
+    String authenticate(UserLoginRequest user);
 
-    User loginWithToken(String token);
+    UserLoginWithTokenResponse loginWithToken(String token);
 
-    Boolean registerUser(User user);
+    UserRegistrationResponse registerUser(User user);
 }

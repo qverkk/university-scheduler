@@ -3,21 +3,20 @@ package com.kul.window.registration;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
+import com.kul.api.adapter.user.registration.UserAccountAlreadyExistException;
+import com.kul.api.adapter.user.registration.UserAccountCreationException;
+import com.kul.api.adapter.user.registration.UserRepositoryFacade;
 import com.kul.api.data.Constants;
-import com.kul.api.http.requests.AuthRequest;
+import com.kul.api.domain.user.registration.NewUser;
+import com.kul.api.domain.user.registration.RegistrationInfo;
+import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
-import com.kul.api.model.User;
 import com.kul.api.validators.MatchingValidator;
-import com.kul.api.validators.PasswordValidator;
+import com.kul.api.validators.PasswordValidation;
 import com.kul.api.validators.UserDetailsValidator;
 import com.kul.window.MainController;
-import feign.Feign;
-import feign.FeignException;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -33,7 +32,9 @@ import java.util.ResourceBundle;
  **/
 
 public class RegistrationController implements Initializable {
+
     private MainController mainController;
+    private UserRegistration userRegistration;
 
     @FXML
     private JFXTextField firstnameField;
@@ -55,6 +56,11 @@ public class RegistrationController implements Initializable {
     @FXML
     private Label registrationSuccess;
 
+    public RegistrationController(MainController mainController, UserRegistration userRegistration) {
+        this.mainController = mainController;
+        this.userRegistration = userRegistration;
+    }
+
     private boolean canRegister() {
         return firstnameField.validate() &&
                 lastnameField.validate() &&
@@ -71,24 +77,23 @@ public class RegistrationController implements Initializable {
         if (!canRegister()) {
             return;
         }
-        AuthRequest authentication = Feign.builder()
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .target(AuthRequest.class, Constants.HOST_URL);
-        User user = new User(
-                null,
+        NewUser user = new NewUser(
                 usernameField.getText(),
                 passwordField.getText(),
                 firstnameField.getText(),
                 lastnameField.getText(),
-                false,
                 authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
+
         try {
-            boolean registered = Boolean.parseBoolean(authentication.register(user));
+            final RegistrationInfo registrationInfo = userRegistration.register(user);
+            registrationSuccess.setText("Success registering account");
             registrationSuccess.setVisible(true);
-        } catch (FeignException.Conflict conflict) {
+        } catch (UserAccountAlreadyExistException accountAlreadyExistException) {
             usernameError.setVisible(true);
+        } catch (UserAccountCreationException e) {
+            registrationSuccess.setVisible(true);
+            registrationSuccess.setText("Failure registrating account");
         }
     }
 
@@ -120,8 +125,8 @@ public class RegistrationController implements Initializable {
     }
 
     private void addPasswordValidator() {
-        PasswordValidator passwordValidator = new PasswordValidator(Constants.PASSWORD_PROMPT);
-        passwordField.getValidators().add(passwordValidator);
+        PasswordValidation passwordValidation = new PasswordValidation(Constants.PASSWORD_PROMPT);
+        passwordField.getValidators().add(passwordValidation);
 
         MatchingValidator matchingValidator = new MatchingValidator(
                 "Passwords don't match",
@@ -147,8 +152,11 @@ public class RegistrationController implements Initializable {
     }
 
     private void addUsernameValidator() {
-        RegexValidator usernameValidator = new RegexValidator("Invalid email, example: example@gmail.com");
-        usernameValidator.setRegexPattern(Constants.EMAIL_REGEX);
+        MatchingValidator usernameValidator = new MatchingValidator(
+                "Invalid email, example: example@gmail.com",
+                () -> Constants.EMAIL_VALIDATOR.isValid(usernameField.getText())
+        );
+
         usernameField.getValidators().add(usernameValidator);
 
         MatchingValidator matchingValidator = new MatchingValidator(
@@ -187,9 +195,5 @@ public class RegistrationController implements Initializable {
                 }
             }
         });
-    }
-
-    public void setMainController(MainController mainController) {
-        this.mainController = mainController;
     }
 }

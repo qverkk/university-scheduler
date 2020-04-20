@@ -3,14 +3,14 @@ package com.kul.database.service;
 import com.kul.database.constants.AuthorityEnum;
 import com.kul.database.constants.JwtUtils;
 import com.kul.database.constants.SecurityConstants;
-import com.kul.database.model.Authorities;
-import com.kul.database.model.User;
-import com.kul.database.model.UserLogin;
+import com.kul.database.model.*;
 import com.kul.database.repository.AuthoritiesRepository;
 import com.kul.database.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -26,6 +26,8 @@ import javax.annotation.PostConstruct;
 
 @Service("Auth service")
 public class JpaAuthService implements AuthService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JpaAuthService.class);
 
     private final UserRepository userRepository;
     private final AuthoritiesRepository authoritiesRepository;
@@ -55,7 +57,7 @@ public class JpaAuthService implements AuthService {
     }
 
     @Override
-    public String authenticate(UserLogin user) {
+    public String authenticate(UserLoginRequest user) {
         User repositoryUser = userRepository.findByUsername(user.getUsername());
         if (repositoryUser == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't exist");
@@ -71,7 +73,7 @@ public class JpaAuthService implements AuthService {
     }
 
     @Override
-    public User loginWithToken(String token) {
+    public UserLoginWithTokenResponse loginWithToken(String token) {
         byte[] signinKey = SecurityConstants.JWT_SECRET.getBytes();
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
@@ -79,16 +81,22 @@ public class JpaAuthService implements AuthService {
                     .build()
                     .parseClaimsJws(token.replace("Bearer ", ""));
             String username = claims.getBody().getSubject();
-            return userRepository.findByUsername(username);
+
+            final User user = userRepository.findByUsername(username);
+            return new UserLoginWithTokenResponse(
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getAuthority()
+            );
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Unable to authenticate user");
+            LOGGER.error("Unable to authenticate user", e);
             return null;
         }
     }
 
     @Override
-    public Boolean registerUser(User user) {
+    public UserRegistrationResponse registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
         }
@@ -99,8 +107,8 @@ public class JpaAuthService implements AuthService {
             user.setEnabled(true);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
-        return true;
+        return new UserRegistrationResponse(savedUser.getId(), true);
     }
 }

@@ -3,14 +3,10 @@ package com.kul.database.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserLogin {
-    private String username;
-    private String password;
+@AllArgsConstructor
+@Getter
+public class UserLoginResponse {
+    private String token;
 }
-
