@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
+import com.kul.api.adapter.user.registration.UserAccountAlreadyExistException;
 import com.kul.api.adapter.user.registration.UserRegistrationFacade;
 import com.kul.api.data.Constants;
 import com.kul.api.domain.user.registration.NewUser;
@@ -83,10 +84,10 @@ public class RegistrationController implements Initializable {
                 authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
 
-        final RegistrationInfo registrationInfo = new UserRegistration(new UserRegistrationFacade()).register(user);
-        if (registrationInfo.getSuccess()) {
+        try {
+            final RegistrationInfo registrationInfo = new UserRegistration(new UserRegistrationFacade()).register(user);
             registrationSuccess.setVisible(true);
-        } else {
+        } catch (UserAccountAlreadyExistException accountAlreadyExistException) {
             usernameError.setVisible(true);
         }
     }

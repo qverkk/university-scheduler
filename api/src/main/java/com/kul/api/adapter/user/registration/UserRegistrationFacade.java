@@ -7,6 +7,7 @@ import com.kul.api.domain.user.registration.RegistrationInfo;
 import com.kul.api.domain.user.registration.User;
 import com.kul.api.domain.user.registration.UserRepository;
 import feign.Feign;
+import feign.FeignException;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 
@@ -18,7 +19,7 @@ public class UserRegistrationFacade implements UserRepository {
             .target(AuthEndpointClient.class, Constants.HOST_URL);
 
     @Override
-    public RegisteredInfo save(User user) {
+    public RegisteredInfo save(User user) throws UserAccountAlreadyExistException {
         final UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(
                 user.getId(),
                 user.getUsername(),
@@ -29,10 +30,13 @@ public class UserRegistrationFacade implements UserRepository {
                 user.getAuthority()
         );
 
-        final UserRegistrationResponse userRegistrationResponse = authentication.register(userRegistrationRequest);
-        user.setId(userRegistrationResponse.getNewUserAssignedId());
-        // TODO: if not successful, then throw an exception
-        // TODO: catch feign conflict
-        return RegisteredInfo.from(user, new RegistrationInfo(user.getId(), userRegistrationResponse.getSuccess()));
+        try {
+            final UserRegistrationResponse userRegistrationResponse = authentication.register(userRegistrationRequest);
+            user.setId(userRegistrationResponse.getNewUserAssignedId());
+
+            return RegisteredInfo.from(user, new RegistrationInfo(user.getId(), userRegistrationResponse.getSuccess()));
+        } catch (FeignException.Conflict conflict) {
+            throw new UserAccountAlreadyExistException();
+        }
     }
 }
