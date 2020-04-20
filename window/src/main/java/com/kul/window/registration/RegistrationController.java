@@ -10,7 +10,7 @@ import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
 import com.kul.api.model.UserRegistration;
 import com.kul.api.validators.MatchingValidator;
-import com.kul.api.validators.PasswordValidator;
+import com.kul.api.validators.PasswordValidation;
 import com.kul.api.validators.UserDetailsValidator;
 import com.kul.window.MainController;
 import feign.Feign;
@@ -119,8 +119,8 @@ public class RegistrationController implements Initializable {
     }
 
     private void addPasswordValidator() {
-        PasswordValidator passwordValidator = new PasswordValidator(Constants.PASSWORD_PROMPT);
-        passwordField.getValidators().add(passwordValidator);
+        PasswordValidation passwordValidation = new PasswordValidation(Constants.PASSWORD_PROMPT);
+        passwordField.getValidators().add(passwordValidation);
 
         MatchingValidator matchingValidator = new MatchingValidator(
                 "Passwords don't match",

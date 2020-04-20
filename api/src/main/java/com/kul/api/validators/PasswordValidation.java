@@ -1,16 +1,25 @@
 package com.kul.api.validators;
 
 import com.jfoenix.controls.JFXPasswordField;
-import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.base.ValidatorBase;
-import com.kul.api.data.Constants;
 import javafx.geometry.Insets;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.VBox;
+import org.passay.*;
 
-public class PasswordValidator extends ValidatorBase {
+import java.util.Arrays;
 
-    public PasswordValidator(String message) {
+public class PasswordValidation extends ValidatorBase {
+
+    private static final PasswordValidator PASSWORD_VALIDATOR = new PasswordValidator(Arrays.asList(
+            new LengthRule(12, 64),
+            new CharacterRule(EnglishCharacterData.UpperCase, 1),
+            new CharacterRule(EnglishCharacterData.LowerCase, 1),
+            new CharacterRule(EnglishCharacterData.Digit, 1),
+            new CharacterRule(EnglishCharacterData.Special, 1)
+    ));
+
+    public PasswordValidation(String message) {
         super(message);
     }
 
@@ -27,7 +36,11 @@ public class PasswordValidator extends ValidatorBase {
         hasErrors.set(false);
 
         JFXPasswordField control = (JFXPasswordField) srcControl.get();
-        if (!text.matches(Constants.PASSWORD_REGEX)) {
+
+        RuleResult result = PASSWORD_VALIDATOR.validate(new PasswordData(text));
+
+//        if (!text.matches(Constants.PASSWORD_REGEX)) {
+        if (!result.isValid()) {
             hasErrors.set(true);
             VBox.setMargin(control, new Insets(0, 0, 100, 0));
         } else {
