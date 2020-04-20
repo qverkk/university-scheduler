@@ -7,10 +7,8 @@ import java.util.Objects;
 @Getter
 public class RegistrationInfo {
     private final Long newUserAssignedId;
-    private final Boolean success;
 
-    public RegistrationInfo(Long newUserAssignedId, Boolean success) {
+    public RegistrationInfo(Long newUserAssignedId) {
         this.newUserAssignedId = Objects.requireNonNull(newUserAssignedId, "User id cannot be null");
-        this.success = success;
     }
 }

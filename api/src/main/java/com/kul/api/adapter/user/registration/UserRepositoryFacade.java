@@ -27,15 +27,12 @@ public class UserRepositoryFacade implements UserRepository {
 
         try {
             final UserRegistrationResponse userRegistrationResponse = authentication.register(userRegistrationRequest);
-            user.setId(userRegistrationResponse.getNewUserAssignedId());
+            final User resultUser = user.setId(userRegistrationResponse.getNewUserAssignedId());
 
-            System.out.println(userRegistrationResponse.getNewUserAssignedId());
-            System.out.println(userRegistrationResponse.getSuccess());
             if (!userRegistrationResponse.getSuccess()) {
                 throw new UserAccountCreationException();
             }
-            return user;
-//            return RegisteredInfo.from(user, new RegistrationInfo(user.getId(), userRegistrationResponse.getSuccess()));
+            return resultUser;
         } catch (FeignException.Conflict conflict) {
             throw new UserAccountAlreadyExistException();
         }

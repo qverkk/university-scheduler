@@ -107,7 +107,6 @@ class AuthControllerTest {
                 .andReturn();
         String jsonResponse = result.getResponse().getContentAsString();
         User responseUser = gson.fromJson(jsonResponse, User.class);
-        System.out.println(jsonResponse);
         Assert.assertEquals("admin@admin.com", responseUser.getUsername());
         Assert.assertTrue(passwordEncoder.matches("admin", responseUser.getPassword()));
         Assert.assertEquals("admin", responseUser.getFirstName());
@@ -129,8 +128,6 @@ class AuthControllerTest {
 
         token = result.getResponse().getContentAsString();
         Assert.assertEquals("", token);
-//        Optional<DisabledException> resultException = Optional.ofNullable((DisabledException) result.getResolvedException());
-//        Assert.assertTrue(resultException.isPresent());
     }
 
     @AfterAll

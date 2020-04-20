@@ -90,7 +90,7 @@ public class JpaAuthService implements AuthService {
                     user.getAuthority()
             );
         } catch (Exception e) {
-            LOGGER.error("Unable to authenticate user");
+            LOGGER.error("Unable to authenticate user", e);
             return null;
         }
     }

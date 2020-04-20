@@ -60,7 +60,7 @@ public class LoginController implements Initializable {
 
     @FXML
     void forgotPassword() {
-        System.out.println("Forgot password");
+        // TODO: Add forgot password functionality
     }
 
     @FXML

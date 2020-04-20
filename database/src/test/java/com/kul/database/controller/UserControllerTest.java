@@ -82,8 +82,6 @@ class UserControllerTest {
         Optional<Exception> resolvedException = Optional.ofNullable((Exception) result.getResolvedException());
         resolvedException.ifPresent(Assert::assertNotNull);
         resolvedException.ifPresent(e -> Assert.assertTrue(e instanceof DisabledException));
-//        regularUserToken = result.getResponse().getContentAsString();
-//        Assert.assertFalse(regularUserToken.isEmpty());
     }
 
     @Test
@@ -149,7 +147,6 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String response = result.getResponse().getContentAsString();
-        System.out.println(response);
         Assert.assertFalse(response.isEmpty());
     }
 

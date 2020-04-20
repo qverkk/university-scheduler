@@ -11,6 +11,6 @@ public class UserRegistration {
     public RegistrationInfo register(NewUser newUser) throws UserAccountAlreadyExistException, UserAccountCreationException {
         User notRegistered = User.from(newUser);
         User registered = usersRepository.save(notRegistered);
-        return new RegistrationInfo(registered.getId(), true);
+        return new RegistrationInfo(registered.getId());
     }
 }

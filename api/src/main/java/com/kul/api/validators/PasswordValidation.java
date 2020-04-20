@@ -39,7 +39,6 @@ public class PasswordValidation extends ValidatorBase {
 
         RuleResult result = PASSWORD_VALIDATOR.validate(new PasswordData(text));
 
-//        if (!text.matches(Constants.PASSWORD_REGEX)) {
         if (!result.isValid()) {
             hasErrors.set(true);
             VBox.setMargin(control, new Insets(0, 0, 100, 0));

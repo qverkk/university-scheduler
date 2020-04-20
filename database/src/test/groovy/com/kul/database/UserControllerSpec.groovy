@@ -64,6 +64,4 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
         then:
             response.statusCode(FORBIDDEN.value())
     }
-
-    // etc.
 }
