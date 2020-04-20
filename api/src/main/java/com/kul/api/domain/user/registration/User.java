@@ -13,6 +13,16 @@ public class User {
     Boolean enabled;
     AuthorityEnum authority;
 
+    public User(Long id, String username, String password, String firstName, String lastName, Boolean enabled, AuthorityEnum authority) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.enabled = enabled;
+        this.authority = authority;
+    }
+
     public User(String username, String password, String firstName, String lastName, AuthorityEnum authority) {
         this(null, username, password, firstName, lastName, false, authority);
     }
