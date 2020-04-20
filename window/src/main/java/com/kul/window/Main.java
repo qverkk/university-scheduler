@@ -1,7 +1,9 @@
 package com.kul.window;
 
 import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
-import com.kul.api.adapter.user.registration.UserRegistrationFacade;
+import com.kul.api.adapter.user.external.AuthEndpointClient;
+import com.kul.api.adapter.user.external.AuthEndpointClientFactory;
+import com.kul.api.adapter.user.registration.UserRepositoryFacade;
 import com.kul.api.domain.user.registration.UserRegistration;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,10 +14,13 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    private final AuthEndpointClient authEndpointClient = new AuthEndpointClientFactory().create();
+
     private final UserRegistration userRegistration = new UserRegistration(
-            new UserRegistrationFacade()
+            new UserRepositoryFacade(authEndpointClient)
     );
-    private final UserAuthorizationFacade userAuthorizationFacade = new UserAuthorizationFacade();
+
+    private final UserAuthorizationFacade userAuthorizationFacade = new UserAuthorizationFacade(authEndpointClient);
 
     public static void main(String[] args) {
         launch(args);

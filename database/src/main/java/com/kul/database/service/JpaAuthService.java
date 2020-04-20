@@ -9,6 +9,8 @@ import com.kul.database.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,8 @@ import javax.annotation.PostConstruct;
 
 @Service("Auth service")
 public class JpaAuthService implements AuthService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JpaAuthService.class);
 
     private final UserRepository userRepository;
     private final AuthoritiesRepository authoritiesRepository;
@@ -86,8 +90,7 @@ public class JpaAuthService implements AuthService {
                     user.getAuthority()
             );
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Unable to authenticate user");
+            LOGGER.error("Unable to authenticate user");
             return null;
         }
     }

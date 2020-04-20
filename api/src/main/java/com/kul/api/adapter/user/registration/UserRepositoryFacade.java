@@ -1,25 +1,20 @@
 package com.kul.api.adapter.user.registration;
 
 import com.kul.api.adapter.user.external.AuthEndpointClient;
-import com.kul.api.data.Constants;
-import com.kul.api.domain.user.registration.RegisteredInfo;
-import com.kul.api.domain.user.registration.RegistrationInfo;
 import com.kul.api.domain.user.registration.User;
 import com.kul.api.domain.user.registration.UserRepository;
-import feign.Feign;
 import feign.FeignException;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 
-public class UserRegistrationFacade implements UserRepository {
+public class UserRepositoryFacade implements UserRepository {
 
-    private final AuthEndpointClient authentication = Feign.builder()
-            .encoder(new GsonEncoder())
-            .decoder(new GsonDecoder())
-            .target(AuthEndpointClient.class, Constants.HOST_URL);
+    private final AuthEndpointClient authentication;
+
+    public UserRepositoryFacade(AuthEndpointClient authentication) {
+        this.authentication = authentication;
+    }
 
     @Override
-    public RegisteredInfo save(User user) throws UserAccountAlreadyExistException {
+    public User save(User user) throws UserAccountAlreadyExistException, UserAccountCreationException {
         final UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(
                 user.getId(),
                 user.getUsername(),
@@ -34,7 +29,13 @@ public class UserRegistrationFacade implements UserRepository {
             final UserRegistrationResponse userRegistrationResponse = authentication.register(userRegistrationRequest);
             user.setId(userRegistrationResponse.getNewUserAssignedId());
 
-            return RegisteredInfo.from(user, new RegistrationInfo(user.getId(), userRegistrationResponse.getSuccess()));
+            System.out.println(userRegistrationResponse.getNewUserAssignedId());
+            System.out.println(userRegistrationResponse.getSuccess());
+            if (!userRegistrationResponse.getSuccess()) {
+                throw new UserAccountCreationException();
+            }
+            return user;
+//            return RegisteredInfo.from(user, new RegistrationInfo(user.getId(), userRegistrationResponse.getSuccess()));
         } catch (FeignException.Conflict conflict) {
             throw new UserAccountAlreadyExistException();
         }

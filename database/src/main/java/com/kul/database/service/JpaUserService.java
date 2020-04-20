@@ -18,17 +18,14 @@ public class JpaUserService implements UserService {
     @Override
     public void enableUser(Long id) {
         userRepository.findById(id).ifPresent(u -> {
-            System.out.println("Is present, enabling:");
             u.setEnabled(true);
             userRepository.save(u);
-            System.out.println("Enabled: " + u.getEnabled());
         });
     }
 
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
-        System.out.println("Deleted");
     }
 
     @Override

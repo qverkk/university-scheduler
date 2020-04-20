@@ -5,7 +5,8 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.kul.api.adapter.user.registration.UserAccountAlreadyExistException;
-import com.kul.api.adapter.user.registration.UserRegistrationFacade;
+import com.kul.api.adapter.user.registration.UserAccountCreationException;
+import com.kul.api.adapter.user.registration.UserRepositoryFacade;
 import com.kul.api.data.Constants;
 import com.kul.api.domain.user.registration.NewUser;
 import com.kul.api.domain.user.registration.RegistrationInfo;
@@ -85,10 +86,14 @@ public class RegistrationController implements Initializable {
         );
 
         try {
-            final RegistrationInfo registrationInfo = new UserRegistration(new UserRegistrationFacade()).register(user);
+            final RegistrationInfo registrationInfo = userRegistration.register(user);
+            registrationSuccess.setText("Success registering account");
             registrationSuccess.setVisible(true);
         } catch (UserAccountAlreadyExistException accountAlreadyExistException) {
             usernameError.setVisible(true);
+        } catch (UserAccountCreationException e) {
+            registrationSuccess.setVisible(true);
+            registrationSuccess.setText("Failure registrating account");
         }
     }
 

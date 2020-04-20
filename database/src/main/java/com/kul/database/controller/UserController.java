@@ -24,10 +24,8 @@ class UserController {
     public void enableUser(HttpServletRequest request, @PathVariable Long id) {
         Principal principal = request.getUserPrincipal();
         if (!principal.getName().equals("admin@admin.com")) {
-            System.out.println("Not admin");
             return;
         }
-        System.out.println("admin");
         service.enableUser(id);
     }
 
@@ -37,10 +35,8 @@ class UserController {
     public void deleteUser(HttpServletRequest request, @PathVariable Long id) {
         Principal principal = request.getUserPrincipal();
         if (!principal.getName().equals("admin@admin.com")) {
-            System.out.println("Not admin");
             return;
         }
-        System.out.println("admin");
         service.deleteUser(id);
     }
 

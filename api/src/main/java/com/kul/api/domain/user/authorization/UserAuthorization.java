@@ -5,6 +5,6 @@ import com.kul.api.adapter.user.authorization.UserLoginAccountDoesntExistExcepti
 import com.kul.api.adapter.user.authorization.UserLoginWrongPasswordException;
 
 public interface UserAuthorization {
-    ExistingUserToken authenticate(ExistingUser existingUser) throws Exception, UserAccountDisabledException, UserLoginWrongPasswordException, UserLoginAccountDoesntExistException;
+    ExistingUserToken authenticate(ExistingUser existingUser) throws UserAccountDisabledException, UserLoginWrongPasswordException, UserLoginAccountDoesntExistException;
     UserInfo loginWithToken(ExistingUserToken userToken);
 }

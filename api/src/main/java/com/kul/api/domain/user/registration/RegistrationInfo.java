@@ -13,8 +13,4 @@ public class RegistrationInfo {
         this.newUserAssignedId = Objects.requireNonNull(newUserAssignedId, "User id cannot be null");
         this.success = success;
     }
-
-//    public static RegistrationInfo from(User user) {
-//        return new RegistrationInfo(user.getId());
-//    }
 }

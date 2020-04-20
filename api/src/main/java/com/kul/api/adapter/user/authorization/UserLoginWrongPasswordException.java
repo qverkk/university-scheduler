@@ -1,4 +1,4 @@
 package com.kul.api.adapter.user.authorization;
 
-public class UserLoginWrongPasswordException extends Throwable {
+public class UserLoginWrongPasswordException extends Exception {
 }
