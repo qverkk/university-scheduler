@@ -2,10 +2,14 @@ package com.kul.window.login;
 
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import com.kul.api.adapter.admin.external.ManagementEndpointClient;
+import com.kul.api.adapter.admin.external.ManagementEndpointClientFactory;
+import com.kul.api.adapter.admin.management.ManagementUserRepositoryFacade;
 import com.kul.api.adapter.user.authorization.UserAccountDisabledException;
 import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
 import com.kul.api.adapter.user.authorization.UserLoginAccountDoesntExistException;
 import com.kul.api.adapter.user.authorization.UserLoginWrongPasswordException;
+import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.ExistingUser;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.api.domain.user.authorization.UserInfo;
@@ -119,10 +123,16 @@ public class LoginController implements Initializable {
 
 
     private void openAdminPanel(UserInfo userInfo, ExistingUserToken existingUserToken) throws IOException {
+        ManagementEndpointClient endpointClient = new ManagementEndpointClientFactory(existingUserToken).create();
+
+        UserManagement userManagement = new UserManagement(
+                new ManagementUserRepositoryFacade(endpointClient)
+        );
+
         changeWindow(
                 "/com/kul/window/panes/AdminWindow.fxml",
                 "KUL Scheduler Admin panel",
-                new AdminController(userInfo, existingUserToken)
+                new AdminController(userInfo, userManagement)
         );
     }
 
