@@ -10,9 +10,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -70,7 +72,9 @@ public class AdminController implements Initializable {
             public TableCell<UserProperty, String> call(final TableColumn<UserProperty, String> param) {
                 final TableCell<UserProperty, String> cell = new TableCell<UserProperty, String>() {
 
-                    final Button btn = new Button("Enable");
+                    final Button enableBtn = new Button("Enable");
+                    final Button disableBtn = new Button("Disable");
+                    final HBox pane = new HBox();
 
                     @Override
                     public void updateItem(String item, boolean empty) {
@@ -78,11 +82,30 @@ public class AdminController implements Initializable {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            btn.setOnAction(event -> {
-                                UserProperty person = getTableView().getItems().get(getIndex());
-                                // TODO: Make call to endpoint to enable user
+                            UserProperty person = getTableView().getItems().get(getIndex());
+                            if (userInfo.getUsername().equals(person.getUsername())) {
+                                enableBtn.setDisable(true);
+                                disableBtn.setDisable(true);
+                            } else {
+                                final boolean enabled = person.enabledProperty().get();
+                                disableBtn.setDisable(!enabled);
+                                enableBtn.setDisable(enabled);
+                            }
+
+                            final Long userId = Long.valueOf(person.getId());
+                            enableBtn.setOnAction(event -> {
+                                userManagement.enableUser(userId);
+                                refreshUsers();
                             });
-                            setGraphic(btn);
+                            disableBtn.setOnAction(event -> {
+                                userManagement.disableUser(userId);
+                                refreshUsers();
+                            });
+
+                            if (!pane.getChildren().containsAll(Arrays.asList(enableBtn, disableBtn))) {
+                                pane.getChildren().addAll(enableBtn, disableBtn);
+                            }
+                            setGraphic(pane);
                         }
                         setText(null);
                     }

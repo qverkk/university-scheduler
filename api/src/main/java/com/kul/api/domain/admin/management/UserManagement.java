@@ -11,4 +11,12 @@ public class UserManagement {
     public List<ManagedUser> getAllUsers() {
         return usersRepository.getAllUsers();
     }
+
+    public void enableUser(Long id) {
+        usersRepository.enableUser(id);
+    }
+
+    public void disableUser(Long id) {
+        usersRepository.disableUser(id);
+    }
 }

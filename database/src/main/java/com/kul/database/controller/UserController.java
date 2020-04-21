@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,18 @@ class UserController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
         service.enableUser(id);
+    }
+
+    @PostMapping(
+            value = "/disable/{id}"
+    )
+    public void disableUser(HttpServletRequest request, @PathVariable Long id) {
+        Principal principal = request.getUserPrincipal();
+        User user = service.getUserByUsername(principal.getName());
+        if (user == null || user.getAuthority() == AuthorityEnum.PROWADZACY) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
+        }
+        service.disableUser(id);
     }
 
     @DeleteMapping(

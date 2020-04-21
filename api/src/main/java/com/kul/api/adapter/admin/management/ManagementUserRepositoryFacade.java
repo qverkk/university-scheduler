@@ -28,4 +28,14 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                 )
         ).collect(Collectors.toList());
     }
+
+    @Override
+    public void enableUser(Long id) {
+        client.enableUser(id);
+    }
+
+    @Override
+    public void disableUser(Long id) {
+        client.disableUser(id);
+    }
 }

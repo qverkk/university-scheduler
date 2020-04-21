@@ -25,6 +25,14 @@ public class JpaUserService implements UserService {
     }
 
     @Override
+    public void disableUser(Long id) {
+        userRepository.findById(id).ifPresent(u -> {
+            u.setEnabled(false);
+            userRepository.save(u);
+        });
+    }
+
+    @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
