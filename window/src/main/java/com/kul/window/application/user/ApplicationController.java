@@ -1,4 +1,4 @@
-package com.kul.window.application;
+package com.kul.window.application.user;
 
 import com.kul.api.domain.user.authorization.UserInfo;
 import javafx.fxml.FXML;

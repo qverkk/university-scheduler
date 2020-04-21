@@ -9,9 +9,10 @@ import com.kul.api.adapter.user.authorization.UserLoginWrongPasswordException;
 import com.kul.api.domain.user.authorization.ExistingUser;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.api.domain.user.authorization.UserInfo;
+import com.kul.api.model.AuthorityEnum;
 import com.kul.window.MainController;
-import com.kul.window.application.ApplicationController;
-import feign.FeignException;
+import com.kul.window.application.admin.AdminController;
+import com.kul.window.application.user.ApplicationController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -73,7 +74,11 @@ public class LoginController implements Initializable {
             );
             final ExistingUserToken existingUserToken = userAuthorizationFacade.authenticate(existingUser);
             final UserInfo userInfo = userAuthorizationFacade.loginWithToken(existingUserToken);
-            openApplication(userInfo);
+            if (userInfo.getAuthority() == AuthorityEnum.ADMIN) {
+                openAdminPanel(userInfo, existingUserToken);
+            } else {
+                openApplication(userInfo);
+            }
 
             Stage stage = (Stage) passwordError.getScene().getWindow();
             stage.close();
@@ -105,14 +110,31 @@ public class LoginController implements Initializable {
     }
 
     private void openApplication(UserInfo userInfo) throws IOException {
+        changeWindow(
+                "/com/kul/window/panes/MainApplication.fxml",
+                "KUL Scheduler",
+                new ApplicationController(userInfo)
+        );
+    }
+
+
+    private void openAdminPanel(UserInfo userInfo, ExistingUserToken existingUserToken) throws IOException {
+        changeWindow(
+                "/com/kul/window/panes/AdminWindow.fxml",
+                "KUL Scheduler Admin panel",
+                new AdminController(userInfo, existingUserToken)
+        );
+    }
+
+    private void changeWindow(String resource, String windowTitle, Initializable controller) throws IOException {
         Stage stage = new Stage();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/kul/window/panes/MainApplication.fxml"));
-        loader.setController(new ApplicationController(userInfo));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(resource));
+        loader.setController(controller);
 
         Parent root = loader.load();
         stage.getIcons().add(new Image("/com/kul/window/images/KUL_icon.jpg"));
-        stage.setTitle("KUL Scheduler");
+        stage.setTitle(windowTitle);
         stage.setScene(new Scene(root));
         stage.show();
     }
