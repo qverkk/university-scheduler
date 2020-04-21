@@ -30,8 +30,9 @@ class UserController {
     )
     public void enableUser(HttpServletRequest request, @PathVariable Long id) {
         Principal principal = request.getUserPrincipal();
-        if (!principal.getName().equals("admin@admin.com")) {
-            return;
+        User user = service.getUserByUsername(principal.getName());
+        if (user == null || user.getAuthority() == AuthorityEnum.PROWADZACY) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
         service.enableUser(id);
     }
