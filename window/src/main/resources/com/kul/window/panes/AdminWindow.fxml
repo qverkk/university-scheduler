@@ -37,15 +37,15 @@
         <tabs>
           <Tab text="Users">
                <content>
-                  <TableView prefHeight="200.0" prefWidth="200.0">
+                  <TableView fx:id="usersTable" prefHeight="200.0" prefWidth="200.0">
                     <columns>
-                      <TableColumn prefWidth="50.0" text="Id" />
-                      <TableColumn prefWidth="115.0" text="Firstname" />
-                        <TableColumn prefWidth="115.0" text="Lastname" />
-                        <TableColumn prefWidth="115.0" text="Username" />
-                        <TableColumn prefWidth="115.0" text="Enabled" />
-                        <TableColumn prefWidth="115.0" text="Authority" />
-                        <TableColumn prefWidth="175.0" text="Actions" />
+                      <TableColumn fx:id="idCol" prefWidth="50.0" text="Id" />
+                      <TableColumn fx:id="firstnameCol" prefWidth="115.0" text="Firstname" />
+                        <TableColumn fx:id="lastnameCol" prefWidth="115.0" text="Lastname" />
+                        <TableColumn fx:id="usernameCol" prefWidth="115.0" text="Username" />
+                        <TableColumn fx:id="enabledCol" prefWidth="115.0" text="Enabled" />
+                        <TableColumn fx:id="authorityCol" prefWidth="115.0" text="Authority" />
+                        <TableColumn fx:id="actionsCol" prefWidth="175.0" text="Actions" />
                     </columns>
                   </TableView>
                </content>
@@ -55,7 +55,7 @@
       </TabPane>
       <HBox alignment="TOP_CENTER" prefWidth="200.0">
          <children>
-            <JFXButton buttonType="RAISED" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh users" />
+            <JFXButton fx:id="refreshUsersButton" buttonType="RAISED" onAction="#refreshUsers" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh users" />
          </children>
       </HBox>
    </children>
