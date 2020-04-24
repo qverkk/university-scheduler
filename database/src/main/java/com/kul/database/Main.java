@@ -131,7 +131,8 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
                     AuthorityEnum.DZIEKANAT.name()
                 )
                 .antMatchers(
-                        "/user/delete/*"
+                        "/user/delete/*",
+                        "/user/all"
                 ).hasAuthority(AuthorityEnum.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()

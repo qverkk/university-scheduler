@@ -80,7 +80,7 @@ public class JpaUserService implements UserService {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
-        } else if (user.hasAccessToAllUserData()) {
+        } else if (!user.hasAccessToAllUserData()) {
             throw new InsufficientPersmissionsToGetAllUserData(username);
         }
         return userRepository.findAll();
