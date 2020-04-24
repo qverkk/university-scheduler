@@ -1,6 +1,6 @@
 package com.kul.window.application.user;
 
-import com.kul.window.application.data.GUIUserInfo;
+import com.kul.window.application.data.UserInfoViewModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -10,12 +10,12 @@ import java.util.ResourceBundle;
 
 public class ApplicationController implements Initializable {
 
-    private final GUIUserInfo user;
+    private final UserInfoViewModel user;
 
     @FXML
     private Label usernameLabel;
 
-    public ApplicationController(GUIUserInfo user) {
+    public ApplicationController(UserInfoViewModel user) {
         this.user = user;
     }
 

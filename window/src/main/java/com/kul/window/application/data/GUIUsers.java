@@ -12,17 +12,17 @@ import java.util.stream.Collectors;
 
 public class GUIUsers implements Users {
 
-    private final List<User> users = new LinkedList<>();
+    private final List<UserInfoViewModel> users = new LinkedList<>();
     private final AdminController adminController;
-    private final ObservableList<User> observableUsers = FXCollections.observableList(users);
-    private boolean fetchingLocked = false;
+    private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
+    private volatile boolean fetchingLocked = false;
 
     public GUIUsers(AdminController adminController) {
         this.adminController = adminController;
     }
 
     @Override
-    public ObservableList<User> users() {
+    public ObservableList<UserInfoViewModel> users() {
         return observableUsers;
     }
 
@@ -57,8 +57,8 @@ public class GUIUsers implements Users {
         users.clear();
         new Thread(() -> {
             final List<ManagedUser> requestedUsers = adminController.getUserManagement().getAllUsers();
-            List<User> userPropertyList = requestedUsers.stream().map(u ->
-                    new GUIUserInfo(
+            List<UserInfoViewModel> userPropertyList = requestedUsers.stream().map(u ->
+                    new UserInfoViewModel(
                             u.getId(),
                             u.getFirstName(),
                             u.getLastName(),

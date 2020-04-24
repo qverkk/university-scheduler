@@ -1,5 +1,6 @@
 package com.kul.window.login;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.kul.api.adapter.admin.external.ManagementEndpointClient;
@@ -16,9 +17,11 @@ import com.kul.api.domain.user.authorization.UserInfo;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.window.MainController;
 import com.kul.window.application.admin.AdminController;
-import com.kul.window.application.data.GUIUserInfo;
+import com.kul.window.application.data.UserInfoViewModel;
 import com.kul.window.application.user.ApplicationController;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -55,7 +58,12 @@ public class LoginController implements Initializable {
     @FXML
     private Text accountLockError;
 
-    private boolean actionsLocked = false;
+    @FXML
+    private JFXButton loginButton;
+    @FXML
+    private JFXButton registerButton;
+
+    private BooleanProperty actionsLocked = new SimpleBooleanProperty(false);
 
     public LoginController(MainController mainController, UserAuthorizationFacade userAuthorizationFacade) {
         this.mainController = mainController;
@@ -64,9 +72,6 @@ public class LoginController implements Initializable {
 
     @FXML
     void goToSignUpPanelFromLogin() {
-        if (actionsLocked) {
-            return;
-        }
         mainController.setRegisterControls();
     }
 
@@ -77,21 +82,18 @@ public class LoginController implements Initializable {
 
     @FXML
     void performSignIn() {
-        if (actionsLocked) {
-            return;
-        }
         resetErrorFields();
         final ExistingUser existingUser = new ExistingUser(
                 usernameField.getText(),
                 passwordField.getText()
         );
-        actionsLocked = true;
+        actionsLocked.set(true);
         new Thread(() -> {
             try {
                 final ExistingUserToken existingUserToken = userAuthorizationFacade.authenticate(existingUser);
                 final UserInfo userInfo = userAuthorizationFacade.loginWithToken(existingUserToken);
 
-                final GUIUserInfo guiUserInfo = new GUIUserInfo(
+                final UserInfoViewModel guiUserInfo = new UserInfoViewModel(
                         0L,
                         userInfo.getFirstName(),
                         userInfo.getLastName(),
@@ -113,18 +115,27 @@ public class LoginController implements Initializable {
                         mainController.removeNodes();
                     } catch (IOException ignored) {
                     }
+                    actionsLocked.set(false);
                 });
             } catch (UserLoginAccountDoesntExistException accountDoesntExistException) {
-                usernameError.setVisible(true);
-                usernameError.setText("User doesn't exist");
+                Platform.runLater(() -> {
+                    usernameError.setVisible(true);
+                    usernameError.setText("User doesn't exist");
+                    actionsLocked.set(false);
+                });
             } catch (UserLoginWrongPasswordException passwordException) {
-                passwordError.setVisible(true);
-                passwordError.setText("Password isn't correct");
+                Platform.runLater(() -> {
+                    passwordError.setVisible(true);
+                    passwordError.setText("Password isn't correct");
+                    actionsLocked.set(false);
+                });
             } catch (UserAccountDisabledException userAccountDisabledException) {
-                accountLockError.setVisible(true);
-                accountLockError.setText("Account is locked. Please contact an admin.");
+                Platform.runLater(() -> {
+                    accountLockError.setVisible(true);
+                    accountLockError.setText("Account is locked. Please contact an admin.");
+                    actionsLocked.set(false);
+                });
             }
-            actionsLocked = false;
         }).start();
     }
 
@@ -137,10 +148,15 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        initializeButtons();
     }
 
-    private void openApplication(GUIUserInfo userInfo) throws IOException {
+    private void initializeButtons() {
+        loginButton.disableProperty().bind(actionsLocked);
+        registerButton.disableProperty().bind(actionsLocked);
+    }
+
+    private void openApplication(UserInfoViewModel userInfo) throws IOException {
         changeWindow(
                 "/com/kul/window/panes/MainApplication.fxml",
                 "KUL Scheduler",
@@ -149,7 +165,7 @@ public class LoginController implements Initializable {
     }
 
 
-    private void openAdminPanel(GUIUserInfo userInfo, ExistingUserToken existingUserToken) throws IOException {
+    private void openAdminPanel(UserInfoViewModel userInfo, ExistingUserToken existingUserToken) throws IOException {
         ManagementEndpointClient endpointClient = new ManagementEndpointClientFactory(existingUserToken).create();
 
         UserManagement userManagement = new UserManagement(

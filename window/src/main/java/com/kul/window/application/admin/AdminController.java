@@ -2,10 +2,8 @@ package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.management.UserManagement;
-import com.kul.api.domain.user.authorization.UserInfo;
-import com.kul.window.application.data.GUIUserInfo;
 import com.kul.window.application.data.GUIUsers;
-import com.kul.window.application.data.User;
+import com.kul.window.application.data.UserInfoViewModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -21,33 +19,33 @@ import java.util.ResourceBundle;
 
 public class AdminController implements Initializable {
 
-    private final GUIUserInfo userInfo;
+    private final UserInfoViewModel userInfo;
     private final UserManagement userManagement;
 
     private final GUIUsers users = new GUIUsers(this);
 
     @FXML
-    private TableView<User> usersTable;
+    private TableView<UserInfoViewModel> usersTable;
 
     @FXML
-    private TableColumn<User, Number> idCol;
+    private TableColumn<UserInfoViewModel, Number> idCol;
     @FXML
-    private TableColumn<User, String> firstnameCol;
+    private TableColumn<UserInfoViewModel, String> firstnameCol;
     @FXML
-    private TableColumn<User, String> lastnameCol;
+    private TableColumn<UserInfoViewModel, String> lastnameCol;
     @FXML
-    private TableColumn<User, String> usernameCol;
+    private TableColumn<UserInfoViewModel, String> usernameCol;
     @FXML
-    private TableColumn<User, Boolean> enabledCol;
+    private TableColumn<UserInfoViewModel, Boolean> enabledCol;
     @FXML
-    private TableColumn<User, String> authorityCol;
+    private TableColumn<UserInfoViewModel, String> authorityCol;
     @FXML
-    private TableColumn<User, String> actionsCol;
+    private TableColumn<UserInfoViewModel, String> actionsCol;
 
     @FXML
     private JFXButton refreshUsersButton;
 
-    public AdminController(GUIUserInfo userInfo, UserManagement userManagement) {
+    public AdminController(UserInfoViewModel userInfo, UserManagement userManagement) {
         this.userInfo = userInfo;
         this.userManagement = userManagement;
     }
@@ -70,11 +68,11 @@ public class AdminController implements Initializable {
         actionsCol.setCellFactory(getActionsCellFactory());
     }
 
-    private Callback<TableColumn<User, String>, TableCell<User, String>> getActionsCellFactory() {
-        return new Callback<TableColumn<User, String>, TableCell<User, String>>() {
+    private Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>> getActionsCellFactory() {
+        return new Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>>() {
             @Override
-            public TableCell<User, String> call(final TableColumn<User, String> param) {
-                final TableCell<User, String> cell = new TableCell<User, String>() {
+            public TableCell<UserInfoViewModel, String> call(final TableColumn<UserInfoViewModel, String> param) {
+                final TableCell<UserInfoViewModel, String> cell = new TableCell<UserInfoViewModel, String>() {
 
                     final Button enableBtn = new Button("Enable");
                     final Button disableBtn = new Button("Disable");
@@ -86,7 +84,7 @@ public class AdminController implements Initializable {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            User person = getTableView().getItems().get(getIndex());
+                            UserInfoViewModel person = getTableView().getItems().get(getIndex());
                             enableBtn.disableProperty()
                                     .bind(person.username().isEqualTo(userInfo.username()).or(person.canBeEnabled()));
 
