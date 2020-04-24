@@ -1,6 +1,9 @@
 package com.kul.database.controller;
 
-import com.kul.database.constants.AuthorityEnum;
+import com.kul.database.exceptions.InsufficientPersmissionsToDeleteUsersException;
+import com.kul.database.exceptions.InsufficientPersmissionsToEnableUsersException;
+import com.kul.database.exceptions.InsufficientPersmissionsToGetAllUserData;
+import com.kul.database.exceptions.NoSuchUserException;
 import com.kul.database.model.AllUsersResponse;
 import com.kul.database.model.User;
 import com.kul.database.service.JpaUserService;
@@ -9,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,36 +29,31 @@ class UserController {
     @PostMapping(
             value = "/enable/{id}"
     )
-    public void enableUser(HttpServletRequest request, @PathVariable Long id) {
-        Principal principal = request.getUserPrincipal();
-        User user = service.getUserByUsername(principal.getName());
-        if (user == null || user.getAuthority() == AuthorityEnum.PROWADZACY) {
+    public void enableUser(Principal principal, @PathVariable Long id) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+        if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
-        service.enableUser(id);
+        service.enableUser(id, principal.getName());
     }
 
     @PostMapping(
             value = "/disable/{id}"
     )
-    public void disableUser(HttpServletRequest request, @PathVariable Long id) {
-        Principal principal = request.getUserPrincipal();
-        User user = service.getUserByUsername(principal.getName());
-        if (user == null || user.getAuthority() == AuthorityEnum.PROWADZACY) {
+    public void disableUser(Principal principal, @PathVariable Long id) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+        if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
-        service.disableUser(id);
+        service.disableUser(id, principal.getName());
     }
 
     @DeleteMapping(
             value = "/delete/{id}"
     )
-    public void deleteUser(HttpServletRequest request, @PathVariable Long id) {
-        Principal principal = request.getUserPrincipal();
-        if (!principal.getName().equals("admin@admin.com")) {
-            return;
+    public void deleteUser(Principal principal, @PathVariable Long id) throws NoSuchUserException, InsufficientPersmissionsToDeleteUsersException {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
-        service.deleteUser(id);
+        service.deleteUser(id, principal.getName());
     }
 
     @GetMapping(
@@ -76,13 +73,11 @@ class UserController {
     @GetMapping(
             value = "/all"
     )
-    public List<AllUsersResponse> getAllUsers(HttpServletRequest request) {
-        Principal principal = request.getUserPrincipal();
-        User user = service.getUserByUsername(principal.getName());
-        if (user == null || user.getAuthority() != AuthorityEnum.ADMIN) {
+    public List<AllUsersResponse> getAllUsers(Principal principal) throws NoSuchUserException, InsufficientPersmissionsToGetAllUserData {
+        if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
-        return service.getAllUsers().stream().map(u ->
+        return service.getAllUsers(principal.getName()).stream().map(u ->
                 new AllUsersResponse(
                         u.getId(),
                         u.getUsername(),

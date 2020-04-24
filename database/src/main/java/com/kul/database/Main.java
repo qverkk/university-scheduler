@@ -1,6 +1,8 @@
 package com.kul.database;
 
+import com.kul.database.constants.AuthorityEnum;
 import com.kul.database.filter.JwtAuthorizationFilter;
+import com.kul.database.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +15,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -51,6 +56,9 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
@@ -80,8 +88,25 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     }
 
     @Bean
+    @Override
     public UserDetailsService userDetailsService() {
-        return super.userDetailsService();
+        return username -> {
+            com.kul.database.model.User account = userRepository.findByUsername(username);
+            if (account != null) {
+                return new User(
+                        account.getUsername(),
+                        account.getPassword(),
+                        account.getEnabled(),
+                        true,
+                        true,
+                        true,
+                        AuthorityUtils.createAuthorityList(account.getAuthority().name())
+                );
+            } else {
+                throw new UsernameNotFoundException("could not find the user '"
+                        + username + "'");
+            }
+        };
     }
 
     @Override
@@ -98,6 +123,16 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
                         "/auth/register*",
                         "/auth/login*"
                 ).permitAll()
+                .antMatchers(
+                        "/user/enable/*",
+                        "/user/disable/*"
+                ).hasAnyAuthority(
+                    AuthorityEnum.ADMIN.name(),
+                    AuthorityEnum.DZIEKANAT.name()
+                )
+                .antMatchers(
+                        "/user/delete/*"
+                ).hasAuthority(AuthorityEnum.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager))

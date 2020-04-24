@@ -1,5 +1,9 @@
 package com.kul.database.service;
 
+import com.kul.database.exceptions.InsufficientPersmissionsToDeleteUsersException;
+import com.kul.database.exceptions.InsufficientPersmissionsToEnableUsersException;
+import com.kul.database.exceptions.InsufficientPersmissionsToGetAllUserData;
+import com.kul.database.exceptions.NoSuchUserException;
 import com.kul.database.model.User;
 import com.kul.database.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +21,13 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public void enableUser(Long id) {
+    public void enableUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+        final User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new NoSuchUserException(username);
+        } else if (!user.canEnableUsers()) {
+            throw new InsufficientPersmissionsToEnableUsersException(user);
+        }
         userRepository.findById(id).ifPresent(u -> {
             u.setEnabled(true);
             userRepository.save(u);
@@ -25,7 +35,13 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public void disableUser(Long id) {
+    public void disableUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+        final User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new NoSuchUserException(username);
+        } else if (!user.canDisableUsers()) {
+            throw new InsufficientPersmissionsToEnableUsersException(user);
+        }
         userRepository.findById(id).ifPresent(u -> {
             u.setEnabled(false);
             userRepository.save(u);
@@ -33,7 +49,13 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToDeleteUsersException {
+        final User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new NoSuchUserException(username);
+        } else if (!user.canDeleteUsers()) {
+            throw new InsufficientPersmissionsToDeleteUsersException(user);
+        }
         userRepository.deleteById(id);
     }
 
@@ -54,7 +76,13 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers(String username) throws NoSuchUserException, InsufficientPersmissionsToGetAllUserData {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new NoSuchUserException(username);
+        } else if (user.hasAccessToAllUserData()) {
+            throw new InsufficientPersmissionsToGetAllUserData(username);
+        }
         return userRepository.findAll();
     }
 }
