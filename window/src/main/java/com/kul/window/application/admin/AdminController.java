@@ -3,7 +3,8 @@ package com.kul.window.application.admin;
 import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.UserInfo;
-import com.kul.window.application.admin.data.UserProperty;
+import com.kul.window.application.data.GUIUsers;
+import com.kul.window.application.data.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,32 +16,32 @@ import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class AdminController implements Initializable {
 
     private final UserInfo userInfo;
     private final UserManagement userManagement;
 
-    @FXML
-    private TableView<UserProperty> usersTable;
+    private final GUIUsers users = new GUIUsers(this);
 
     @FXML
-    private TableColumn<UserProperty, String> idCol;
+    private TableView<User> usersTable;
+
     @FXML
-    private TableColumn<UserProperty, String> firstnameCol;
+    private TableColumn<User, Number> idCol;
     @FXML
-    private TableColumn<UserProperty, String> lastnameCol;
+    private TableColumn<User, String> firstnameCol;
     @FXML
-    private TableColumn<UserProperty, String> usernameCol;
+    private TableColumn<User, String> lastnameCol;
     @FXML
-    private TableColumn<UserProperty, Boolean> enabledCol;
+    private TableColumn<User, String> usernameCol;
     @FXML
-    private TableColumn<UserProperty, String> authorityCol;
+    private TableColumn<User, Boolean> enabledCol;
     @FXML
-    private TableColumn<UserProperty, String> actionsCol;
+    private TableColumn<User, String> authorityCol;
+    @FXML
+    private TableColumn<User, String> actionsCol;
 
     @FXML
     private JFXButton refreshUsersButton;
@@ -52,25 +53,27 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        usersTable.setItems(users.users());
         initializeColumns();
         refreshUsers();
     }
 
     private void initializeColumns() {
-        idCol.setCellValueFactory(param -> param.getValue().idProperty());
-        firstnameCol.setCellValueFactory(param -> param.getValue().firstNameProperty());
-        lastnameCol.setCellValueFactory(param -> param.getValue().lastNameProperty());
-        usernameCol.setCellValueFactory(param -> param.getValue().usernameProperty());
-        enabledCol.setCellValueFactory(param -> param.getValue().enabledProperty());
-        authorityCol.setCellValueFactory(param -> param.getValue().authorityProperty());
+        idCol.setCellValueFactory(param -> param.getValue().id());
+        idCol.setCellValueFactory(param -> param.getValue().id());
+        firstnameCol.setCellValueFactory(param -> param.getValue().firstName());
+        lastnameCol.setCellValueFactory(param -> param.getValue().lastName());
+        usernameCol.setCellValueFactory(param -> param.getValue().username());
+        enabledCol.setCellValueFactory(param -> param.getValue().enabled());
+        authorityCol.setCellValueFactory(param -> param.getValue().authority());
         actionsCol.setCellFactory(getActionsCellFactory());
     }
 
-    private Callback<TableColumn<UserProperty, String>, TableCell<UserProperty, String>> getActionsCellFactory() {
-        return new Callback<TableColumn<UserProperty, String>, TableCell<UserProperty, String>>() {
+    private Callback<TableColumn<User, String>, TableCell<User, String>> getActionsCellFactory() {
+        return new Callback<TableColumn<User, String>, TableCell<User, String>>() {
             @Override
-            public TableCell<UserProperty, String> call(final TableColumn<UserProperty, String> param) {
-                final TableCell<UserProperty, String> cell = new TableCell<UserProperty, String>() {
+            public TableCell<User, String> call(final TableColumn<User, String> param) {
+                final TableCell<User, String> cell = new TableCell<User, String>() {
 
                     final Button enableBtn = new Button("Enable");
                     final Button disableBtn = new Button("Disable");
@@ -82,25 +85,16 @@ public class AdminController implements Initializable {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            UserProperty person = getTableView().getItems().get(getIndex());
-                            if (userInfo.getUsername().equals(person.getUsername())) {
-                                enableBtn.setDisable(true);
-                                disableBtn.setDisable(true);
-                            } else {
-                                final boolean enabled = person.enabledProperty().get();
-                                disableBtn.setDisable(!enabled);
-                                enableBtn.setDisable(enabled);
-                            }
+                            User person = getTableView().getItems().get(getIndex());
+                            enableBtn.disableProperty()
+                                    .bind(person.username().isEqualTo(userInfo.getUsername()).or(person.canBeEnabled()));
 
-                            final Long userId = Long.valueOf(person.getId());
-                            enableBtn.setOnAction(event -> {
-                                userManagement.enableUser(userId);
-                                refreshUsers();
-                            });
-                            disableBtn.setOnAction(event -> {
-                                userManagement.disableUser(userId);
-                                refreshUsers();
-                            });
+                            disableBtn.disableProperty()
+                                    .bind(person.username().isEqualTo(userInfo.getUsername()).or(person.canBeDisabled()));
+
+                            final Long userId = person.id().get();
+                            enableBtn.setOnAction(event -> users.enableUser(userId));
+                            disableBtn.setOnAction(event -> users.disableUser(userId));
 
                             if (!pane.getChildren().containsAll(Arrays.asList(enableBtn, disableBtn))) {
                                 pane.getChildren().addAll(enableBtn, disableBtn);
@@ -117,17 +111,10 @@ public class AdminController implements Initializable {
 
     @FXML
     void refreshUsers() {
-        usersTable.getItems().clear();
-        List<UserProperty> userPropertyList = userManagement.getAllUsers().stream().map(u ->
-                new UserProperty(
-                        u.getId(),
-                        u.getFirstName(),
-                        u.getLastName(),
-                        u.getUsername(),
-                        u.getEnabled(),
-                        u.getAuthority()
-                )
-        ).collect(Collectors.toList());
-        usersTable.getItems().addAll(userPropertyList);
+        users.refresh();
+    }
+
+    public UserManagement getUserManagement() {
+        return userManagement;
     }
 }
