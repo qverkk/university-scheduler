@@ -16,7 +16,9 @@ import com.kul.api.domain.user.authorization.UserInfo;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.window.MainController;
 import com.kul.window.application.admin.AdminController;
+import com.kul.window.application.data.GUIUserInfo;
 import com.kul.window.application.user.ApplicationController;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -53,6 +55,8 @@ public class LoginController implements Initializable {
     @FXML
     private Text accountLockError;
 
+    private boolean actionsLocked = false;
+
     public LoginController(MainController mainController, UserAuthorizationFacade userAuthorizationFacade) {
         this.mainController = mainController;
         this.userAuthorizationFacade = userAuthorizationFacade;
@@ -60,6 +64,9 @@ public class LoginController implements Initializable {
 
     @FXML
     void goToSignUpPanelFromLogin() {
+        if (actionsLocked) {
+            return;
+        }
         mainController.setRegisterControls();
     }
 
@@ -70,35 +77,55 @@ public class LoginController implements Initializable {
 
     @FXML
     void performSignIn() {
-        try {
-            resetErrorFields();
-            final ExistingUser existingUser = new ExistingUser(
-                    usernameField.getText(),
-                    passwordField.getText()
-            );
-            final ExistingUserToken existingUserToken = userAuthorizationFacade.authenticate(existingUser);
-            final UserInfo userInfo = userAuthorizationFacade.loginWithToken(existingUserToken);
-            if (userInfo.getAuthority() == AuthorityEnum.ADMIN) {
-                openAdminPanel(userInfo, existingUserToken);
-            } else {
-                openApplication(userInfo);
-            }
-
-            Stage stage = (Stage) passwordError.getScene().getWindow();
-            stage.close();
-            mainController.removeNodes();
-        } catch (UserLoginAccountDoesntExistException accountDoesntExistException) {
-            usernameError.setVisible(true);
-            usernameError.setText("User doesn't exist");
-        } catch (UserLoginWrongPasswordException passwordException) {
-            passwordError.setVisible(true);
-            passwordError.setText("Password isn't correct");
-        } catch (UserAccountDisabledException userAccountDisabledException) {
-            accountLockError.setVisible(true);
-            accountLockError.setText("Account is locked. Please contact an admin.");
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (actionsLocked) {
+            return;
         }
+        resetErrorFields();
+        final ExistingUser existingUser = new ExistingUser(
+                usernameField.getText(),
+                passwordField.getText()
+        );
+        actionsLocked = true;
+        new Thread(() -> {
+            try {
+                final ExistingUserToken existingUserToken = userAuthorizationFacade.authenticate(existingUser);
+                final UserInfo userInfo = userAuthorizationFacade.loginWithToken(existingUserToken);
+
+                final GUIUserInfo guiUserInfo = new GUIUserInfo(
+                        0L,
+                        userInfo.getFirstName(),
+                        userInfo.getLastName(),
+                        userInfo.getUsername(),
+                        true,
+                        userInfo.getAuthority()
+                );
+
+                Platform.runLater(() -> {
+                    try {
+                        if (userInfo.getAuthority() == AuthorityEnum.ADMIN) {
+                            openAdminPanel(guiUserInfo, existingUserToken);
+                        } else {
+                            openApplication(guiUserInfo);
+                        }
+
+                        Stage stage = (Stage) passwordError.getScene().getWindow();
+                        stage.close();
+                        mainController.removeNodes();
+                    } catch (IOException ignored) {
+                    }
+                });
+            } catch (UserLoginAccountDoesntExistException accountDoesntExistException) {
+                usernameError.setVisible(true);
+                usernameError.setText("User doesn't exist");
+            } catch (UserLoginWrongPasswordException passwordException) {
+                passwordError.setVisible(true);
+                passwordError.setText("Password isn't correct");
+            } catch (UserAccountDisabledException userAccountDisabledException) {
+                accountLockError.setVisible(true);
+                accountLockError.setText("Account is locked. Please contact an admin.");
+            }
+            actionsLocked = false;
+        }).start();
     }
 
     private void resetErrorFields() {
@@ -113,7 +140,7 @@ public class LoginController implements Initializable {
 
     }
 
-    private void openApplication(UserInfo userInfo) throws IOException {
+    private void openApplication(GUIUserInfo userInfo) throws IOException {
         changeWindow(
                 "/com/kul/window/panes/MainApplication.fxml",
                 "KUL Scheduler",
@@ -122,7 +149,7 @@ public class LoginController implements Initializable {
     }
 
 
-    private void openAdminPanel(UserInfo userInfo, ExistingUserToken existingUserToken) throws IOException {
+    private void openAdminPanel(GUIUserInfo userInfo, ExistingUserToken existingUserToken) throws IOException {
         ManagementEndpointClient endpointClient = new ManagementEndpointClientFactory(existingUserToken).create();
 
         UserManagement userManagement = new UserManagement(

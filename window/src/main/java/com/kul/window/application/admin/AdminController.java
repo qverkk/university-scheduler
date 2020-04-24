@@ -3,6 +3,7 @@ package com.kul.window.application.admin;
 import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.UserInfo;
+import com.kul.window.application.data.GUIUserInfo;
 import com.kul.window.application.data.GUIUsers;
 import com.kul.window.application.data.User;
 import javafx.fxml.FXML;
@@ -20,7 +21,7 @@ import java.util.ResourceBundle;
 
 public class AdminController implements Initializable {
 
-    private final UserInfo userInfo;
+    private final GUIUserInfo userInfo;
     private final UserManagement userManagement;
 
     private final GUIUsers users = new GUIUsers(this);
@@ -46,7 +47,7 @@ public class AdminController implements Initializable {
     @FXML
     private JFXButton refreshUsersButton;
 
-    public AdminController(UserInfo userInfo, UserManagement userManagement) {
+    public AdminController(GUIUserInfo userInfo, UserManagement userManagement) {
         this.userInfo = userInfo;
         this.userManagement = userManagement;
     }
@@ -87,10 +88,10 @@ public class AdminController implements Initializable {
                         } else {
                             User person = getTableView().getItems().get(getIndex());
                             enableBtn.disableProperty()
-                                    .bind(person.username().isEqualTo(userInfo.getUsername()).or(person.canBeEnabled()));
+                                    .bind(person.username().isEqualTo(userInfo.username()).or(person.canBeEnabled()));
 
                             disableBtn.disableProperty()
-                                    .bind(person.username().isEqualTo(userInfo.getUsername()).or(person.canBeDisabled()));
+                                    .bind(person.username().isEqualTo(userInfo.username()).or(person.canBeDisabled()));
 
                             final Long userId = person.id().get();
                             enableBtn.setOnAction(event -> users.enableUser(userId));
