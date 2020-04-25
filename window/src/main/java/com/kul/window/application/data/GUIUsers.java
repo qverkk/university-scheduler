@@ -2,7 +2,12 @@ package com.kul.window.application.data;
 
 import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.window.application.admin.AdminController;
-import javafx.application.Platform;
+import com.kul.window.async.PreconfiguredExecutors;
+import io.reactivex.Completable;
+import io.reactivex.Scheduler;
+import io.reactivex.Single;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import io.reactivex.schedulers.Schedulers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -31,10 +36,19 @@ public class GUIUsers implements Users {
         if (fetchingLocked) {
             return;
         }
-        new Thread(() -> {
-            adminController.getUserManagement().enableUser(id);
-            refresh();
-        }).start();
+        fetchingLocked = true;
+        Scheduler enableUserScheduler = Schedulers.from(
+                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("enable-user-%d")
+        );
+        Completable.fromRunnable(() -> adminController.getUserManagement().enableUser(id))
+                .subscribeOn(enableUserScheduler)
+                .andThen(Single.fromCallable(this::getAllUsers))
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(usersList -> {
+                    observableUsers.clear();
+                    observableUsers.addAll(usersList);
+                    fetchingLocked = false;
+                });
     }
 
     @Override
@@ -42,10 +56,23 @@ public class GUIUsers implements Users {
         if (fetchingLocked) {
             return;
         }
-        new Thread(() -> {
-            adminController.getUserManagement().disableUser(id);
-            refresh();
-        }).start();
+        fetchingLocked = true;
+//        new Thread(() -> {
+//            adminController.getUserManagement().disableUser(id);
+//            refresh();
+//        }).start();
+        Scheduler enableUserScheduler = Schedulers.from(
+                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("disable-user-%d")
+        );
+        Completable.fromRunnable(() -> adminController.getUserManagement().disableUser(id))
+                .subscribeOn(enableUserScheduler)
+                .andThen(Single.fromCallable(this::getAllUsers))
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(usersList -> {
+                    observableUsers.clear();
+                    observableUsers.addAll(usersList);
+                    fetchingLocked = false;
+                });
     }
 
     @Override
@@ -54,21 +81,31 @@ public class GUIUsers implements Users {
             return;
         }
         fetchingLocked = true;
-        users.clear();
-        new Thread(() -> {
-            final List<ManagedUser> requestedUsers = adminController.getUserManagement().getAllUsers();
-            List<UserInfoViewModel> userPropertyList = requestedUsers.stream().map(u ->
-                    new UserInfoViewModel(
-                            u.getId(),
-                            u.getFirstName(),
-                            u.getLastName(),
-                            u.getUsername(),
-                            u.getEnabled(),
-                            u.getAuthority()
-                    )
-            ).collect(Collectors.toList());
-            Platform.runLater(() -> observableUsers.addAll(userPropertyList));
-            fetchingLocked = false;
-        }).start();
+        Scheduler enableUserScheduler = Schedulers.from(
+                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-users-%d")
+        );
+        Completable.complete()
+                .subscribeOn(enableUserScheduler)
+                .andThen(Single.fromCallable(this::getAllUsers))
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(usersList -> {
+                    observableUsers.clear();
+                    observableUsers.addAll(usersList);
+                    fetchingLocked = false;
+                });
+    }
+
+    private List<UserInfoViewModel> getAllUsers() {
+        final List<ManagedUser> requestedUsers = adminController.getUserManagement().getAllUsers();
+        return requestedUsers.stream().map(u ->
+                new UserInfoViewModel(
+                        u.getId(),
+                        u.getFirstName(),
+                        u.getLastName(),
+                        u.getUsername(),
+                        u.getEnabled(),
+                        u.getAuthority()
+                )
+        ).collect(Collectors.toList());
     }
 }
