@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.window.application.data.GUIUsers;
 import com.kul.window.application.data.UserInfoViewModel;
+import com.kul.window.async.PreconfiguredExecutors;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -22,7 +23,7 @@ public class AdminController implements Initializable {
     private final UserInfoViewModel userInfo;
     private final UserManagement userManagement;
 
-    private final GUIUsers users = new GUIUsers(this);
+    private final GUIUsers users;
 
     @FXML
     private TableView<UserInfoViewModel> usersTable;
@@ -45,9 +46,10 @@ public class AdminController implements Initializable {
     @FXML
     private JFXButton refreshUsersButton;
 
-    public AdminController(UserInfoViewModel userInfo, UserManagement userManagement) {
+    public AdminController(UserInfoViewModel userInfo, UserManagement userManagement, PreconfiguredExecutors preconfiguredExecutors) {
         this.userInfo = userInfo;
         this.userManagement = userManagement;
+        this.users = new GUIUsers(this, preconfiguredExecutors);
     }
 
     @Override

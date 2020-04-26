@@ -4,21 +4,13 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
-import com.kul.api.adapter.user.registration.UserAccountAlreadyExistException;
-import com.kul.api.adapter.user.registration.UserAccountCreationException;
 import com.kul.api.data.Constants;
-import com.kul.api.domain.user.registration.NewUser;
-import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
 import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidation;
 import com.kul.api.validators.UserDetailsValidator;
-import com.kul.window.MainController;
-import com.kul.window.async.PreconfiguredExecutors;
-import io.reactivex.Single;
-import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
-import io.reactivex.schedulers.Schedulers;
+import com.kul.window.ViewModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -26,7 +18,6 @@ import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Y510p
@@ -36,9 +27,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class RegistrationController implements Initializable {
 
-    private final RegistrationViewModel registrationViewModel = new RegistrationViewModel();
-    private MainController mainController;
-    private UserRegistration userRegistration;
+    private final RegistrationViewModel registrationViewModel;
+    private ViewModel mainViewModel;
 
     @FXML
     private JFXTextField firstnameField;
@@ -59,9 +49,9 @@ public class RegistrationController implements Initializable {
     @FXML
     private Label registrationSuccess;
 
-    public RegistrationController(MainController mainController, UserRegistration userRegistration) {
-        this.mainController = mainController;
-        this.userRegistration = userRegistration;
+    public RegistrationController(RegistrationViewModel registrationViewModel, ViewModel mainViewModel) {
+        this.registrationViewModel = registrationViewModel;
+        this.mainViewModel = mainViewModel;
     }
 
     private boolean canRegister() {
@@ -75,40 +65,21 @@ public class RegistrationController implements Initializable {
 
     @FXML
     void performRegister() {
-        registrationViewModel.registrationStatusProperty().setValue("");
-        registrationViewModel.usernameErrorProperty().setValue(false);
         if (!canRegister()) {
             return;
         }
-        NewUser user = new NewUser(
+        registrationViewModel.register(
                 usernameField.getText(),
                 passwordField.getText(),
                 firstnameField.getText(),
                 lastnameField.getText(),
                 authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
-
-        final ThreadPoolExecutor executor = PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("register-user-%d");
-
-        Single
-                .fromCallable(() -> userRegistration.register(user))
-                .subscribeOn(Schedulers.from(executor))
-                .observeOn(JavaFxScheduler.platform())
-                .doFinally(executor::shutdown)
-                .subscribe(registrationInfo -> {
-                    registrationViewModel.registrationStatusProperty().setValue("Success registering account");
-                }, error -> {
-                    if (error instanceof UserAccountAlreadyExistException) {
-                        registrationViewModel.usernameErrorProperty().setValue(true);
-                    } else if (error instanceof UserAccountCreationException) {
-                        registrationViewModel.registrationStatusProperty().setValue("Failure registrating account");
-                    }
-                });
     }
 
     @FXML
     private void goToLoginForm() {
-        mainController.setLoginControls();
+        mainViewModel.openLoginMenu();
     }
 
     @Override
