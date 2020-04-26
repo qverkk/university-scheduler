@@ -17,9 +17,14 @@ import com.kul.api.domain.user.authorization.UserInfo;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.window.MainController;
 import com.kul.window.application.admin.AdminController;
+import com.kul.window.application.data.UserAndTokenInfo;
 import com.kul.window.application.data.UserInfoViewModel;
 import com.kul.window.application.user.ApplicationController;
-import javafx.application.Platform;
+import com.kul.window.async.PreconfiguredExecutors;
+import io.reactivex.Scheduler;
+import io.reactivex.Single;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import io.reactivex.schedulers.Schedulers;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -46,7 +51,7 @@ public class LoginController implements Initializable {
 
     private final MainController mainController;
     private final UserAuthorizationFacade userAuthorizationFacade;
-
+    private final BooleanProperty actionsLocked = new SimpleBooleanProperty(false);
     @FXML
     private JFXTextField usernameField;
     @FXML
@@ -62,8 +67,6 @@ public class LoginController implements Initializable {
     private JFXButton loginButton;
     @FXML
     private JFXButton registerButton;
-
-    private BooleanProperty actionsLocked = new SimpleBooleanProperty(false);
 
     public LoginController(MainController mainController, UserAuthorizationFacade userAuthorizationFacade) {
         this.mainController = mainController;
@@ -88,55 +91,54 @@ public class LoginController implements Initializable {
                 passwordField.getText()
         );
         actionsLocked.set(true);
-        new Thread(() -> {
-            try {
-                final ExistingUserToken existingUserToken = userAuthorizationFacade.authenticate(existingUser);
-                final UserInfo userInfo = userAuthorizationFacade.loginWithToken(existingUserToken);
+        Scheduler loginUserScheduler = Schedulers.from(
+                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("login-user-%d")
+        );
+        Single
+                .fromCallable(() -> userAuthorizationFacade.authenticate(existingUser))
+                .subscribeOn(loginUserScheduler)
+                .flatMap(token -> Single.fromCallable(() -> {
+                    final UserInfo userInfo = userAuthorizationFacade.loginWithToken(token);
+                    return new UserAndTokenInfo(token, userInfo);
+                }))
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(userAndTokenInfo -> {
+                    final UserInfo userInfo = userAndTokenInfo.getUserInfo();
+                    final ExistingUserToken userToken = userAndTokenInfo.getUserToken();
 
-                final UserInfoViewModel guiUserInfo = new UserInfoViewModel(
-                        0L,
-                        userInfo.getFirstName(),
-                        userInfo.getLastName(),
-                        userInfo.getUsername(),
-                        true,
-                        userInfo.getAuthority()
-                );
+                    final UserInfoViewModel guiUserInfo = new UserInfoViewModel(
+                            0L,
+                            userInfo.getFirstName(),
+                            userInfo.getLastName(),
+                            userInfo.getUsername(),
+                            true,
+                            userInfo.getAuthority()
+                    );
 
-                Platform.runLater(() -> {
-                    try {
-                        if (userInfo.getAuthority() == AuthorityEnum.ADMIN) {
-                            openAdminPanel(guiUserInfo, existingUserToken);
-                        } else {
-                            openApplication(guiUserInfo);
-                        }
+                    if (userInfo.getAuthority() == AuthorityEnum.ADMIN) {
+                        openAdminPanel(guiUserInfo, userToken);
+                    } else {
+                        openApplication(guiUserInfo);
+                    }
 
-                        Stage stage = (Stage) passwordError.getScene().getWindow();
-                        stage.close();
-                        mainController.removeNodes();
-                    } catch (IOException ignored) {
+                    Stage stage = (Stage) passwordError.getScene().getWindow();
+                    stage.close();
+                    mainController.removeNodes();
+                    actionsLocked.set(false);
+                }, error -> {
+                    if (error instanceof UserLoginAccountDoesntExistException) {
+                        usernameError.setVisible(true);
+                        usernameError.setText("User doesn't exist");
+                    } else if (error instanceof UserLoginWrongPasswordException) {
+                        passwordError.setVisible(true);
+                        passwordError.setText("Password isn't correct");
+                    } else if (error instanceof UserAccountDisabledException) {
+                        accountLockError.setVisible(true);
+                        accountLockError.setText("Account is locked. Please contact an admin.");
                     }
                     actionsLocked.set(false);
+                    loginUserScheduler.shutdown();
                 });
-            } catch (UserLoginAccountDoesntExistException accountDoesntExistException) {
-                Platform.runLater(() -> {
-                    usernameError.setVisible(true);
-                    usernameError.setText("User doesn't exist");
-                    actionsLocked.set(false);
-                });
-            } catch (UserLoginWrongPasswordException passwordException) {
-                Platform.runLater(() -> {
-                    passwordError.setVisible(true);
-                    passwordError.setText("Password isn't correct");
-                    actionsLocked.set(false);
-                });
-            } catch (UserAccountDisabledException userAccountDisabledException) {
-                Platform.runLater(() -> {
-                    accountLockError.setVisible(true);
-                    accountLockError.setText("Account is locked. Please contact an admin.");
-                    actionsLocked.set(false);
-                });
-            }
-        }).start();
     }
 
     private void resetErrorFields() {

@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class GUIUsers implements Users {
@@ -20,7 +21,7 @@ public class GUIUsers implements Users {
     private final List<UserInfoViewModel> users = new LinkedList<>();
     private final AdminController adminController;
     private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
-    private volatile boolean fetchingLocked = false;
+    private final AtomicBoolean fetchingLocked = new AtomicBoolean(false);
 
     public GUIUsers(AdminController adminController) {
         this.adminController = adminController;
@@ -33,10 +34,9 @@ public class GUIUsers implements Users {
 
     @Override
     public void enableUser(Long id) {
-        if (fetchingLocked) {
+        if (fetchingLocked.getAndSet(true)) {
             return;
         }
-        fetchingLocked = true;
         Scheduler enableUserScheduler = Schedulers.from(
                 PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("enable-user-%d")
         );
@@ -44,54 +44,51 @@ public class GUIUsers implements Users {
                 .subscribeOn(enableUserScheduler)
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(JavaFxScheduler.platform())
+                .doFinally(enableUserScheduler::shutdown)
                 .subscribe(usersList -> {
                     observableUsers.clear();
                     observableUsers.addAll(usersList);
-                    fetchingLocked = false;
+                    fetchingLocked.set(false);
                 });
     }
 
     @Override
     public void disableUser(Long id) {
-        if (fetchingLocked) {
+        if (fetchingLocked.getAndSet(true)) {
             return;
         }
-        fetchingLocked = true;
-//        new Thread(() -> {
-//            adminController.getUserManagement().disableUser(id);
-//            refresh();
-//        }).start();
-        Scheduler enableUserScheduler = Schedulers.from(
+        Scheduler disableUserScheduler = Schedulers.from(
                 PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("disable-user-%d")
         );
         Completable.fromRunnable(() -> adminController.getUserManagement().disableUser(id))
-                .subscribeOn(enableUserScheduler)
+                .subscribeOn(disableUserScheduler)
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(JavaFxScheduler.platform())
+                .doFinally(disableUserScheduler::shutdown)
                 .subscribe(usersList -> {
                     observableUsers.clear();
                     observableUsers.addAll(usersList);
-                    fetchingLocked = false;
+                    fetchingLocked.set(false);
                 });
     }
 
     @Override
     public void refresh() {
-        if (fetchingLocked) {
+        if (fetchingLocked.getAndSet(true)) {
             return;
         }
-        fetchingLocked = true;
-        Scheduler enableUserScheduler = Schedulers.from(
+        Scheduler fetchUserSchedler = Schedulers.from(
                 PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-users-%d")
         );
         Completable.complete()
-                .subscribeOn(enableUserScheduler)
+                .subscribeOn(fetchUserSchedler)
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(JavaFxScheduler.platform())
+                .doFinally(fetchUserSchedler::shutdown)
                 .subscribe(usersList -> {
                     observableUsers.clear();
                     observableUsers.addAll(usersList);
-                    fetchingLocked = false;
+                    fetchingLocked.set(false);
                 });
     }
 
