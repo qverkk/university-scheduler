@@ -6,10 +6,8 @@ import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.kul.api.adapter.user.registration.UserAccountAlreadyExistException;
 import com.kul.api.adapter.user.registration.UserAccountCreationException;
-import com.kul.api.adapter.user.registration.UserRepositoryFacade;
 import com.kul.api.data.Constants;
 import com.kul.api.domain.user.registration.NewUser;
-import com.kul.api.domain.user.registration.RegistrationInfo;
 import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
@@ -17,6 +15,10 @@ import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidation;
 import com.kul.api.validators.UserDetailsValidator;
 import com.kul.window.MainController;
+import com.kul.window.async.PreconfiguredExecutors;
+import io.reactivex.Single;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import io.reactivex.schedulers.Schedulers;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -24,6 +26,7 @@ import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Y510p
@@ -33,6 +36,7 @@ import java.util.ResourceBundle;
 
 public class RegistrationController implements Initializable {
 
+    private final RegistrationViewModel registrationViewModel = new RegistrationViewModel();
     private MainController mainController;
     private UserRegistration userRegistration;
 
@@ -50,7 +54,6 @@ public class RegistrationController implements Initializable {
     private JFXPasswordField repeatPasswordField;
     @FXML
     private JFXComboBox<Displayable<AuthorityEnum>> authorityCb;
-
     @FXML
     private Label usernameError;
     @FXML
@@ -72,8 +75,8 @@ public class RegistrationController implements Initializable {
 
     @FXML
     void performRegister() {
-        registrationSuccess.setVisible(false);
-        usernameError.setVisible(false);
+        registrationViewModel.registrationStatusProperty().setValue("");
+        registrationViewModel.usernameErrorProperty().setValue(false);
         if (!canRegister()) {
             return;
         }
@@ -85,16 +88,22 @@ public class RegistrationController implements Initializable {
                 authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
 
-        try {
-            final RegistrationInfo registrationInfo = userRegistration.register(user);
-            registrationSuccess.setText("Success registering account");
-            registrationSuccess.setVisible(true);
-        } catch (UserAccountAlreadyExistException accountAlreadyExistException) {
-            usernameError.setVisible(true);
-        } catch (UserAccountCreationException e) {
-            registrationSuccess.setVisible(true);
-            registrationSuccess.setText("Failure registrating account");
-        }
+        final ThreadPoolExecutor executor = PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("register-user-%d");
+
+        Single
+                .fromCallable(() -> userRegistration.register(user))
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(JavaFxScheduler.platform())
+                .doFinally(executor::shutdown)
+                .subscribe(registrationInfo -> {
+                    registrationViewModel.registrationStatusProperty().setValue("Success registering account");
+                }, error -> {
+                    if (error instanceof UserAccountAlreadyExistException) {
+                        registrationViewModel.usernameErrorProperty().setValue(true);
+                    } else if (error instanceof UserAccountCreationException) {
+                        registrationViewModel.registrationStatusProperty().setValue("Failure registrating account");
+                    }
+                });
     }
 
     @FXML
@@ -110,6 +119,16 @@ public class RegistrationController implements Initializable {
         addUserDetailsValidator();
         addPasswordValidator();
         addFocusPropertyListeners();
+        initializeBindings();
+    }
+
+    private void initializeBindings() {
+        usernameError.visibleProperty()
+                .bind(registrationViewModel.usernameErrorProperty());
+        registrationSuccess.textProperty()
+                .bind(registrationViewModel.registrationStatusProperty());
+        registrationSuccess.visibleProperty()
+                .bind(registrationViewModel.registrationStatusProperty().isNotEmpty());
     }
 
     private void addAuthoritiesToComboBox() {
