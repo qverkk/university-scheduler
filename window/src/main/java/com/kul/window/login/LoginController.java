@@ -21,7 +21,6 @@ import com.kul.window.application.data.UserAndTokenInfo;
 import com.kul.window.application.data.UserInfoViewModel;
 import com.kul.window.application.user.ApplicationController;
 import com.kul.window.async.PreconfiguredExecutors;
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
@@ -40,6 +39,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Y510p
@@ -52,6 +52,8 @@ public class LoginController implements Initializable {
     private final MainController mainController;
     private final UserAuthorizationFacade userAuthorizationFacade;
     private final BooleanProperty actionsLocked = new SimpleBooleanProperty(false);
+    private final LoginViewModel loginViewModel = new LoginViewModel();
+
     @FXML
     private JFXTextField usernameField;
     @FXML
@@ -62,7 +64,6 @@ public class LoginController implements Initializable {
     private Label passwordError;
     @FXML
     private Text accountLockError;
-
     @FXML
     private JFXButton loginButton;
     @FXML
@@ -91,18 +92,18 @@ public class LoginController implements Initializable {
                 passwordField.getText()
         );
         actionsLocked.set(true);
-        Scheduler loginUserScheduler = Schedulers.from(
-                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("login-user-%d")
-        );
+
+        final ThreadPoolExecutor executor = PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("login-user-%d");
+
         Single
                 .fromCallable(() -> userAuthorizationFacade.authenticate(existingUser))
-                .subscribeOn(loginUserScheduler)
+                .subscribeOn(Schedulers.from(executor))
                 .flatMap(token -> Single.fromCallable(() -> {
                     final UserInfo userInfo = userAuthorizationFacade.loginWithToken(token);
                     return new UserAndTokenInfo(token, userInfo);
                 }))
                 .observeOn(JavaFxScheduler.platform())
-                .doFinally(loginUserScheduler::shutdown)
+                .doFinally(executor::shutdown)
                 .subscribe(userAndTokenInfo -> {
                     final UserInfo userInfo = userAndTokenInfo.getUserInfo();
                     final ExistingUserToken userToken = userAndTokenInfo.getUserToken();
@@ -128,29 +129,35 @@ public class LoginController implements Initializable {
                     actionsLocked.set(false);
                 }, error -> {
                     if (error instanceof UserLoginAccountDoesntExistException) {
-                        usernameError.setVisible(true);
-                        usernameError.setText("User doesn't exist");
+                        loginViewModel.usernameErrorProperty().setValue(true);
                     } else if (error instanceof UserLoginWrongPasswordException) {
-                        passwordError.setVisible(true);
-                        passwordError.setText("Password isn't correct");
+                        loginViewModel.passwordErrorProperty().setValue(true);
                     } else if (error instanceof UserAccountDisabledException) {
-                        accountLockError.setVisible(true);
-                        accountLockError.setText("Account is locked. Please contact an admin.");
+                        loginViewModel.accountLockedProperty().setValue(true);
                     }
                     actionsLocked.set(false);
                 });
     }
 
     private void resetErrorFields() {
-        usernameError.setVisible(false);
-        usernameError.setText("");
-        passwordError.setVisible(false);
-        passwordError.setText("");
+        loginViewModel.usernameErrorProperty().setValue(false);
+        loginViewModel.passwordErrorProperty().setValue(false);
+        loginViewModel.accountLockedProperty().setValue(false);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeButtons();
+        initializeBindings();
+    }
+
+    private void initializeBindings() {
+        usernameError.visibleProperty()
+                .bind(loginViewModel.usernameErrorProperty());
+        passwordError.visibleProperty()
+                .bind(loginViewModel.passwordErrorProperty());
+        accountLockError.visibleProperty()
+                .bind(loginViewModel.accountLockedProperty());
     }
 
     private void initializeButtons() {

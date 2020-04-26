@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -37,14 +38,13 @@ public class GUIUsers implements Users {
         if (fetchingLocked.getAndSet(true)) {
             return;
         }
-        Scheduler enableUserScheduler = Schedulers.from(
-                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("enable-user-%d")
-        );
+        final ThreadPoolExecutor executor = PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("enable-user-%d");
+
         Completable.fromRunnable(() -> adminController.getUserManagement().enableUser(id))
-                .subscribeOn(enableUserScheduler)
+                .subscribeOn(Schedulers.from(executor))
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(JavaFxScheduler.platform())
-                .doFinally(enableUserScheduler::shutdown)
+                .doFinally(executor::shutdown)
                 .subscribe(usersList -> {
                     observableUsers.clear();
                     observableUsers.addAll(usersList);
@@ -57,14 +57,13 @@ public class GUIUsers implements Users {
         if (fetchingLocked.getAndSet(true)) {
             return;
         }
-        Scheduler disableUserScheduler = Schedulers.from(
-                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("disable-user-%d")
-        );
+        final ThreadPoolExecutor executor = PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("disable-user-%d");
+
         Completable.fromRunnable(() -> adminController.getUserManagement().disableUser(id))
-                .subscribeOn(disableUserScheduler)
+                .subscribeOn(Schedulers.from(executor))
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(JavaFxScheduler.platform())
-                .doFinally(disableUserScheduler::shutdown)
+                .doFinally(executor::shutdown)
                 .subscribe(usersList -> {
                     observableUsers.clear();
                     observableUsers.addAll(usersList);
@@ -77,14 +76,12 @@ public class GUIUsers implements Users {
         if (fetchingLocked.getAndSet(true)) {
             return;
         }
-        Scheduler fetchUserSchedler = Schedulers.from(
-                PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-users-%d")
-        );
-        Completable.complete()
-                .subscribeOn(fetchUserSchedler)
-                .andThen(Single.fromCallable(this::getAllUsers))
+        final ThreadPoolExecutor executor = PreconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-users-%d");
+
+        Single.fromCallable(this::getAllUsers)
+                .subscribeOn(Schedulers.from(executor))
                 .observeOn(JavaFxScheduler.platform())
-                .doFinally(fetchUserSchedler::shutdown)
+                .doFinally(executor::shutdown)
                 .subscribe(usersList -> {
                     observableUsers.clear();
                     observableUsers.addAll(usersList);

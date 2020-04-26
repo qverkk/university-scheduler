@@ -26,20 +26,20 @@
             <Insets bottom="5.0" />
          </VBox.margin>
       </JFXTextField>
-      <Label fx:id="usernameError" alignment="CENTER" styleClass="error-label" visible="false" />
+      <Label fx:id="usernameError" alignment="CENTER" styleClass="error-label" text="User doesn't exist" visible="false" />
       <JFXPasswordField fx:id="passwordField" focusColor="#17bf2d" prefHeight="25.0" prefWidth="179.0" promptText="password" unFocusColor="#e8e6e6">
          <VBox.margin>
             <Insets bottom="5.0" />
          </VBox.margin>
       </JFXPasswordField>
-      <Label fx:id="passwordError" alignment="CENTER" styleClass="error-label" visible="false">
+      <Label fx:id="passwordError" alignment="CENTER" styleClass="error-label" text="Password isn't correct" visible="false">
          <VBox.margin>
             <Insets />
          </VBox.margin>
       </Label>
       <TextFlow>
          <children>
-            <Text fx:id="accountLockError" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="error-label" visible="false" />
+            <Text fx:id="accountLockError" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="error-label" text="Account is locked. Please contact an admin." visible="false" />
          </children>
          <VBox.margin>
             <Insets bottom="30.0" />
