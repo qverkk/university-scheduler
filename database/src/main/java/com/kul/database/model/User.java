@@ -40,4 +40,20 @@ public class User {
 
     @NotNull
     private AuthorityEnum authority;
+
+    public boolean canEnableUsers() {
+        return authority == AuthorityEnum.ADMIN || authority == AuthorityEnum.DZIEKANAT;
+    }
+
+    public boolean canDeleteUsers() {
+        return authority == AuthorityEnum.ADMIN;
+    }
+
+    public boolean canDisableUsers() {
+        return authority == AuthorityEnum.ADMIN || authority == AuthorityEnum.DZIEKANAT;
+    }
+
+    public boolean hasAccessToAllUserData() {
+        return authority == AuthorityEnum.ADMIN;
+    }
 }

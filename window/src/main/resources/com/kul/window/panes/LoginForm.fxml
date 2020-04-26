@@ -45,12 +45,12 @@
             <Insets bottom="30.0" />
          </VBox.margin>
       </TextFlow>
-      <JFXButton onAction="#performSignIn" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign In" textFill="#e8e6e6">
+      <JFXButton fx:id="loginButton" onAction="#performSignIn" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign In" textFill="#e8e6e6">
          <VBox.margin>
             <Insets bottom="10.0" />
          </VBox.margin>
       </JFXButton>
-      <JFXButton id="sign-up-btn" onAction="#goToSignUpPanelFromLogin" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6">
+      <JFXButton fx:id="registerButton" onAction="#goToSignUpPanelFromLogin" prefWidth="300.0" style="-fx-background-color: #5dade2;" text="Sign Up" textFill="#e8e6e6">
          <VBox.margin>
             <Insets bottom="50.0" />
          </VBox.margin>
