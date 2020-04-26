@@ -102,6 +102,7 @@ public class LoginController implements Initializable {
                     return new UserAndTokenInfo(token, userInfo);
                 }))
                 .observeOn(JavaFxScheduler.platform())
+                .doFinally(loginUserScheduler::shutdown)
                 .subscribe(userAndTokenInfo -> {
                     final UserInfo userInfo = userAndTokenInfo.getUserInfo();
                     final ExistingUserToken userToken = userAndTokenInfo.getUserToken();
@@ -137,7 +138,6 @@ public class LoginController implements Initializable {
                         accountLockError.setText("Account is locked. Please contact an admin.");
                     }
                     actionsLocked.set(false);
-                    loginUserScheduler.shutdown();
                 });
     }
 
