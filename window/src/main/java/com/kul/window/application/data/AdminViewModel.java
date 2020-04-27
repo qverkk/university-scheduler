@@ -1,12 +1,10 @@
 package com.kul.window.application.data;
 
 import com.kul.api.domain.admin.management.ManagedUser;
-import com.kul.window.application.admin.AdminController;
-import com.kul.window.async.PreconfiguredExecutors;
+import com.kul.api.domain.admin.management.UserManagement;
+import com.kul.window.async.ExecutorsFactory;
 import io.reactivex.Completable;
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,32 +15,36 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-public class GUIUsers implements Users {
+public class AdminViewModel {
 
     private final List<UserInfoViewModel> users = new LinkedList<>();
-    private final AdminController adminController;
     private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
     private final AtomicBoolean fetchingLocked = new AtomicBoolean(false);
-    private final PreconfiguredExecutors preconfiguredExecutors;
+    private final ExecutorsFactory preconfiguredExecutors;
+    private final UserManagement userManagement;
+    private final UserInfoViewModel currentUserInfo;
 
-    public GUIUsers(AdminController adminController, PreconfiguredExecutors preconfiguredExecutors) {
-        this.adminController = adminController;
+    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, UserInfoViewModel currentUserInfo) {
         this.preconfiguredExecutors = preconfiguredExecutors;
+        this.userManagement = userManagement;
+        this.currentUserInfo = currentUserInfo;
     }
 
-    @Override
     public ObservableList<UserInfoViewModel> users() {
         return observableUsers;
     }
 
-    @Override
+    public UserInfoViewModel getCurrentUserInfo() {
+        return currentUserInfo;
+    }
+
     public void enableUser(Long id) {
         if (fetchingLocked.getAndSet(true)) {
             return;
         }
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("enable-user");
 
-        Completable.fromRunnable(() -> adminController.getUserManagement().enableUser(id))
+        Completable.fromRunnable(() -> userManagement.enableUser(id))
                 .subscribeOn(Schedulers.from(executor))
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(preconfiguredExecutors.platformScheduler())
@@ -54,14 +56,13 @@ public class GUIUsers implements Users {
                 });
     }
 
-    @Override
     public void disableUser(Long id) {
         if (fetchingLocked.getAndSet(true)) {
             return;
         }
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("disable-user");
 
-        Completable.fromRunnable(() -> adminController.getUserManagement().disableUser(id))
+        Completable.fromRunnable(() -> userManagement.disableUser(id))
                 .subscribeOn(Schedulers.from(executor))
                 .andThen(Single.fromCallable(this::getAllUsers))
                 .observeOn(preconfiguredExecutors.platformScheduler())
@@ -73,7 +74,6 @@ public class GUIUsers implements Users {
                 });
     }
 
-    @Override
     public void refresh() {
         if (fetchingLocked.getAndSet(true)) {
             return;
@@ -92,7 +92,7 @@ public class GUIUsers implements Users {
     }
 
     private List<UserInfoViewModel> getAllUsers() {
-        final List<ManagedUser> requestedUsers = adminController.getUserManagement().getAllUsers();
+        final List<ManagedUser> requestedUsers = userManagement.getAllUsers();
         return requestedUsers.stream().map(u ->
                 new UserInfoViewModel(
                         u.getId(),

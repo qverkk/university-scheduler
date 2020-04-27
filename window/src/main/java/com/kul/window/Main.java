@@ -6,6 +6,8 @@ import com.kul.api.adapter.user.external.AuthEndpointClientFactory;
 import com.kul.api.adapter.user.registration.UserRepositoryFacade;
 import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.window.application.helpers.ApplicationWindowManager;
+import com.kul.window.application.helpers.ApplicationWindowManagerFactory;
+import com.kul.window.async.ExecutorsFactory;
 import com.kul.window.async.PreconfiguredExecutors;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.application.Application;
@@ -17,7 +19,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private final PreconfiguredExecutors preconfiguredExecutors = new PreconfiguredExecutors(
+    private final ExecutorsFactory preconfiguredExecutors = new PreconfiguredExecutors(
             JavaFxScheduler.platform()
     );
 
@@ -29,8 +31,7 @@ public class Main extends Application {
 
     private final UserAuthorizationFacade userAuthorizationFacade = new UserAuthorizationFacade(authEndpointClient);
 
-    private final ApplicationWindowManager applicationWindowManager = new ApplicationWindowManager(
-            null,
+    private final ApplicationWindowManagerFactory applicationWindowManagerFactory = new ApplicationWindowManagerFactory(
             preconfiguredExecutors
     );
 
@@ -42,7 +43,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/kul/window/panes/MainWindow.fxml"));
 
-        applicationWindowManager.setCurrentStage(primaryStage);
+        final ApplicationWindowManager applicationWindowManager = applicationWindowManagerFactory.createForStage(primaryStage);
 
         loader.setController(new MainController(
                 applicationWindowManager,

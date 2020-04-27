@@ -1,10 +1,8 @@
 package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
-import com.kul.api.domain.admin.management.UserManagement;
-import com.kul.window.application.data.GUIUsers;
+import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
-import com.kul.window.async.PreconfiguredExecutors;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -20,10 +18,7 @@ import java.util.ResourceBundle;
 
 public class AdminController implements Initializable {
 
-    private final UserInfoViewModel userInfo;
-    private final UserManagement userManagement;
-
-    private final GUIUsers users;
+    private final AdminViewModel adminViewModel;
 
     @FXML
     private TableView<UserInfoViewModel> usersTable;
@@ -46,15 +41,13 @@ public class AdminController implements Initializable {
     @FXML
     private JFXButton refreshUsersButton;
 
-    public AdminController(UserInfoViewModel userInfo, UserManagement userManagement, PreconfiguredExecutors preconfiguredExecutors) {
-        this.userInfo = userInfo;
-        this.userManagement = userManagement;
-        this.users = new GUIUsers(this, preconfiguredExecutors);
+    public AdminController(AdminViewModel adminViewModel) {
+        this.adminViewModel = adminViewModel;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        usersTable.setItems(users.users());
+        usersTable.setItems(adminViewModel.users());
         initializeColumns();
         refreshUsers();
     }
@@ -88,14 +81,14 @@ public class AdminController implements Initializable {
                         } else {
                             UserInfoViewModel person = getTableView().getItems().get(getIndex());
                             enableBtn.disableProperty()
-                                    .bind(person.username().isEqualTo(userInfo.username()).or(person.canBeEnabled()));
+                                    .bind(person.username().isEqualTo(adminViewModel.getCurrentUserInfo().username()).or(person.canBeEnabled()));
 
                             disableBtn.disableProperty()
-                                    .bind(person.username().isEqualTo(userInfo.username()).or(person.canBeDisabled()));
+                                    .bind(person.username().isEqualTo(adminViewModel.getCurrentUserInfo().username()).or(person.canBeDisabled()));
 
                             final Long userId = person.id().get();
-                            enableBtn.setOnAction(event -> users.enableUser(userId));
-                            disableBtn.setOnAction(event -> users.disableUser(userId));
+                            enableBtn.setOnAction(event -> adminViewModel.enableUser(userId));
+                            disableBtn.setOnAction(event -> adminViewModel.disableUser(userId));
 
                             if (!pane.getChildren().containsAll(Arrays.asList(enableBtn, disableBtn))) {
                                 pane.getChildren().addAll(enableBtn, disableBtn);
@@ -112,10 +105,6 @@ public class AdminController implements Initializable {
 
     @FXML
     void refreshUsers() {
-        users.refresh();
-    }
-
-    public UserManagement getUserManagement() {
-        return userManagement;
+        adminViewModel.refresh();
     }
 }

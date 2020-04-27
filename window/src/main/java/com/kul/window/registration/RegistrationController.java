@@ -28,7 +28,6 @@ import java.util.ResourceBundle;
 public class RegistrationController implements Initializable {
 
     private final RegistrationViewModel registrationViewModel;
-    private ViewModel mainViewModel;
 
     @FXML
     private JFXTextField firstnameField;
@@ -49,9 +48,8 @@ public class RegistrationController implements Initializable {
     @FXML
     private Label registrationSuccess;
 
-    public RegistrationController(RegistrationViewModel registrationViewModel, ViewModel mainViewModel) {
+    public RegistrationController(RegistrationViewModel registrationViewModel) {
         this.registrationViewModel = registrationViewModel;
-        this.mainViewModel = mainViewModel;
     }
 
     private boolean canRegister() {
@@ -79,7 +77,7 @@ public class RegistrationController implements Initializable {
 
     @FXML
     private void goToLoginForm() {
-        mainViewModel.openLoginMenu();
+        registrationViewModel.openLoginMenu();
     }
 
     @Override

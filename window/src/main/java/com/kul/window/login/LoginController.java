@@ -20,7 +20,6 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
-    private final ViewModel mainViewModel;
     private final LoginViewModel loginViewModel;
 
     @FXML
@@ -38,14 +37,13 @@ public class LoginController implements Initializable {
     @FXML
     private JFXButton registerButton;
 
-    public LoginController(ViewModel mainViewModel, LoginViewModel loginViewModel) {
-        this.mainViewModel = mainViewModel;
+    public LoginController(LoginViewModel loginViewModel) {
         this.loginViewModel = loginViewModel;
     }
 
     @FXML
     void goToSignUpPanelFromLogin() {
-        mainViewModel.openRegistrationMenu();
+        loginViewModel.openRegistrationMenu();
     }
 
     @FXML

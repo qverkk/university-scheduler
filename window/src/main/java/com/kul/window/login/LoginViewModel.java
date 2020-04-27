@@ -8,10 +8,11 @@ import com.kul.api.domain.user.authorization.ExistingUser;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.api.domain.user.authorization.UserInfo;
 import com.kul.api.model.AuthorityEnum;
+import com.kul.window.ViewModel;
 import com.kul.window.application.data.UserAndTokenInfo;
 import com.kul.window.application.data.UserInfoViewModel;
 import com.kul.window.application.helpers.ApplicationWindowManager;
-import com.kul.window.async.PreconfiguredExecutors;
+import com.kul.window.async.ExecutorsFactory;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import javafx.beans.property.BooleanProperty;
@@ -21,16 +22,23 @@ import javafx.stage.Stage;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class LoginViewModel {
+    private final ViewModel mainViewModel;
     private final ApplicationWindowManager applicationWindowManager;
     private final UserAuthorizationFacade userAuthorizationFacade;
-    private final PreconfiguredExecutors preconfiguredExecutors;
+    private final ExecutorsFactory preconfiguredExecutors;
 
     private final BooleanProperty usernameError = new SimpleBooleanProperty(false);
     private final BooleanProperty passwordError = new SimpleBooleanProperty(false);
     private final BooleanProperty accountLocked = new SimpleBooleanProperty(false);
     private final BooleanProperty actionsLocked = new SimpleBooleanProperty(false);
 
-    public LoginViewModel(ApplicationWindowManager applicationWindowManager, UserAuthorizationFacade userAuthorizationFacade, PreconfiguredExecutors preconfiguredExecutors) {
+    public LoginViewModel(
+            ViewModel mainViewModel,
+            ApplicationWindowManager applicationWindowManager,
+            UserAuthorizationFacade userAuthorizationFacade,
+            ExecutorsFactory preconfiguredExecutors
+    ) {
+        this.mainViewModel = mainViewModel;
         this.applicationWindowManager = applicationWindowManager;
         this.userAuthorizationFacade = userAuthorizationFacade;
         this.preconfiguredExecutors = preconfiguredExecutors;
@@ -62,11 +70,11 @@ public class LoginViewModel {
         accountLockedProperty().setValue(false);
     }
 
-    public ExistingUserToken authenticate(ExistingUser existingUser) throws UserAccountDisabledException, UserLoginAccountDoesntExistException, UserLoginWrongPasswordException {
+    private ExistingUserToken authenticate(ExistingUser existingUser) throws UserAccountDisabledException, UserLoginAccountDoesntExistException, UserLoginWrongPasswordException {
         return userAuthorizationFacade.authenticate(existingUser);
     }
 
-    public UserInfo loginWithToken(ExistingUserToken token) {
+    private UserInfo loginWithToken(ExistingUserToken token) {
         return userAuthorizationFacade.loginWithToken(token);
     }
 
@@ -119,5 +127,9 @@ public class LoginViewModel {
                     }
                     actionsLocked.set(false);
                 });
+    }
+
+    public void openRegistrationMenu() {
+        mainViewModel.openRegistrationMenu();
     }
 }

@@ -3,9 +3,7 @@ package com.kul.window;
 import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
 import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.window.application.helpers.ApplicationWindowManager;
-import com.kul.window.async.PreconfiguredExecutors;
-import com.kul.window.login.LoginViewModel;
-import com.kul.window.registration.RegistrationViewModel;
+import com.kul.window.async.ExecutorsFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -24,19 +22,14 @@ public class MainController implements Initializable {
     public MainController(
             ApplicationWindowManager applicationWindowManager,
             UserAuthorizationFacade userAuthorizationFacade,
-            PreconfiguredExecutors preconfiguredExecutors,
+            ExecutorsFactory preconfiguredExecutors,
             UserRegistration userRegistration
     ) {
         this.mainViewModel = new MainViewModel(
-                new LoginViewModel(
-                        applicationWindowManager,
-                        userAuthorizationFacade,
-                        preconfiguredExecutors
-                ),
-                new RegistrationViewModel(
-                        userRegistration,
-                        preconfiguredExecutors
-                )
+                applicationWindowManager,
+                userAuthorizationFacade,
+                preconfiguredExecutors,
+                userRegistration
         );
     }
 

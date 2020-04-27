@@ -1,5 +1,9 @@
 package com.kul.window;
 
+import com.kul.api.adapter.user.authorization.UserAuthorizationFacade;
+import com.kul.api.domain.user.registration.UserRegistration;
+import com.kul.window.application.helpers.ApplicationWindowManager;
+import com.kul.window.async.ExecutorsFactory;
 import com.kul.window.login.LoginController;
 import com.kul.window.login.LoginViewModel;
 import com.kul.window.registration.RegistrationController;
@@ -22,16 +26,25 @@ public class MainViewModel implements ViewModel {
     private Node registerNode;
 
     public MainViewModel(
-            LoginViewModel loginViewModel,
-            RegistrationViewModel registrationViewModel
+            ApplicationWindowManager applicationWindowManager,
+            UserAuthorizationFacade userAuthorizationFacade,
+            ExecutorsFactory preconfiguredExecutors,
+            UserRegistration userRegistration
     ) {
         this.loginController = new LoginController(
-                this,
-                loginViewModel
+                new LoginViewModel(
+                        this,
+                        applicationWindowManager,
+                        userAuthorizationFacade,
+                        preconfiguredExecutors
+                )
         );
         this.registrationController = new RegistrationController(
-                registrationViewModel,
-                this
+                new RegistrationViewModel(
+                        this,
+                        userRegistration,
+                        preconfiguredExecutors
+                )
         );
     }
 

@@ -5,7 +5,8 @@ import com.kul.api.adapter.user.registration.UserAccountCreationException;
 import com.kul.api.domain.user.registration.NewUser;
 import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.api.model.AuthorityEnum;
-import com.kul.window.async.PreconfiguredExecutors;
+import com.kul.window.ViewModel;
+import com.kul.window.async.ExecutorsFactory;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import javafx.beans.property.BooleanProperty;
@@ -16,13 +17,15 @@ import javafx.beans.property.StringProperty;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class RegistrationViewModel {
+    private final ViewModel mainViewModel;
     private final UserRegistration userRegistration;
-    private final PreconfiguredExecutors preconfiguredExecutors;
+    private final ExecutorsFactory preconfiguredExecutors;
     private final StringProperty registrationStatus = new SimpleStringProperty();
     private final BooleanProperty usernameError = new SimpleBooleanProperty(false);
 
 
-    public RegistrationViewModel(UserRegistration userRegistration, PreconfiguredExecutors preconfiguredExecutors) {
+    public RegistrationViewModel(ViewModel mainViewModel, UserRegistration userRegistration, ExecutorsFactory preconfiguredExecutors) {
+        this.mainViewModel = mainViewModel;
         this.userRegistration = userRegistration;
         this.preconfiguredExecutors = preconfiguredExecutors;
     }
@@ -67,5 +70,9 @@ public class RegistrationViewModel {
                     }
                 });
 
+    }
+
+    public void openLoginMenu() {
+        mainViewModel.openLoginMenu();
     }
 }

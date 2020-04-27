@@ -6,9 +6,10 @@ import com.kul.api.adapter.admin.management.ManagementUserRepositoryFacade;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.window.application.admin.AdminController;
+import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
 import com.kul.window.application.user.ApplicationController;
-import com.kul.window.async.PreconfiguredExecutors;
+import com.kul.window.async.ExecutorsFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -20,10 +21,10 @@ import java.io.IOException;
 
 public class ApplicationWindowManager {
 
+    private final ExecutorsFactory preconfiguredExecutors;
     private Stage currentStage;
-    private final PreconfiguredExecutors preconfiguredExecutors;
 
-    public ApplicationWindowManager(Stage currentStage, PreconfiguredExecutors preconfiguredExecutors) {
+    public ApplicationWindowManager(Stage currentStage, ExecutorsFactory preconfiguredExecutors) {
         this.currentStage = currentStage;
         this.preconfiguredExecutors = preconfiguredExecutors;
     }
@@ -54,7 +55,13 @@ public class ApplicationWindowManager {
         changeWindow(
                 "/com/kul/window/panes/AdminWindow.fxml",
                 "KUL Scheduler Admin panel",
-                new AdminController(userInfo, userManagement, preconfiguredExecutors)
+                new AdminController(
+                        new AdminViewModel(
+                                preconfiguredExecutors,
+                                userManagement,
+                                userInfo
+                        )
+                )
         );
     }
 
