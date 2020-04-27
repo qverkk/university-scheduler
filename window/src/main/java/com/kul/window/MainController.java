@@ -36,13 +36,17 @@ public class MainController implements Initializable {
                 new RegistrationViewModel(
                         userRegistration,
                         preconfiguredExecutors
-                ),
-                this
+                )
         );
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        mainViewModel.nodeProperty().addListener(((observable, oldValue, newValue) -> {
+            clearMenu();
+            addMenu(newValue);
+        }));
+
         clearMenu();
         mainViewModel.openLoginMenu();
     }

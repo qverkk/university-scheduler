@@ -4,6 +4,8 @@ import com.kul.window.login.LoginController;
 import com.kul.window.login.LoginViewModel;
 import com.kul.window.registration.RegistrationController;
 import com.kul.window.registration.RegistrationViewModel;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -14,17 +16,15 @@ public class MainViewModel implements ViewModel {
 
     private final LoginController loginController;
     private final RegistrationController registrationController;
-    private final MainController mainController;
+    private final ObjectProperty<Node> nodeObject = new SimpleObjectProperty<Node>();
 
     private Node loginNode;
     private Node registerNode;
 
     public MainViewModel(
             LoginViewModel loginViewModel,
-            RegistrationViewModel registrationViewModel,
-            MainController mainController
+            RegistrationViewModel registrationViewModel
     ) {
-        this.mainController = mainController;
         this.loginController = new LoginController(
                 this,
                 loginViewModel
@@ -47,7 +47,6 @@ public class MainViewModel implements ViewModel {
 
     private void getControls(String fxmlPath, Node node, Initializable controller) {
         try {
-            mainController.clearMenu();
             if (node == null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
                 loader.setController(controller);
@@ -58,9 +57,13 @@ public class MainViewModel implements ViewModel {
                     registerNode = node;
                 }
             }
-            mainController.addMenu(node);
+            nodeObject.setValue(node);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ObjectProperty<Node> nodeProperty() {
+        return nodeObject;
     }
 }
