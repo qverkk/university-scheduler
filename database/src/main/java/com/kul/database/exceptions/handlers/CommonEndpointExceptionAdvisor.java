@@ -1,9 +1,6 @@
 package com.kul.database.exceptions.handlers;
 
-import com.kul.database.exceptions.InsufficientPersmissionsToDeleteUsersException;
-import com.kul.database.exceptions.InsufficientPersmissionsToEnableUsersException;
-import com.kul.database.exceptions.InsufficientPersmissionsToGetAllUserData;
-import com.kul.database.exceptions.NoSuchUserException;
+import com.kul.database.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -63,4 +60,14 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                         new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
                 );
     }
+
+    @ExceptionHandler(LecturerPreferenceAlreadyExists.class)
+    public ResponseEntity<EndpointError> handle(LecturerPreferenceAlreadyExists exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(
+                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
+
 }
