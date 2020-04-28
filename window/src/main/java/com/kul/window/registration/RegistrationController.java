@@ -4,19 +4,13 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
-import com.kul.api.adapter.user.registration.UserAccountAlreadyExistException;
-import com.kul.api.adapter.user.registration.UserAccountCreationException;
-import com.kul.api.adapter.user.registration.UserRepositoryFacade;
 import com.kul.api.data.Constants;
-import com.kul.api.domain.user.registration.NewUser;
-import com.kul.api.domain.user.registration.RegistrationInfo;
-import com.kul.api.domain.user.registration.UserRegistration;
 import com.kul.api.model.AuthorityEnum;
 import com.kul.api.model.Displayable;
 import com.kul.api.validators.MatchingValidator;
 import com.kul.api.validators.PasswordValidation;
 import com.kul.api.validators.UserDetailsValidator;
-import com.kul.window.MainController;
+import com.kul.window.ViewModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -33,8 +27,7 @@ import java.util.ResourceBundle;
 
 public class RegistrationController implements Initializable {
 
-    private MainController mainController;
-    private UserRegistration userRegistration;
+    private final RegistrationViewModel registrationViewModel;
 
     @FXML
     private JFXTextField firstnameField;
@@ -50,15 +43,13 @@ public class RegistrationController implements Initializable {
     private JFXPasswordField repeatPasswordField;
     @FXML
     private JFXComboBox<Displayable<AuthorityEnum>> authorityCb;
-
     @FXML
     private Label usernameError;
     @FXML
     private Label registrationSuccess;
 
-    public RegistrationController(MainController mainController, UserRegistration userRegistration) {
-        this.mainController = mainController;
-        this.userRegistration = userRegistration;
+    public RegistrationController(RegistrationViewModel registrationViewModel) {
+        this.registrationViewModel = registrationViewModel;
     }
 
     private boolean canRegister() {
@@ -72,34 +63,21 @@ public class RegistrationController implements Initializable {
 
     @FXML
     void performRegister() {
-        registrationSuccess.setVisible(false);
-        usernameError.setVisible(false);
         if (!canRegister()) {
             return;
         }
-        NewUser user = new NewUser(
+        registrationViewModel.register(
                 usernameField.getText(),
                 passwordField.getText(),
                 firstnameField.getText(),
                 lastnameField.getText(),
                 authorityCb.getSelectionModel().getSelectedItem().getValue()
         );
-
-        try {
-            final RegistrationInfo registrationInfo = userRegistration.register(user);
-            registrationSuccess.setText("Success registering account");
-            registrationSuccess.setVisible(true);
-        } catch (UserAccountAlreadyExistException accountAlreadyExistException) {
-            usernameError.setVisible(true);
-        } catch (UserAccountCreationException e) {
-            registrationSuccess.setVisible(true);
-            registrationSuccess.setText("Failure registrating account");
-        }
     }
 
     @FXML
     private void goToLoginForm() {
-        mainController.setLoginControls();
+        registrationViewModel.openLoginMenu();
     }
 
     @Override
@@ -110,6 +88,16 @@ public class RegistrationController implements Initializable {
         addUserDetailsValidator();
         addPasswordValidator();
         addFocusPropertyListeners();
+        initializeBindings();
+    }
+
+    private void initializeBindings() {
+        usernameError.visibleProperty()
+                .bind(registrationViewModel.usernameErrorProperty());
+        registrationSuccess.textProperty()
+                .bind(registrationViewModel.registrationStatusProperty());
+        registrationSuccess.visibleProperty()
+                .bind(registrationViewModel.registrationStatusProperty().isNotEmpty());
     }
 
     private void addAuthoritiesToComboBox() {
