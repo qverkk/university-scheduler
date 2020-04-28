@@ -19,7 +19,7 @@ public class PreconfiguredExecutors implements ExecutorsFactory {
         return new ThreadPoolExecutor(
                 1, 1, 0, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(1),
-                new NamedThreadFactory(namePattern + "-%d"),
+                new NamedThreadFactory(namePattern),
                 new ThreadPoolExecutor.AbortPolicy()
         );
     }

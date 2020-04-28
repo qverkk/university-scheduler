@@ -13,13 +13,13 @@ public class NamedThreadFactory implements ThreadFactory {
     private final String nameFormat;
 
     public NamedThreadFactory(String namePattern) {
+        this.nameFormat = namePattern + "-%d-thread";
+
         try {
             String.format(namePattern, 0);
         } catch (IllegalFormatException ex) {
             throw new RuntimeException("Invalid thread name pattern - required single numeric parameter", ex);
         }
-
-        this.nameFormat = namePattern + "-thread";
     }
 
     @Override
