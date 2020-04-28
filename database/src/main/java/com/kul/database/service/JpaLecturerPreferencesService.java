@@ -2,7 +2,8 @@ package com.kul.database.service;
 
 import com.kul.database.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.exceptions.NoSuchUserException;
-import com.kul.database.model.LecturerPreferenceRequest;
+import com.kul.database.model.AddLecturePreferenceResponse;
+import com.kul.database.model.AddLecturerPreferenceRequest;
 import com.kul.database.model.LecturerPreferences;
 import com.kul.database.model.User;
 import com.kul.database.repository.LecturerPreferencesRepository;
@@ -23,17 +24,17 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
     }
 
     @Override
-    public void addPreferenceForUser(LecturerPreferenceRequest userPreferenceRequest) throws NoSuchUserException, LecturerPreferenceAlreadyExists {
+    public LecturerPreferences addPreferenceForUser(AddLecturerPreferenceRequest userPreferenceRequest) throws NoSuchUserException, LecturerPreferenceAlreadyExists {
         final Optional<User> optionalUser = userRepository.findById(userPreferenceRequest.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
         }
         final User user = optionalUser.get();
-        final Boolean preferenceExists = lecturerPreferencesRepository.findByDayAndUser(
+        final LecturerPreferences preferenceExists = lecturerPreferencesRepository.findByDayAndUser(
                 userPreferenceRequest.getDay(),
                 user
         );
-        if (preferenceExists) {
+        if (preferenceExists != null) {
             throw new LecturerPreferenceAlreadyExists(
                     String.format("Preference for %s already exists", userPreferenceRequest.getDay())
             );
@@ -45,6 +46,7 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
                 userPreferenceRequest.getEndTime(),
                 userPreferenceRequest.getDay()
         );
-        lecturerPreferencesRepository.save(preference);
+        final LecturerPreferences savedPreference = lecturerPreferencesRepository.save(preference);
+        return savedPreference;
     }
 }

@@ -8,6 +8,6 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 public interface LecturerPreferencesRepository extends JpaRepository<LecturerPreferences, Long> {
-    Boolean findByDayAndUser(DayOfWeek day, User user);
+    LecturerPreferences findByDayAndUser(DayOfWeek day, User user);
     List<LecturerPreferences> findAllByUser(User user);
 }
