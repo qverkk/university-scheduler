@@ -1,5 +1,7 @@
 package com.kul.database.lecturerpreferences.adapter.jpa;
 
+import com.kul.database.lecturerpreferences.domain.AddLecturerPreference;
+import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
@@ -26,7 +28,7 @@ public class JpaLecturerPreferencesService {
         this.userRepository = userRepository;
     }
 
-    public LecturerPreferences addPreferenceForUser(AddLecturerPreferenceRequest userPreferenceRequest) throws Exception {
+    public LecturerPreferences addPreferenceForUser(AddLecturerPreference userPreferenceRequest) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(userPreferenceRequest.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
@@ -57,7 +59,7 @@ public class JpaLecturerPreferencesService {
         return savedPreference;
     }
 
-    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreferenceRequest request) throws Exception {
+    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreference request) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(request.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
