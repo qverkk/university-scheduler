@@ -1,5 +1,6 @@
 package com.kul.database.service;
 
+import com.kul.database.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
 import com.kul.database.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.exceptions.LecturerPreferenceDoesntExist;
 import com.kul.database.exceptions.NoSuchUserException;
@@ -22,12 +23,17 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
     }
 
     @Override
-    public LecturerPreferences addPreferenceForUser(AddLecturerPreferenceRequest userPreferenceRequest) throws NoSuchUserException, LecturerPreferenceAlreadyExists {
+    public LecturerPreferences addPreferenceForUser(AddLecturerPreferenceRequest userPreferenceRequest) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(userPreferenceRequest.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
         }
         final User user = optionalUser.get();
+        if (!user.canUpdatePreferencesForUserId(userPreferenceRequest.getUserId())) {
+            throw new InsufficientPermissionsToUpdateLecturerPreferences(
+                    "Only admin, dziekanat or user for this permission can update them"
+            );
+        }
         final LecturerPreferences preferenceExists = lecturerPreferencesRepository.findByDayAndUser(
                 userPreferenceRequest.getDay(),
                 user
@@ -49,12 +55,17 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
     }
 
     @Override
-    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreferenceRequest request) throws NoSuchUserException, LecturerPreferenceDoesntExist {
+    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreferenceRequest request) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(request.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
         }
         final User user = optionalUser.get();
+        if (!user.canUpdatePreferencesForUserId(request.getUserId())) {
+            throw new InsufficientPermissionsToUpdateLecturerPreferences(
+                    "Only admin, dziekanat or user for this permission can update them"
+            );
+        }
         final LecturerPreferences preferenceExists = lecturerPreferencesRepository.findByDayAndUser(
                 request.getDay(),
                 user

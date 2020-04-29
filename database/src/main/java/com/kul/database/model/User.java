@@ -56,4 +56,10 @@ public class User {
     public boolean hasAccessToAllUserData() {
         return authority == AuthorityEnum.ADMIN;
     }
+
+    public boolean canUpdatePreferencesForUserId(Long userId) {
+        return authority == AuthorityEnum.ADMIN ||
+                authority == AuthorityEnum.DZIEKANAT ||
+                userId.equals(id);
+    }
 }
