@@ -86,4 +86,37 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
             response.statusCode(UNPROCESSABLE_ENTITY.value())
                 .body("message", equalTo(String.format("Preference for %s already exists", preference.getDay())))
     }
+
+    def "should respond 200 when updating preferences for user"() {
+        given:
+            def preference = aNewLecturerPreference()
+                        .withStartTime("9:00")
+                        .withEndTime("14:00")
+
+        when:
+            def response = updatePreference(preference, token)
+
+        then:
+            response.statusCode(OK.value())
+                .body("lecturerPreferenceId", equalTo(1))
+                .body("userId", equalTo(2))
+                .body("startTime", equalTo("9:00"))
+                .body("endTime", equalTo("14:00"))
+                .body("day", equalTo("MONDAY"))
+    }
+
+    def "should respond 422 when updating for non existent user"() {
+        given:
+            def preference = aNewLecturerPreference()
+                    .withStartTime("9:00")
+                    .withEndTime("14:00")
+                    .withUserId(3)
+
+        when:
+            def response = updatePreference(preference, token)
+
+        then:
+            response.statusCode(UNPROCESSABLE_ENTITY.value())
+                .body("message", equalTo("User No username provided cannot be found"))
+    }
 }

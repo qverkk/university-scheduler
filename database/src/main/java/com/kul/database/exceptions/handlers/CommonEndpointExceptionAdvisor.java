@@ -70,4 +70,13 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 );
     }
 
+    @ExceptionHandler(LecturerPreferenceDoesntExist.class)
+    public ResponseEntity<EndpointError> handle(LecturerPreferenceDoesntExist exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(
+                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
+
 }

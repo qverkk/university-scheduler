@@ -14,4 +14,13 @@ trait CallLecturerPreferencesEndpointAbility extends RequestLocalServerAbility {
                 .post(baseUrl().resolve("/preferences/add"))
                 .then()
     }
+
+    ValidatableResponse updatePreference(NewLecturerPreferencesRequest request, String token) {
+        return RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + token)
+                .body(objectMapper().writeValueAsString(request))
+                .put(baseUrl().resolve("/preferences/update"))
+                .then()
+    }
 }

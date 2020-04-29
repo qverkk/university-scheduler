@@ -1,11 +1,9 @@
 package com.kul.database.service;
 
 import com.kul.database.exceptions.LecturerPreferenceAlreadyExists;
+import com.kul.database.exceptions.LecturerPreferenceDoesntExist;
 import com.kul.database.exceptions.NoSuchUserException;
-import com.kul.database.model.AddLecturePreferenceResponse;
-import com.kul.database.model.AddLecturerPreferenceRequest;
-import com.kul.database.model.LecturerPreferences;
-import com.kul.database.model.User;
+import com.kul.database.model.*;
 import com.kul.database.repository.LecturerPreferencesRepository;
 import com.kul.database.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -47,6 +45,34 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
                 userPreferenceRequest.getDay()
         );
         final LecturerPreferences savedPreference = lecturerPreferencesRepository.save(preference);
+        return savedPreference;
+    }
+
+    @Override
+    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreferenceRequest request) throws NoSuchUserException, LecturerPreferenceDoesntExist {
+        final Optional<User> optionalUser = userRepository.findById(request.getUserId());
+        if (!optionalUser.isPresent()) {
+            throw new NoSuchUserException("No username provided");
+        }
+        final User user = optionalUser.get();
+        final LecturerPreferences preferenceExists = lecturerPreferencesRepository.findByDayAndUser(
+                request.getDay(),
+                user
+        );
+        if (preferenceExists == null) {
+            throw new LecturerPreferenceDoesntExist(
+                    String.format("Preference for %s doesn't exists", request.getDay())
+            );
+        }
+        final LecturerPreferences updatedPreferences = new LecturerPreferences(
+                preferenceExists.getId(),
+                preferenceExists.getUser(),
+                request.getStartTime(),
+                request.getEndTime(),
+                preferenceExists.getDay()
+        );
+
+        final LecturerPreferences savedPreference = lecturerPreferencesRepository.save(updatedPreferences);
         return savedPreference;
     }
 }
