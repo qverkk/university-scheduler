@@ -22,4 +22,12 @@ trait CallAuthEndpointAbility extends RequestLocalServerAbility {
                 .post(baseUrl().resolve("/auth/auth"))
                 .then()
     }
+
+    String getAdminToken() {
+        return authenticateUser(
+                new UserLoginRequest()
+                        .withPassword("admin")
+                        .withUsername("admin@admin.com")
+        ).extract().body().jsonPath().get("token").toString()
+    }
 }

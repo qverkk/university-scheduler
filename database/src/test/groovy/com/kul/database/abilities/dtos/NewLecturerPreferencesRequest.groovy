@@ -17,7 +17,7 @@ class NewLecturerPreferencesRequests {
     static aNewLecturerPreference() {
         return new NewLecturerPreferencesRequest()
             .withUserId(2)
-            .withStartTime("8:00")
+            .withStartTime("08:00")
             .withEndTime("15:00")
             .withDay(DayOfWeek.MONDAY)
     }
