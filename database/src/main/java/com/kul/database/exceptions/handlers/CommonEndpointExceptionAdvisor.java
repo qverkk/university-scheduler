@@ -79,4 +79,13 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 );
     }
 
+    @ExceptionHandler(InsufficientPermissionsToUpdateLecturerPreferences.class)
+    public ResponseEntity<EndpointError> handle(InsufficientPermissionsToUpdateLecturerPreferences exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(
+                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
+
 }

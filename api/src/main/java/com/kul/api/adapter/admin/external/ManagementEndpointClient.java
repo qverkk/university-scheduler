@@ -1,6 +1,8 @@
 package com.kul.api.adapter.admin.external;
 
-import com.kul.api.adapter.admin.management.AllUsersResponse;
+import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferencesResponse;
+import com.kul.api.adapter.admin.management.users.AllUsersResponse;
+import com.kul.api.domain.admin.management.LecturerPreferences;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -20,4 +22,12 @@ public interface ManagementEndpointClient {
     @RequestLine("POST /user/disable/{id}")
     @Headers("Content-Type: application/json")
     void disableUser(@Param("id") Long id);
+
+    @RequestLine("PUT /preferences/update")
+    @Headers("Content-Type: application/json")
+    LecturerPreferencesResponse updatePreferences(LecturerPreferences preferences);
+
+    @RequestLine("POST /preferences/add")
+    @Headers("Content-Type: application/json")
+    LecturerPreferencesResponse addPreferences(LecturerPreferences preferences);
 }

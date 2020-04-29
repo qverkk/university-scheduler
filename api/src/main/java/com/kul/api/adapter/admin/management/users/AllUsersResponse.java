@@ -1,4 +1,4 @@
-package com.kul.api.adapter.admin.management;
+package com.kul.api.adapter.admin.management.users;
 
 import com.kul.api.model.AuthorityEnum;
 import lombok.Value;

@@ -19,4 +19,12 @@ public class UserManagement {
     public void disableUser(Long id) {
         usersRepository.disableUser(id);
     }
+
+    public LecturerPreferences updatePreferences(LecturerPreferences preferences) throws Exception {
+        return usersRepository.updatePreferences(preferences);
+    }
+
+    public LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception {
+        return usersRepository.addPreferences(preferences);
+    }
 }

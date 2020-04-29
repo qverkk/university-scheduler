@@ -6,4 +6,6 @@ public interface ManagementUserRepository {
     List<ManagedUser> getAllUsers();
     void enableUser(Long id);
     void disableUser(Long id);
+    LecturerPreferences updatePreferences(LecturerPreferences preferences) throws Exception;
+    LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception;
 }
