@@ -56,4 +56,8 @@ public class UserInfoViewModel {
     public ObservableBooleanValue enabled() {
         return enabled;
     }
+
+    public boolean canContainPreferences() {
+        return authority.get().equals(AuthorityEnum.PROWADZACY.displayName);
+    }
 }

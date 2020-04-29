@@ -1,6 +1,7 @@
 package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
+import com.kul.api.model.AuthorityEnum;
 import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
 import javafx.fxml.FXML;
@@ -10,6 +11,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -71,7 +73,9 @@ public class AdminController implements Initializable {
 
                     final Button enableBtn = new Button("Enable");
                     final Button disableBtn = new Button("Disable");
+                    final Button preferencesBtn = new Button("Preferences");
                     final HBox pane = new HBox();
+                    final VBox vpane = new VBox();
 
                     @Override
                     public void updateItem(String item, boolean empty) {
@@ -79,6 +83,10 @@ public class AdminController implements Initializable {
                         if (empty) {
                             setGraphic(null);
                         } else {
+                            enableBtn.setMinWidth(75);
+                            disableBtn.setMinWidth(75);
+                            preferencesBtn.setMinWidth(150);
+
                             UserInfoViewModel person = getTableView().getItems().get(getIndex());
                             enableBtn.disableProperty()
                                     .bind(person.username().isEqualTo(adminViewModel.getCurrentUserInfo().username()).or(person.canBeEnabled()));
@@ -89,11 +97,19 @@ public class AdminController implements Initializable {
                             final Long userId = person.id().get();
                             enableBtn.setOnAction(event -> adminViewModel.enableUser(userId));
                             disableBtn.setOnAction(event -> adminViewModel.disableUser(userId));
+                            preferencesBtn.setOnAction(event -> adminViewModel.displayPreferences(userId));
 
                             if (!pane.getChildren().containsAll(Arrays.asList(enableBtn, disableBtn))) {
                                 pane.getChildren().addAll(enableBtn, disableBtn);
+                                vpane.getChildren().add(pane);
                             }
-                            setGraphic(pane);
+                            if (person.canContainPreferences()) {
+                                if (!pane.getChildren().contains(preferencesBtn)) {
+                                    pane.getChildren().add(preferencesBtn);
+                                    vpane.getChildren().add(preferencesBtn);
+                                }
+                            }
+                            setGraphic(vpane);
                         }
                         setText(null);
                     }

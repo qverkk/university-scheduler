@@ -8,6 +8,7 @@ import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.Stage;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -103,5 +104,9 @@ public class AdminViewModel {
                         u.getAuthority()
                 )
         ).collect(Collectors.toList());
+    }
+
+    public void displayPreferences(Long userId) {
+        
     }
 }
