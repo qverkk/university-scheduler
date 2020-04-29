@@ -11,6 +11,8 @@ import com.kul.window.async.ExecutorsFactory;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -186,9 +188,22 @@ public class AdminViewModel {
         ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(updateButton, ButtonType.CANCEL);
 
+        final StringProperty startTimeProperty = new SimpleStringProperty("00:00");
+        final StringProperty endTimeProperty = new SimpleStringProperty("00:00");
+
         final TextField startTime = new TextField();
         final TextField endTime = new TextField();
         final ComboBox<DayOfWeek> day = new ComboBox<>();
+
+        startTime.textProperty().bind(startTimeProperty);
+        endTime.textProperty().bind(endTimeProperty);
+        day.setOnAction(event -> fetchPreferences(
+                dialog,
+                day.getSelectionModel().getSelectedItem(),
+                userId,
+                startTimeProperty,
+                endTimeProperty
+        ));
 
         dialog.getDialogPane().setContent(generateGridSettings(startTime, endTime, day));
 
@@ -205,6 +220,37 @@ public class AdminViewModel {
         });
 
         return dialog.showAndWait().orElse(null);
+    }
+
+    private void fetchPreferences(Dialog<LecturerPreferences> dialog, DayOfWeek selectedItem,
+                                  Long userId,
+                                  StringProperty startTimeProperty,
+                                  StringProperty endTimeProperty
+    ) {
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
+                "fetch-lecturer-preferences"
+        );
+
+        Single.fromCallable(() -> userManagement.fetchPreferences(userId, selectedItem))
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(response -> {
+                    startTimeProperty.setValue(response.getStartTime());
+                    endTimeProperty.setValue(response.getEndTime());
+                }, error -> {
+                    if (error instanceof LecturerCannotBeFound) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setContentText("This lecturer doesn't exist in our database");
+                        alert.showAndWait();
+                    } else if (error instanceof LecturerPreferenceDoesntExistException) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setContentText("Preference for this day doesn't exist. Please add one.");
+                        alert.showAndWait();
+                    }
+                    dialog.close();
+                });
     }
 
     private LecturerPreferences addNewPreferencesDialog(Long userId) {

@@ -9,6 +9,7 @@ import com.kul.database.repository.LecturerPreferencesRepository;
 import com.kul.database.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.Optional;
 
 @Service("Lecturer preferences service")
@@ -85,5 +86,21 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
 
         final LecturerPreferences savedPreference = lecturerPreferencesRepository.save(updatedPreferences);
         return savedPreference;
+    }
+
+    @Override
+    public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) throws Exception {
+        final Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new NoSuchUserException("No username provided");
+        }
+        final User user = optionalUser.get();
+        LecturerPreferences result = lecturerPreferencesRepository.findByDayAndUser(day, user);
+        if (result == null) {
+            throw new LecturerPreferenceDoesntExist(
+                    String.format("Preference for %s %s doesn't exists", user.getUsername(), day)
+            );
+        }
+        return result;
     }
 }

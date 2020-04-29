@@ -7,6 +7,7 @@ import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.api.domain.admin.management.ManagementUserRepository;
 import feign.FeignException;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -105,6 +106,30 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     throw new LecturerPreferenceDoesntExistException();
                 } else if (error.contains("Preference for ") && error.contains("already exists")) {
                     throw new LecturerPreferenceAlreadyExistsException();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws Exception {
+        try {
+            FetchLecturerPreferenceResponse response = client.fetchPreferences(userId, day);
+            return new LecturerPreferences(
+                    userId,
+                    response.getStartTime(),
+                    response.getEndTime(),
+                    day
+            );
+        } catch (FeignException.UnprocessableEntity unprocessableEntity) {
+            Matcher matcher = MESSAGE_PATTERN.matcher(unprocessableEntity.getMessage());
+            if (matcher.find()) {
+                String error = matcher.group("error");
+                if (error.contains("No username provided")) {
+                    throw new LecturerCannotBeFound();
+                } else {
+                    throw new LecturerPreferenceDoesntExistException();
                 }
             }
         }

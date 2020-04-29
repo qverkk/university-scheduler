@@ -2,6 +2,7 @@ package com.kul.api.domain.admin.management;
 
 import lombok.AllArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 @AllArgsConstructor
@@ -26,5 +27,9 @@ public class UserManagement {
 
     public LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception {
         return usersRepository.addPreferences(preferences);
+    }
+
+    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek selectedItem) throws Exception {
+        return usersRepository.fetchPreferences(userId, selectedItem);
     }
 }

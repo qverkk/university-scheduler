@@ -1,5 +1,6 @@
 package com.kul.api.domain.admin.management;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 public interface ManagementUserRepository {
@@ -8,4 +9,5 @@ public interface ManagementUserRepository {
     void disableUser(Long id);
     LecturerPreferences updatePreferences(LecturerPreferences preferences) throws Exception;
     LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception;
+    LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws Exception;
 }

@@ -1,13 +1,10 @@
 package com.kul.database.controller;
 
-import com.kul.database.exceptions.LecturerPreferenceAlreadyExists;
-import com.kul.database.exceptions.LecturerPreferenceDoesntExist;
-import com.kul.database.exceptions.NoSuchUserException;
 import com.kul.database.model.*;
 import com.kul.database.service.LecturerPreferencesService;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import java.time.DayOfWeek;
 
 @RestController
 @RequestMapping(value = "/preferences")
@@ -45,6 +42,17 @@ class LecturerPreferencesController {
                 lecturerPreferences.getStartTime(),
                 lecturerPreferences.getEndTime(),
                 lecturerPreferences.getDay()
+        );
+    }
+
+    @GetMapping(
+            value = "/fetch/{userId}/{day}"
+    )
+    public FetchLecturerPreferenceResponse fetchLecturerPreference(@PathVariable Long userId, @PathVariable DayOfWeek day) throws Exception {
+        LecturerPreferences lecturerPreferences = lecturerPreferencesService.fetchPreferenceForUserAndDay(userId, day);
+        return new FetchLecturerPreferenceResponse(
+                lecturerPreferences.getStartTime(),
+                lecturerPreferences.getEndTime()
         );
     }
 }
