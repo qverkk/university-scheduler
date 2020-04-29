@@ -22,7 +22,7 @@ class LecturerPreferencesController {
     @PostMapping(
             value = "/add"
     )
-    public AddLecturePreferenceResponse addLecturerPreferences(@RequestBody AddLecturerPreferenceRequest lecturerPreferenceRequest) throws LecturerPreferenceAlreadyExists, NoSuchUserException {
+    public AddLecturePreferenceResponse addLecturerPreferences(@RequestBody AddLecturerPreferenceRequest lecturerPreferenceRequest) throws Exception {
         final LecturerPreferences lecturerPreferences = lecturerPreferencesService.addPreferenceForUser(lecturerPreferenceRequest);
         return new AddLecturePreferenceResponse(
                 lecturerPreferences.getId(),
@@ -37,7 +37,7 @@ class LecturerPreferencesController {
             method = RequestMethod.PUT,
             value = "/update"
     )
-    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreferenceRequest request) throws NoSuchUserException, LecturerPreferenceDoesntExist {
+    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreferenceRequest request) throws Exception {
         final LecturerPreferences lecturerPreferences = lecturerPreferencesService.updatePreferenceForUser(request);
         return new UpdateLecturerPreferenceResponse(
                 lecturerPreferences.getId(),
