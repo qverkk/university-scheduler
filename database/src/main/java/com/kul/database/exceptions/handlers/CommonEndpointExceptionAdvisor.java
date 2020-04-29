@@ -1,6 +1,12 @@
 package com.kul.database.exceptions.handlers;
 
-import com.kul.database.exceptions.*;
+import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
+import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
+import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
+import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
+import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
+import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
+import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

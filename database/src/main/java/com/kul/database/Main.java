@@ -1,8 +1,8 @@
 package com.kul.database;
 
-import com.kul.database.constants.AuthorityEnum;
-import com.kul.database.filter.JwtAuthorizationFilter;
-import com.kul.database.repository.UserRepository;
+import com.kul.database.usermanagement.domain.AuthorityEnum;
+import com.kul.database.infrastructure.filter.JwtAuthorizationFilter;
+import com.kul.database.usermanagement.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -91,7 +91,7 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     @Override
     public UserDetailsService userDetailsService() {
         return username -> {
-            com.kul.database.model.User account = userRepository.findByUsername(username);
+            com.kul.database.usermanagement.domain.User account = userRepository.findByUsername(username);
             if (account != null) {
                 return new User(
                         account.getUsername(),

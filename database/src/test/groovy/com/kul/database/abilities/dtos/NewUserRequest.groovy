@@ -1,6 +1,6 @@
 package com.kul.database.abilities.dtos
 
-import com.kul.database.constants.AuthorityEnum
+import com.kul.database.usermanagement.domain.AuthorityEnum
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
