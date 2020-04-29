@@ -4,6 +4,7 @@ import com.kul.database.usermanagement.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.time.DayOfWeek;
 
 @Entity(name = "lecturer_preferences")
@@ -20,8 +21,10 @@ public class LecturerPreferences {
     @ManyToOne
     private User user;
 
+    @Pattern(regexp = "^\\d{2}:\\d{2}$")
     private String startTime;
 
+    @Pattern(regexp = "^\\d{2}:\\d{2}$")
     private String endTime;
 
     private DayOfWeek day;

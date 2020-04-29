@@ -26,7 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.PostConstruct;
 
 @Service("Auth service")
-public class JpaAuthService implements AuthService {
+public class JpaAuthService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JpaAuthService.class);
 
@@ -57,7 +57,6 @@ public class JpaAuthService implements AuthService {
         registerUser(user);
     }
 
-    @Override
     public String authenticate(UserLoginRequest user) {
         User repositoryUser = userRepository.findByUsername(user.getUsername());
         if (repositoryUser == null) {
@@ -73,7 +72,6 @@ public class JpaAuthService implements AuthService {
         return JwtUtils.generateToken(authentication);
     }
 
-    @Override
     public UserLoginWithTokenResponse loginWithToken(String token) {
         byte[] signinKey = SecurityConstants.JWT_SECRET.getBytes();
         try {
@@ -96,7 +94,6 @@ public class JpaAuthService implements AuthService {
         }
     }
 
-    @Override
     public UserRegistrationResponse registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");

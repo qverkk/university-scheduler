@@ -6,14 +6,13 @@ import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmission
 import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
 import com.kul.database.usermanagement.domain.User;
 import com.kul.database.usermanagement.domain.UserRepository;
-import com.kul.database.usermanagement.domain.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service("User service")
-public class JpaUserService implements UserService {
+public class JpaUserService {
 
     private final UserRepository userRepository;
 
@@ -21,7 +20,6 @@ public class JpaUserService implements UserService {
         this.userRepository = userRepository;
     }
 
-    @Override
     public void enableUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
@@ -35,7 +33,6 @@ public class JpaUserService implements UserService {
         });
     }
 
-    @Override
     public void disableUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
@@ -49,7 +46,6 @@ public class JpaUserService implements UserService {
         });
     }
 
-    @Override
     public void deleteUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToDeleteUsersException {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
@@ -60,23 +56,19 @@ public class JpaUserService implements UserService {
         userRepository.deleteById(id);
     }
 
-    @Override
     public Boolean isUserEnabled(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
         return optionalUser.map(User::getEnabled).orElse(null);
     }
 
-    @Override
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    @Override
     public List<User> getAllUsers(String username) throws NoSuchUserException, InsufficientPersmissionsToGetAllUserData {
         User user = userRepository.findByUsername(username);
         if (user == null) {

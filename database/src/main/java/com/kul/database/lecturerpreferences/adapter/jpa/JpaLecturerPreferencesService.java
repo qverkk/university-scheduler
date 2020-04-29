@@ -8,7 +8,6 @@ import com.kul.database.lecturerpreferences.api.AddLecturerPreferenceRequest;
 import com.kul.database.lecturerpreferences.api.UpdateLecturerPreferenceRequest;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferencesRepository;
-import com.kul.database.lecturerpreferences.domain.LecturerPreferencesService;
 import com.kul.database.usermanagement.domain.User;
 import com.kul.database.usermanagement.domain.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ import java.time.DayOfWeek;
 import java.util.Optional;
 
 @Service("Lecturer preferences service")
-public class JpaLecturerPreferencesService implements LecturerPreferencesService {
+public class JpaLecturerPreferencesService {
 
     private final LecturerPreferencesRepository lecturerPreferencesRepository;
     private final UserRepository userRepository;
@@ -27,7 +26,6 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
         this.userRepository = userRepository;
     }
 
-    @Override
     public LecturerPreferences addPreferenceForUser(AddLecturerPreferenceRequest userPreferenceRequest) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(userPreferenceRequest.getUserId());
         if (!optionalUser.isPresent()) {
@@ -59,7 +57,6 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
         return savedPreference;
     }
 
-    @Override
     public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreferenceRequest request) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(request.getUserId());
         if (!optionalUser.isPresent()) {
@@ -92,7 +89,6 @@ public class JpaLecturerPreferencesService implements LecturerPreferencesService
         return savedPreference;
     }
 
-    @Override
     public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) throws Exception {
         final Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {

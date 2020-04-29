@@ -1,8 +1,8 @@
 package com.kul.database.infrastructure.api;
 
+import com.kul.database.lecturerpreferences.adapter.jpa.JpaLecturerPreferencesService;
 import com.kul.database.lecturerpreferences.api.*;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
-import com.kul.database.lecturerpreferences.domain.LecturerPreferencesService;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
@@ -11,9 +11,9 @@ import java.time.DayOfWeek;
 @RequestMapping(value = "/preferences")
 class LecturerPreferencesController {
 
-    private final LecturerPreferencesService lecturerPreferencesService;
+    private final JpaLecturerPreferencesService lecturerPreferencesService;
 
-    public LecturerPreferencesController(LecturerPreferencesService lecturerPreferencesService) {
+    public LecturerPreferencesController(JpaLecturerPreferencesService lecturerPreferencesService) {
         this.lecturerPreferencesService = lecturerPreferencesService;
     }
 

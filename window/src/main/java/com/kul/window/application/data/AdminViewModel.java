@@ -195,8 +195,8 @@ public class AdminViewModel {
         final TextField endTime = new TextField();
         final ComboBox<DayOfWeek> day = new ComboBox<>();
 
-        startTime.textProperty().bind(startTimeProperty);
-        endTime.textProperty().bind(endTimeProperty);
+        startTime.textProperty().bindBidirectional(startTimeProperty);
+        endTime.textProperty().bindBidirectional(endTimeProperty);
         day.setOnAction(event -> fetchPreferences(
                 dialog,
                 day.getSelectionModel().getSelectedItem(),
