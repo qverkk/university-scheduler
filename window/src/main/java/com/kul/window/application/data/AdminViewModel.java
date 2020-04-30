@@ -118,107 +118,12 @@ public class AdminViewModel {
         ).collect(Collectors.toList());
     }
 
-    public void displayPreferences(Long userId) {
-        AtomicBoolean update = new AtomicBoolean(false);
-        Dialog<LecturerPreferences> dialog = new Dialog<>();
-
-        ButtonType addNew = new ButtonType("Add new", ButtonBar.ButtonData.OK_DONE);
-        ButtonType updateExisting = new ButtonType("Update existing", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(addNew, updateExisting, ButtonType.CANCEL);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == addNew) {
-                return addNewPreferencesDialog(userId);
-            } else if (dialogButton == updateExisting) {
-                update.set(true);
-                return updatePreferencesDialog(userId);
-            }
-            return null;
-        });
-
-        Optional<LecturerPreferences> success = dialog.showAndWait();
-        success.ifPresent(preferences -> {
-
-            final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
-                    "update-lecturer-preferences"
-            );
-
-            Single.fromCallable(() -> {
-                if (update.get()) {
-                    return userManagement.updatePreferences(preferences);
-                } else {
-                    return userManagement.addPreferences(preferences);
-                }
-            })
-                    .subscribeOn(Schedulers.from(executor))
-                    .observeOn(preconfiguredExecutors.platformScheduler())
-                    .doFinally(executor::shutdown)
-                    .subscribe(response -> {
-                        responseMessage.setValue("Success!");
-                    }, error -> {
-                        if (error instanceof InsufficientLecturerPreferencesPriviliges) {
-                            responseMessage.setValue("Not enough priviliges to update preferences for this user");
-                        } else if (error instanceof LecturerCannotBeFound) {
-                            responseMessage.setValue("This lecturer doesn't exist in our database");
-                        } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                            responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
-                        } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
-                            responseMessage.setValue("Preference for this day already exists. Please update it.");
-                        } else if (error instanceof InvalidLecturerPreferencesException) {
-                            responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
-                        } else if (error instanceof BadUpdateLecturerPreferenceException) {
-                            responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
-                        }
-                    });
-        });
-    }
-
-    private LecturerPreferences updatePreferencesDialog(Long userId) {
-        Dialog<LecturerPreferences> dialog = new Dialog<>();
-
-        ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(updateButton, ButtonType.CANCEL);
-
-        final StringProperty startTimeProperty = new SimpleStringProperty("00:00");
-        final StringProperty endTimeProperty = new SimpleStringProperty("00:00");
-
-        final TextField startTime = new TextField();
-        final TextField endTime = new TextField();
-        final ComboBox<DayOfWeek> day = new ComboBox<>();
-
-        startTime.textProperty().bindBidirectional(startTimeProperty);
-        endTime.textProperty().bindBidirectional(endTimeProperty);
-        day.setOnAction(event -> fetchPreferences(
-                dialog,
-                day.getSelectionModel().getSelectedItem(),
-                userId,
-                startTimeProperty,
-                endTimeProperty
-        ));
-
-        dialog.getDialogPane().setContent(generateGridSettings(startTime, endTime, day));
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == updateButton) {
-                return new LecturerPreferences(
-                        userId,
-                        startTime.getText(),
-                        endTime.getText(),
-                        day.getSelectionModel().getSelectedItem()
-                );
-            }
-            return null;
-        });
-
-        return dialog.showAndWait().orElse(null);
-    }
-
-    private void fetchPreferences(Dialog<LecturerPreferences> dialog, DayOfWeek selectedItem,
+    public void fetchPreferences(Dialog<LecturerPreferences> dialog,
+                                  DayOfWeek selectedItem,
                                   Long userId,
                                   StringProperty startTimeProperty,
                                   StringProperty endTimeProperty
     ) {
-
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
                 "fetch-lecturer-preferences"
         );
@@ -240,44 +145,59 @@ public class AdminViewModel {
                 });
     }
 
-    private LecturerPreferences addNewPreferencesDialog(Long userId) {
-        Dialog<LecturerPreferences> dialog = new Dialog<>();
+    public void addNewPreference(LecturerPreferences preferences) {
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
+                "update-lecturer-preferences"
+        );
 
-        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
-
-        final TextField startTime = new TextField();
-        final TextField endTime = new TextField();
-        final ComboBox<DayOfWeek> day = new ComboBox<>();
-
-        dialog.getDialogPane().setContent(generateGridSettings(startTime, endTime, day));
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == addButton) {
-                return new LecturerPreferences(
-                        userId,
-                        startTime.getText(),
-                        endTime.getText(),
-                        day.getSelectionModel().getSelectedItem()
-                );
-            }
-            return null;
-        });
-
-        return dialog.showAndWait().orElse(null);
+        Single.fromCallable(() -> userManagement.addPreferences(preferences))
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(response -> {
+                    responseMessage.setValue("Success!");
+                }, error -> {
+                    if (error instanceof InsufficientLecturerPreferencesPriviliges) {
+                        responseMessage.setValue("Not enough priviliges to update preferences for this user");
+                    } else if (error instanceof LecturerCannotBeFound) {
+                        responseMessage.setValue("This lecturer doesn't exist in our database");
+                    } else if (error instanceof LecturerPreferenceDoesntExistException) {
+                        responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
+                    } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
+                        responseMessage.setValue("Preference for this day already exists. Please update it.");
+                    } else if (error instanceof InvalidLecturerPreferencesException) {
+                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                    } else if (error instanceof BadUpdateLecturerPreferenceException) {
+                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                    }
+                });
     }
 
-    private GridPane generateGridSettings(TextField startTime, TextField endTime, ComboBox<DayOfWeek> day) {
-        final GridPane grid = new GridPane();
-        day.getItems().addAll(DayOfWeek.values());
+    public void updatePreference(LecturerPreferences preferences) {
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
+                "update-lecturer-preferences"
+        );
 
-        grid.add(new Label("Start time"), 0, 0);
-        grid.add(new Label("End time"), 0, 1);
-        grid.add(new Label("Day"), 0, 2);
-
-        grid.add(startTime, 1, 0);
-        grid.add(endTime, 1, 1);
-        grid.add(day, 1, 2);
-        return grid;
+        Single.fromCallable(() -> userManagement.updatePreferences(preferences))
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(response -> {
+                    responseMessage.setValue("Success!");
+                }, error -> {
+                    if (error instanceof InsufficientLecturerPreferencesPriviliges) {
+                        responseMessage.setValue("Not enough priviliges to update preferences for this user");
+                    } else if (error instanceof LecturerCannotBeFound) {
+                        responseMessage.setValue("This lecturer doesn't exist in our database");
+                    } else if (error instanceof LecturerPreferenceDoesntExistException) {
+                        responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
+                    } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
+                        responseMessage.setValue("Preference for this day already exists. Please update it.");
+                    } else if (error instanceof InvalidLecturerPreferencesException) {
+                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                    } else if (error instanceof BadUpdateLecturerPreferenceException) {
+                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                    }
+                });
     }
 }

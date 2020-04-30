@@ -1,19 +1,25 @@
 package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
-import com.kul.api.model.AuthorityEnum;
+import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 import java.net.URL;
+import java.time.DayOfWeek;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdminController implements Initializable {
 
@@ -69,6 +75,115 @@ public class AdminController implements Initializable {
         });
     }
 
+    public void displayPreferences(Long userId) {
+        AtomicBoolean update = new AtomicBoolean(false);
+        Dialog<LecturerPreferences> dialog = new Dialog<>();
+
+        ButtonType addNew = new ButtonType("Add new", ButtonBar.ButtonData.OK_DONE);
+        ButtonType updateExisting = new ButtonType("Update existing", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addNew, updateExisting, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addNew) {
+                return addNewPreferencesDialog(userId);
+            } else if (dialogButton == updateExisting) {
+                update.set(true);
+                return updatePreferencesDialog(userId);
+            }
+            return null;
+        });
+
+        Optional<LecturerPreferences> success = dialog.showAndWait();
+        success.ifPresent(preferences -> {
+            if (update.get()) {
+                adminViewModel.updatePreference(preferences);
+            } else {
+                adminViewModel.addNewPreference(preferences);
+            }
+        });
+    }
+
+    private LecturerPreferences updatePreferencesDialog(Long userId) {
+        Dialog<LecturerPreferences> dialog = new Dialog<>();
+
+        ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(updateButton, ButtonType.CANCEL);
+
+        final StringProperty startTimeProperty = new SimpleStringProperty("00:00");
+        final StringProperty endTimeProperty = new SimpleStringProperty("00:00");
+
+        final TextField startTime = new TextField();
+        final TextField endTime = new TextField();
+        final ComboBox<DayOfWeek> day = new ComboBox<>();
+
+        startTime.textProperty().bindBidirectional(startTimeProperty);
+        endTime.textProperty().bindBidirectional(endTimeProperty);
+        day.setOnAction(event -> adminViewModel.fetchPreferences(
+                dialog,
+                day.getSelectionModel().getSelectedItem(),
+                userId,
+                startTimeProperty,
+                endTimeProperty
+        ));
+
+        dialog.getDialogPane().setContent(generateGridSettings(startTime, endTime, day));
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == updateButton) {
+                return new LecturerPreferences(
+                        userId,
+                        startTime.getText(),
+                        endTime.getText(),
+                        day.getSelectionModel().getSelectedItem()
+                );
+            }
+            return null;
+        });
+
+        return dialog.showAndWait().orElse(null);
+    }
+
+    private LecturerPreferences addNewPreferencesDialog(Long userId) {
+        Dialog<LecturerPreferences> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final TextField startTime = new TextField();
+        final TextField endTime = new TextField();
+        final ComboBox<DayOfWeek> day = new ComboBox<>();
+
+        dialog.getDialogPane().setContent(generateGridSettings(startTime, endTime, day));
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                return new LecturerPreferences(
+                        userId,
+                        startTime.getText(),
+                        endTime.getText(),
+                        day.getSelectionModel().getSelectedItem()
+                );
+            }
+            return null;
+        });
+
+        return dialog.showAndWait().orElse(null);
+    }
+
+    private GridPane generateGridSettings(TextField startTime, TextField endTime, ComboBox<DayOfWeek> day) {
+        final GridPane grid = new GridPane();
+        day.getItems().addAll(DayOfWeek.values());
+
+        grid.add(new Label("Start time"), 0, 0);
+        grid.add(new Label("End time"), 0, 1);
+        grid.add(new Label("Day"), 0, 2);
+
+        grid.add(startTime, 1, 0);
+        grid.add(endTime, 1, 1);
+        grid.add(day, 1, 2);
+        return grid;
+    }
+
     private void initializeColumns() {
         idCol.setCellValueFactory(param -> param.getValue().id());
         idCol.setCellValueFactory(param -> param.getValue().id());
@@ -112,7 +227,7 @@ public class AdminController implements Initializable {
                             final Long userId = person.id().get();
                             enableBtn.setOnAction(event -> adminViewModel.enableUser(userId));
                             disableBtn.setOnAction(event -> adminViewModel.disableUser(userId));
-                            preferencesBtn.setOnAction(event -> adminViewModel.displayPreferences(userId));
+                            preferencesBtn.setOnAction(event -> displayPreferences(userId));
 
                             if (!pane.getChildren().containsAll(Arrays.asList(enableBtn, disableBtn))) {
                                 pane.getChildren().addAll(enableBtn, disableBtn);
