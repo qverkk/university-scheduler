@@ -1,6 +1,6 @@
 package com.kul.database.infrastructure.api;
 
-import com.kul.database.usermanagement.adapter.jpa.JpaUserService;
+import com.kul.database.usermanagement.domain.UserService;
 import com.kul.database.usermanagement.api.AllUsersResponse;
 import com.kul.database.usermanagement.domain.User;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/user")
 class UserController {
 
-    private final JpaUserService service;
+    private final UserService service;
 
-    public UserController(JpaUserService service) {
+    public UserController(UserService service) {
         this.service = service;
     }
 

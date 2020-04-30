@@ -1,6 +1,6 @@
 package com.kul.database.infrastructure.api;
 
-import com.kul.database.usermanagement.adapter.jpa.JpaAuthService;
+import com.kul.database.usermanagement.domain.AuthService;
 import com.kul.database.usermanagement.api.login.TokenRequest;
 import com.kul.database.usermanagement.api.login.UserLoginRequest;
 import com.kul.database.usermanagement.api.login.UserLoginResponse;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 class AuthController {
 
-    private final JpaAuthService service;
+    private final AuthService service;
 
-    public AuthController(JpaAuthService service) {
+    public AuthController(AuthService service) {
         this.service = service;
     }
 

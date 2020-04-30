@@ -1,5 +1,6 @@
 package com.kul.api.adapter.admin.management;
 
+import com.kul.api.adapter.admin.external.ErrorResponseException;
 import com.kul.api.adapter.admin.external.ManagementEndpointClient;
 import com.kul.api.adapter.admin.management.lecturer.preferences.*;
 import com.kul.api.domain.admin.management.LecturerPreferences;
@@ -56,25 +57,29 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     response.getEndTime(),
                     response.getDay()
             );
-        } catch (FeignException.Forbidden forbidden) {
-            Matcher matcher = MESSAGE_PATTERN.matcher(forbidden.getMessage());
-            if (matcher.find()) {
-                String error = matcher.group("error");
-                if (error.equals("Only admin, dziekanat or user for this permission can update them")) {
-                    throw new InsufficientLecturerPreferencesPriviliges();
-                } else if (error.contains("No username provided")) {
-                    throw new LecturerCannotBeFound();
-                }
-            }
-        } catch (FeignException.UnprocessableEntity unprocessableEntity) {
-            Matcher matcher = MESSAGE_PATTERN.matcher(unprocessableEntity.getMessage());
-            if (matcher.find()) {
-                String error = matcher.group("error");
-                if (error.contains("Preference for ") && error.contains("doesn't exist")) {
-                    throw new LecturerPreferenceDoesntExistException();
-                }
-            }
         }
+        catch (ErrorResponseException ex) {
+            ex.printStackTrace();
+        }
+//        catch (FeignException.Forbidden forbidden) {
+//            Matcher matcher = MESSAGE_PATTERN.matcher(forbidden.getMessage());
+//            if (matcher.find()) {
+//                String error = matcher.group("error");
+//                if (error.equals("Only admin, dziekanat or user for this permission can update them")) {
+//                    throw new InsufficientLecturerPreferencesPriviliges();
+//                } else if (error.contains("No username provided")) {
+//                    throw new LecturerCannotBeFound();
+//                }
+//            }
+//        } catch (FeignException.UnprocessableEntity unprocessableEntity) {
+//            Matcher matcher = MESSAGE_PATTERN.matcher(unprocessableEntity.getMessage());
+//            if (matcher.find()) {
+//                String error = matcher.group("error");
+//                if (error.contains("Preference for ") && error.contains("doesn't exist")) {
+//                    throw new LecturerPreferenceDoesntExistException();
+//                }
+//            }
+//        }
         return null;
     }
 

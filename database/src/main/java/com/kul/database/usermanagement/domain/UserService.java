@@ -1,4 +1,4 @@
-package com.kul.database.usermanagement.adapter.jpa;
+package com.kul.database.usermanagement.domain;
 
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service("User service")
-public class JpaUserService {
+public class UserService {
 
     private final UserRepository userRepository;
 
-    public JpaUserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

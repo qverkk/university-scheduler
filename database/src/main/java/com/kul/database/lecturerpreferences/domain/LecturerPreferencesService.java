@@ -1,29 +1,23 @@
-package com.kul.database.lecturerpreferences.adapter.jpa;
+package com.kul.database.lecturerpreferences.domain;
 
-import com.kul.database.lecturerpreferences.domain.AddLecturerPreference;
-import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
-import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
-import com.kul.database.lecturerpreferences.api.AddLecturerPreferenceRequest;
-import com.kul.database.lecturerpreferences.api.UpdateLecturerPreferenceRequest;
-import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
-import com.kul.database.lecturerpreferences.domain.LecturerPreferencesRepository;
 import com.kul.database.usermanagement.domain.User;
 import com.kul.database.usermanagement.domain.UserRepository;
+import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.util.Optional;
 
 @Service("Lecturer preferences service")
-public class JpaLecturerPreferencesService {
+public class LecturerPreferencesService {
 
     private final LecturerPreferencesRepository lecturerPreferencesRepository;
     private final UserRepository userRepository;
 
-    public JpaLecturerPreferencesService(LecturerPreferencesRepository lecturerPreferencesRepository, UserRepository userRepository) {
+    public LecturerPreferencesService(LecturerPreferencesRepository lecturerPreferencesRepository, UserRepository userRepository) {
         this.lecturerPreferencesRepository = lecturerPreferencesRepository;
         this.userRepository = userRepository;
     }

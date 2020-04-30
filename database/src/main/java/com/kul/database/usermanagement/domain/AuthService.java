@@ -1,9 +1,7 @@
-package com.kul.database.usermanagement.adapter.jpa;
+package com.kul.database.usermanagement.domain;
 
-import com.kul.database.usermanagement.domain.AuthorityEnum;
 import com.kul.database.infrastructure.helpers.JwtUtils;
 import com.kul.database.infrastructure.helpers.SecurityConstants;
-import com.kul.database.usermanagement.domain.*;
 import com.kul.database.usermanagement.api.login.UserLoginRequest;
 import com.kul.database.usermanagement.api.login.UserLoginWithTokenResponse;
 import com.kul.database.usermanagement.api.registration.UserRegistrationResponse;
@@ -26,9 +24,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.annotation.PostConstruct;
 
 @Service("Auth service")
-public class JpaAuthService {
+public class AuthService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JpaAuthService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final AuthoritiesRepository authoritiesRepository;
@@ -38,7 +36,7 @@ public class JpaAuthService {
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
 
-    public JpaAuthService(UserRepository userRepository, AuthoritiesRepository authoritiesRepository) {
+    public AuthService(UserRepository userRepository, AuthoritiesRepository authoritiesRepository) {
         this.userRepository = userRepository;
         this.authoritiesRepository = authoritiesRepository;
     }
