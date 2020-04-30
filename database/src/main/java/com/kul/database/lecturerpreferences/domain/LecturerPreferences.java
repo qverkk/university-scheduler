@@ -4,6 +4,7 @@ import com.kul.database.usermanagement.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.DayOfWeek;
 
@@ -27,5 +28,6 @@ public class LecturerPreferences {
     @Pattern(regexp = "^\\d{2}:\\d{2}$")
     private String endTime;
 
+    @NotNull
     private DayOfWeek day;
 }

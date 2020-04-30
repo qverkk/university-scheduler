@@ -1,6 +1,8 @@
 package com.kul.api.adapter.admin.management;
 
+import com.kul.api.adapter.admin.external.ErrorResponse;
 import com.kul.api.adapter.admin.external.ErrorResponseException;
+import com.kul.api.adapter.admin.external.FallbackErrorResponseException;
 import com.kul.api.adapter.admin.external.ManagementEndpointClient;
 import com.kul.api.adapter.admin.management.lecturer.preferences.*;
 import com.kul.api.domain.admin.management.LecturerPreferences;
@@ -10,14 +12,11 @@ import feign.FeignException;
 
 import java.time.DayOfWeek;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ManagementUserRepositoryFacade implements ManagementUserRepository {
 
     private final ManagementEndpointClient client;
-    private static final Pattern MESSAGE_PATTERN = Pattern.compile("\"message\":\"(?<error>.*)\",");
 
     public ManagementUserRepositoryFacade(ManagementEndpointClient client) {
         this.client = client;
@@ -57,29 +56,23 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     response.getEndTime(),
                     response.getDay()
             );
+        } catch (ErrorResponseException ex) {
+            String errorCode = ex.getErrorResponse().getCode();
+            switch (errorCode) {
+                case "NoSuchUserProvided":
+                    throw new LecturerCannotBeFound();
+                case "LecturerPreferenceDoesntExist":
+                    throw new LecturerPreferenceDoesntExistException();
+                case "InsufficientPermissionsToUpdateLecturerPreferences":
+                    throw new InsufficientLecturerPreferencesPriviliges();
+                case "LecturerPreferenceAlreadyExists":
+                    throw new LecturerPreferenceAlreadyExistsException();
+                default:
+                    System.out.println("Unknown " + errorCode);
+            }
+        } catch (FeignException.BadRequest ex) {
+            throw new BadUpdateLecturerPreferenceException();
         }
-        catch (ErrorResponseException ex) {
-            ex.printStackTrace();
-        }
-//        catch (FeignException.Forbidden forbidden) {
-//            Matcher matcher = MESSAGE_PATTERN.matcher(forbidden.getMessage());
-//            if (matcher.find()) {
-//                String error = matcher.group("error");
-//                if (error.equals("Only admin, dziekanat or user for this permission can update them")) {
-//                    throw new InsufficientLecturerPreferencesPriviliges();
-//                } else if (error.contains("No username provided")) {
-//                    throw new LecturerCannotBeFound();
-//                }
-//            }
-//        } catch (FeignException.UnprocessableEntity unprocessableEntity) {
-//            Matcher matcher = MESSAGE_PATTERN.matcher(unprocessableEntity.getMessage());
-//            if (matcher.find()) {
-//                String error = matcher.group("error");
-//                if (error.contains("Preference for ") && error.contains("doesn't exist")) {
-//                    throw new LecturerPreferenceDoesntExistException();
-//                }
-//            }
-//        }
         return null;
     }
 
@@ -93,26 +86,22 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     response.getEndTime(),
                     response.getDay()
             );
-        } catch (FeignException.Forbidden forbidden) {
-            Matcher matcher = MESSAGE_PATTERN.matcher(forbidden.getMessage());
-            if (matcher.find()) {
-                String error = matcher.group("error");
-                if (error.equals("Only admin, dziekanat or user for this permission can update them")) {
-                    throw new InsufficientLecturerPreferencesPriviliges();
-                } else if (error.contains("No username provided")) {
+        } catch (ErrorResponseException ex) {
+            String errorCode = ex.getErrorResponse().getCode();
+            switch (errorCode) {
+                case "NoSuchUserProvided":
                     throw new LecturerCannotBeFound();
-                }
-            }
-        } catch (FeignException.UnprocessableEntity unprocessableEntity) {
-            Matcher matcher = MESSAGE_PATTERN.matcher(unprocessableEntity.getMessage());
-            if (matcher.find()) {
-                String error = matcher.group("error");
-                if (error.contains("Preference for ") && error.contains("doesn't exist")) {
+                case "LecturerPreferenceDoesntExist":
                     throw new LecturerPreferenceDoesntExistException();
-                } else if (error.contains("Preference for ") && error.contains("already exists")) {
+                case "InsufficientPermissionsToUpdateLecturerPreferences":
+                    throw new InsufficientLecturerPreferencesPriviliges();
+                case "LecturerPreferenceAlreadyExists":
                     throw new LecturerPreferenceAlreadyExistsException();
-                }
+                default:
+                    System.out.println("Unknown " + errorCode);
             }
+        } catch (FallbackErrorResponseException ex) {
+            throw new InvalidLecturerPreferencesException();
         }
         return null;
     }
@@ -127,15 +116,15 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     response.getEndTime(),
                     day
             );
-        } catch (FeignException.UnprocessableEntity unprocessableEntity) {
-            Matcher matcher = MESSAGE_PATTERN.matcher(unprocessableEntity.getMessage());
-            if (matcher.find()) {
-                String error = matcher.group("error");
-                if (error.contains("No username provided")) {
-                    throw new LecturerCannotBeFound();
-                } else {
+        } catch (ErrorResponseException ex) {
+            String errorCode = ex.getErrorResponse().getCode();
+            switch (errorCode) {
+                case "LecturerPreferenceDoesntExist":
                     throw new LecturerPreferenceDoesntExistException();
-                }
+                case "NoSuchUserProvided":
+                    throw new LecturerCannotBeFound();
+                default:
+                    System.out.println("Unknown " + errorCode);
             }
         }
         return null;

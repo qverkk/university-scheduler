@@ -6,10 +6,7 @@ import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
@@ -52,6 +49,24 @@ public class AdminController implements Initializable {
         usersTable.setItems(adminViewModel.users());
         initializeColumns();
         refreshUsers();
+        initializeErrorAlertListener();
+    }
+
+    private void initializeErrorAlertListener() {
+        adminViewModel.responseMessageProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                return;
+            }
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Label response = new Label(newValue);
+            response.setWrapText(true);
+            alert.getDialogPane().setContent(response);
+            if (!newValue.equals("Success!")) {
+                alert.setAlertType(Alert.AlertType.ERROR);
+            }
+            alert.showAndWait();
+            adminViewModel.responseMessageProperty().setValue("");
+        });
     }
 
     private void initializeColumns() {

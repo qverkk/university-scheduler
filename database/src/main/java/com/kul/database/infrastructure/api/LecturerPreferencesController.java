@@ -7,6 +7,7 @@ import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.DayOfWeek;
 
 @RestController
@@ -44,7 +45,7 @@ class LecturerPreferencesController {
             method = RequestMethod.PUT,
             value = "/update"
     )
-    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreference request) throws Exception {
+    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody @Valid UpdateLecturerPreference request) throws Exception {
         final LecturerPreferences lecturerPreferences = lecturerPreferencesService.updatePreferenceForUser(request);
         return new UpdateLecturerPreferenceResponse(
                 lecturerPreferences.getId(),

@@ -1,9 +1,6 @@
 package com.kul.window.application.data;
 
-import com.kul.api.adapter.admin.management.lecturer.preferences.InsufficientLecturerPreferencesPriviliges;
-import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerCannotBeFound;
-import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferenceAlreadyExistsException;
-import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferenceDoesntExistException;
+import com.kul.api.adapter.admin.management.lecturer.preferences.*;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.api.domain.admin.management.UserManagement;
@@ -34,11 +31,16 @@ public class AdminViewModel {
     private final ExecutorsFactory preconfiguredExecutors;
     private final UserManagement userManagement;
     private final UserInfoViewModel currentUserInfo;
+    private final StringProperty responseMessage = new SimpleStringProperty();
 
     public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, UserInfoViewModel currentUserInfo) {
         this.preconfiguredExecutors = preconfiguredExecutors;
         this.userManagement = userManagement;
         this.currentUserInfo = currentUserInfo;
+    }
+
+    public StringProperty responseMessageProperty() {
+        return responseMessage;
     }
 
     public ObservableList<UserInfoViewModel> users() {
@@ -152,31 +154,20 @@ public class AdminViewModel {
                     .observeOn(preconfiguredExecutors.platformScheduler())
                     .doFinally(executor::shutdown)
                     .subscribe(response -> {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        if (response == null) {
-                            alert.setAlertType(Alert.AlertType.ERROR);
-                            alert.setContentText("Failed to add/update preferences");
-                        } else {
-                            alert.setContentText("Success!");
-                        }
-                        alert.showAndWait();
+                        responseMessage.setValue("Success!");
                     }, error -> {
                         if (error instanceof InsufficientLecturerPreferencesPriviliges) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setContentText("Not enough priviliges to update preferences for this user");
-                            alert.showAndWait();
+                            responseMessage.setValue("Not enough priviliges to update preferences for this user");
                         } else if (error instanceof LecturerCannotBeFound) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setContentText("This lecturer doesn't exist in our database");
-                            alert.showAndWait();
+                            responseMessage.setValue("This lecturer doesn't exist in our database");
                         } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setContentText("Preference for this day doesn't exist. Please add one.");
-                            alert.showAndWait();
+                            responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
                         } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setContentText("Preference for this day already exists. Please update it.");
-                            alert.showAndWait();
+                            responseMessage.setValue("Preference for this day already exists. Please update it.");
+                        } else if (error instanceof InvalidLecturerPreferencesException) {
+                            responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                        } else if (error instanceof BadUpdateLecturerPreferenceException) {
+                            responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
                         }
                     });
         });
@@ -241,13 +232,9 @@ public class AdminViewModel {
                     endTimeProperty.setValue(response.getEndTime());
                 }, error -> {
                     if (error instanceof LecturerCannotBeFound) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setContentText("This lecturer doesn't exist in our database");
-                        alert.showAndWait();
+                        responseMessage.setValue("This lecturer doesn't exist in our database");
                     } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setContentText("Preference for this day doesn't exist. Please add one.");
-                        alert.showAndWait();
+                        responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
                     }
                     dialog.close();
                 });
@@ -283,7 +270,6 @@ public class AdminViewModel {
     private GridPane generateGridSettings(TextField startTime, TextField endTime, ComboBox<DayOfWeek> day) {
         final GridPane grid = new GridPane();
         day.getItems().addAll(DayOfWeek.values());
-        day.getSelectionModel().selectFirst();
 
         grid.add(new Label("Start time"), 0, 0);
         grid.add(new Label("End time"), 0, 1);
