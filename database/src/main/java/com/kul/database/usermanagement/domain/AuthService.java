@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.PostConstruct;
 
-@Service("Auth service")
+@Service
 public class AuthService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthService.class);

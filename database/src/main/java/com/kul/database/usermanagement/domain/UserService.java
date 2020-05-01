@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service("User service")
+@Service
 public class UserService {
 
     private final UserRepository userRepository;

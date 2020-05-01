@@ -4,8 +4,6 @@ import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,10 +14,10 @@ import javafx.util.Callback;
 
 import java.net.URL;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdminController implements Initializable {
 
@@ -122,8 +120,8 @@ public class AdminController implements Initializable {
             if (dialogButton == updateButton) {
                 return new LecturerPreferences(
                         userId,
-                        startTime.getText(),
-                        endTime.getText(),
+                        stringToLocalTime(startTime.getText()),
+                        stringToLocalTime(endTime.getText()),
                         day.getSelectionModel().getSelectedItem()
                 );
             }
@@ -131,6 +129,11 @@ public class AdminController implements Initializable {
         });
 
         return dialog.showAndWait().orElse(null);
+    }
+
+    private LocalTime stringToLocalTime(String time) {
+        String[] split = time.split(":");
+        return LocalTime.of(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
     }
 
     private LecturerPreferences addNewPreferencesDialog(Long userId) {
@@ -149,8 +152,8 @@ public class AdminController implements Initializable {
             if (dialogButton == addButton) {
                 return new LecturerPreferences(
                         userId,
-                        startTime.getText(),
-                        endTime.getText(),
+                        stringToLocalTime(startTime.getText()),
+                        stringToLocalTime(endTime.getText()),
                         day.getSelectionModel().getSelectedItem()
                 );
             }

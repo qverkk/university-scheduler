@@ -8,9 +8,8 @@ import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
-import java.util.Optional;
 
-@Service("Lecturer preferences service")
+@Service
 public class LecturerPreferencesService {
 
     private final LecturerPreferencesRepository lecturerPreferencesRepository;
@@ -22,48 +21,29 @@ public class LecturerPreferencesService {
     }
 
     public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreference request) throws RuntimeException {
-        final Optional<User> optionalUser = userRepository.findById(request.getUserId());
-        if (!optionalUser.isPresent()) {
-            throw new NoSuchUserException("No username provided");
-        }
-        final User user = optionalUser.get();
+        final User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new NoSuchUserException("No username provided"));
+
         if (!user.canUpdatePreferencesForUserId(request.getUserId())) {
             throw new InsufficientPermissionsToUpdateLecturerPreferences(
                     "Only admin, dziekanat or user for this permission can update them"
             );
         }
-        final LecturerPreferences preferenceExists = lecturerPreferencesRepository.findByDayAndUser(
-                request.getDay(),
-                user
-        );
-        final LecturerPreferences updatedPreferences = new LecturerPreferences(
-                null,
-                user,
-                request.getStartTime(),
-                request.getEndTime(),
-                request.getDay()
-        );
-        if (preferenceExists != null) {
-            updatedPreferences.setId(preferenceExists.getId());
-            updatedPreferences.setUser(preferenceExists.getUser());
-            updatedPreferences.setDay(preferenceExists.getDay());
-        }
+        final LecturerPreferences preference = lecturerPreferencesRepository.findByDayAndUser(request.getDay(), user)
+                .orElse(new LecturerPreferences(user, request.getStartTime(), request.getEndTime(), request.getDay()));
 
-        return lecturerPreferencesRepository.save(updatedPreferences);
+        preference.changeScheduleWindow(request.getStartTime(), request.getEndTime());
+
+        return lecturerPreferencesRepository.save(preference);
     }
 
     public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) throws RuntimeException {
-        final Optional<User> optionalUser = userRepository.findById(userId);
-        if (!optionalUser.isPresent()) {
-            throw new NoSuchUserException("No username provided");
-        }
-        final User user = optionalUser.get();
-        LecturerPreferences result = lecturerPreferencesRepository.findByDayAndUser(day, user);
-        if (result == null) {
-            throw new LecturerPreferenceDoesntExist(
-                    String.format("Preference for %s %s doesn't exists", user.getUsername(), day)
-            );
-        }
-        return result;
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchUserException("No username provided"));
+
+        return lecturerPreferencesRepository.findByDayAndUser(day, user)
+                .orElseThrow(() -> new LecturerPreferenceDoesntExist(
+                        String.format("Preference for %s %s doesn't exists", user.getUsername(), day)
+                ));
     }
 }

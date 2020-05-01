@@ -2,8 +2,10 @@ package com.kul.database.lecturerpreferences.api;
 
 import lombok.Value;
 
+import java.time.LocalTime;
+
 @Value
 public class FetchLecturerPreferenceResponse {
-    String startTime;
-    String endTime;
+    LocalTime startTime;
+    LocalTime endTime;
 }

@@ -14,8 +14,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -136,8 +139,8 @@ public class AdminViewModel {
                 .observeOn(preconfiguredExecutors.platformScheduler())
                 .doFinally(executor::shutdown)
                 .subscribe(response -> {
-                    startTimeProperty().setValue(response.getStartTime());
-                    endTimeProperty().setValue(response.getEndTime());
+                    startTimeProperty().setValue(localTimeToString(response.getStartTime()));
+                    endTimeProperty().setValue(localTimeToString(response.getEndTime()));
                 }, error -> {
                     if (!(error instanceof LecutrerPreferenecesUpdateException)) {
                         return;
@@ -155,6 +158,11 @@ public class AdminViewModel {
                             break;
                     }
                 });
+    }
+
+    private String localTimeToString(LocalTime localTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("PL"));
+        return formatter.format(localTime);
     }
 
     public void addOrUpdatePreference(LecturerPreferences preferences) {
