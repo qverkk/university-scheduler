@@ -174,13 +174,9 @@ public class AdminController implements Initializable {
         final GridPane grid = new GridPane();
         day.getItems().addAll(DayOfWeek.values());
 
-        grid.add(new Label("Start time"), 0, 0);
-        grid.add(new Label("End time"), 0, 1);
-        grid.add(new Label("Day"), 0, 2);
+        grid.addRow(0, new Label("Start time"), new Label("End time"), new Label("Day"));
+        grid.addRow(1, startTime, endTime, day);
 
-        grid.add(startTime, 1, 0);
-        grid.add(endTime, 1, 1);
-        grid.add(day, 1, 2);
         return grid;
     }
 

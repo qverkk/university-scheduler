@@ -14,20 +14,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<EndpointErrors> handle(ConstraintViolationException exception, WebRequest webRequest) {
+    public ResponseEntity<ConstraintViolationErrorResponse> handle(ConstraintViolationException exception, WebRequest webRequest) {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new EndpointErrors(
-                        exception.getConstraintViolations().stream()
-                                .map(e -> new EndpointError(e.getMessage(), exception.getClass().getSimpleName()))
-                                .collect(Collectors.toList())
+                .body(new ConstraintViolationErrorResponse(
+                        exception.getMessage(),
+                        exception.getClass().getSimpleName(),
+                        new ArrayList<>(exception.getConstraintViolations())
                 ));
     }
 
