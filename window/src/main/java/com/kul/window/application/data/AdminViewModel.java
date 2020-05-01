@@ -8,6 +8,8 @@ import com.kul.window.async.ExecutorsFactory;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -30,6 +32,7 @@ public class AdminViewModel {
     private final UserInfoViewModel currentUserInfo;
     private final StringProperty responseMessage = new SimpleStringProperty();
     private final UpdatePreferenceViewModel updatePreferenceViewModel;
+    private final AdminViewMessageResolver messageResolver = new DefaultAdminViewMessageResolver();
 
     public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel) {
         this.preconfiguredExecutors = preconfiguredExecutors;
@@ -139,9 +142,9 @@ public class AdminViewModel {
                     endTimeProperty().setValue(response.getEndTime());
                 }, error -> {
                     if (error instanceof LecturerCannotBeFound) {
-                        responseMessage.setValue("This lecturer doesn't exist in our database");
+                        responseMessage.setValue(messageResolver.nonExistingLecturer());
                     } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                        responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
+                        responseMessage.setValue(messageResolver.nonExistingPreference());
                     }
                 });
     }
@@ -156,20 +159,20 @@ public class AdminViewModel {
                 .observeOn(preconfiguredExecutors.platformScheduler())
                 .doFinally(executor::shutdown)
                 .subscribe(response -> {
-                    responseMessage.setValue("Success!");
+                    responseMessage.setValue(messageResolver.success());
                 }, error -> {
                     if (error instanceof InsufficientLecturerPreferencesPriviliges) {
-                        responseMessage.setValue("Not enough priviliges to update preferences for this user");
+                        responseMessage.setValue(messageResolver.insufficientLecturerPreferences());
                     } else if (error instanceof LecturerCannotBeFound) {
-                        responseMessage.setValue("This lecturer doesn't exist in our database");
+                        responseMessage.setValue(messageResolver.nonExistingLecturer());
                     } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                        responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
+                        responseMessage.setValue(messageResolver.nonExistingPreference());
                     } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
-                        responseMessage.setValue("Preference for this day already exists. Please update it.");
+                        responseMessage.setValue(messageResolver.alreadyExistingPreference());
                     } else if (error instanceof InvalidLecturerPreferencesException) {
-                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                        responseMessage.setValue(messageResolver.nonValidPreferences());
                     } else if (error instanceof BadUpdateLecturerPreferenceException) {
-                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
+                        responseMessage.setValue(messageResolver.nonValidPreferences());
                     }
                 });
     }
