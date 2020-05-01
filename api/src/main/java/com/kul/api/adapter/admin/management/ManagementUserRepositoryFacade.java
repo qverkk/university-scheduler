@@ -74,36 +74,6 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
     }
 
     @Override
-    public LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception {
-        try {
-            LecturerPreferencesResponse response = client.addPreferences(preferences);
-            return new LecturerPreferences(
-                    response.getUserId(),
-                    response.getStartTime(),
-                    response.getEndTime(),
-                    response.getDay()
-            );
-        } catch (ErrorResponseException ex) {
-            String errorCode = ex.getErrorResponse().getCode();
-            switch (errorCode) {
-                case "NoSuchUserProvided":
-                    throw new LecturerCannotBeFound();
-                case "LecturerPreferenceDoesntExist":
-                    throw new LecturerPreferenceDoesntExistException();
-                case "InsufficientPermissionsToUpdateLecturerPreferences":
-                    throw new InsufficientLecturerPreferencesPriviliges();
-                case "LecturerPreferenceAlreadyExists":
-                    throw new LecturerPreferenceAlreadyExistsException();
-                case "ConstraintViolationException":
-                    throw new InvalidLecturerPreferencesException();
-                default:
-                    System.out.println("Unknown " + errorCode);
-            }
-        }
-        return null;
-    }
-
-    @Override
     public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws Exception {
         try {
             FetchLecturerPreferenceResponse response = client.fetchPreferences(userId, day);

@@ -26,7 +26,7 @@ public class UserManagement {
     }
 
     public LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception {
-        return usersRepository.addPreferences(preferences);
+        return usersRepository.updatePreferences(preferences);
     }
 
     public LecturerPreferences fetchPreferences(Long userId, DayOfWeek selectedItem) throws Exception {

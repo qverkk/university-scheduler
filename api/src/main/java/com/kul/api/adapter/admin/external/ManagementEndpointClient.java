@@ -29,10 +29,6 @@ public interface ManagementEndpointClient {
     @Headers("Content-Type: application/json")
     LecturerPreferencesResponse updatePreferences(LecturerPreferences preferences);
 
-    @RequestLine("POST /preferences/add")
-    @Headers("Content-Type: application/json")
-    LecturerPreferencesResponse addPreferences(LecturerPreferences preferences);
-
     @RequestLine("GET /preferences/fetch/{userId}/{day}")
     @Headers("Content-Type: application/json")
     FetchLecturerPreferenceResponse fetchPreferences(@Param("userId") Long userId, @Param("day") DayOfWeek day);

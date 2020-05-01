@@ -8,6 +8,5 @@ public interface ManagementUserRepository {
     void enableUser(Long id);
     void disableUser(Long id);
     LecturerPreferences updatePreferences(LecturerPreferences preferences) throws Exception;
-    LecturerPreferences addPreferences(LecturerPreferences preferences) throws Exception;
     LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws Exception;
 }

@@ -20,10 +20,7 @@ class JsonErrorAwareErrorDecoder implements ErrorDecoder {
             return exception;
         } else {
             return parseErrorResponse(exception)
-                    .orElse(
-                            parseFallbackErrorResponse(exception)
-                                    .orElse(exception)
-                    );
+                    .orElse(exception);
         }
     }
 
@@ -34,21 +31,6 @@ class JsonErrorAwareErrorDecoder implements ErrorDecoder {
                 .map(FeignException::contentUTF8)
                 .filter(content -> !content.isEmpty())
                 .map(content -> gson.fromJson(content, ErrorResponse.class))
-                .map(errorResponse -> {
-                    if (errorResponse.getCode() == null) {
-                        return null;
-                    }
-                    return new ErrorResponseException(exception, errorResponse);
-                });
-    }
-
-    private Optional<Exception> parseFallbackErrorResponse(Exception exception) {
-        return Optional.ofNullable(exception)
-                .filter(FeignException.class::isInstance)
-                .map(FeignException.class::cast)
-                .map(FeignException::contentUTF8)
-                .filter(content -> !content.isEmpty())
-                .map(content -> gson.fromJson(content, FallbackErrorResponse.class))
-                .map(errorResponse -> new FallbackErrorResponseException(exception, errorResponse));
+                .map(errorResponse -> new ErrorResponseException(exception, errorResponse));
     }
 }
