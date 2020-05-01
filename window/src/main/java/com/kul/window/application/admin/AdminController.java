@@ -76,7 +76,6 @@ public class AdminController implements Initializable {
     }
 
     public void displayPreferences(Long userId) {
-        AtomicBoolean update = new AtomicBoolean(false);
         Dialog<LecturerPreferences> dialog = new Dialog<>();
 
         ButtonType addNew = new ButtonType("Add new", ButtonBar.ButtonData.OK_DONE);
@@ -87,20 +86,13 @@ public class AdminController implements Initializable {
             if (dialogButton == addNew) {
                 return addNewPreferencesDialog(userId);
             } else if (dialogButton == updateExisting) {
-                update.set(true);
                 return updatePreferencesDialog(userId);
             }
             return null;
         });
 
         Optional<LecturerPreferences> success = dialog.showAndWait();
-        success.ifPresent(preferences -> {
-            if (update.get()) {
-                adminViewModel.updatePreference(preferences);
-            } else {
-                adminViewModel.addNewPreference(preferences);
-            }
-        });
+        success.ifPresent(adminViewModel::addOrUpdatePreference);
     }
 
     private LecturerPreferences updatePreferencesDialog(Long userId) {

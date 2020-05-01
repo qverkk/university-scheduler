@@ -145,37 +145,9 @@ public class AdminViewModel {
                 });
     }
 
-    public void addNewPreference(LecturerPreferences preferences) {
+    public void addOrUpdatePreference(LecturerPreferences preferences) {
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
-                "update-lecturer-preferences"
-        );
-
-        Single.fromCallable(() -> userManagement.addPreferences(preferences))
-                .subscribeOn(Schedulers.from(executor))
-                .observeOn(preconfiguredExecutors.platformScheduler())
-                .doFinally(executor::shutdown)
-                .subscribe(response -> {
-                    responseMessage.setValue("Success!");
-                }, error -> {
-                    if (error instanceof InsufficientLecturerPreferencesPriviliges) {
-                        responseMessage.setValue("Not enough priviliges to update preferences for this user");
-                    } else if (error instanceof LecturerCannotBeFound) {
-                        responseMessage.setValue("This lecturer doesn't exist in our database");
-                    } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                        responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
-                    } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
-                        responseMessage.setValue("Preference for this day already exists. Please update it.");
-                    } else if (error instanceof InvalidLecturerPreferencesException) {
-                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
-                    } else if (error instanceof BadUpdateLecturerPreferenceException) {
-                        responseMessage.setValue("Day must be selected and start/end time must match 00:00, 10:00 etc");
-                    }
-                });
-    }
-
-    public void updatePreference(LecturerPreferences preferences) {
-        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
-                "update-lecturer-preferences"
+                "add-or-update-lecturer-preferences"
         );
 
         Single.fromCallable(() -> userManagement.updatePreferences(preferences))
