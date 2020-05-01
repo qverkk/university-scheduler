@@ -1,14 +1,11 @@
 package com.kul.api.adapter.admin.management;
 
-import com.kul.api.adapter.admin.external.ErrorResponse;
 import com.kul.api.adapter.admin.external.ErrorResponseException;
-import com.kul.api.adapter.admin.external.FallbackErrorResponseException;
 import com.kul.api.adapter.admin.external.ManagementEndpointClient;
 import com.kul.api.adapter.admin.management.lecturer.preferences.*;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.api.domain.admin.management.ManagementUserRepository;
-import feign.FeignException;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -67,11 +64,11 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     throw new InsufficientLecturerPreferencesPriviliges();
                 case "LecturerPreferenceAlreadyExists":
                     throw new LecturerPreferenceAlreadyExistsException();
+                case "MethodArgumentNotValidException":
+                    throw new BadUpdateLecturerPreferenceException();
                 default:
                     System.out.println("Unknown " + errorCode);
             }
-        } catch (FeignException.BadRequest ex) {
-            throw new BadUpdateLecturerPreferenceException();
         }
         return null;
     }
@@ -97,11 +94,11 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     throw new InsufficientLecturerPreferencesPriviliges();
                 case "LecturerPreferenceAlreadyExists":
                     throw new LecturerPreferenceAlreadyExistsException();
+                case "ConstraintViolationException":
+                    throw new InvalidLecturerPreferencesException();
                 default:
                     System.out.println("Unknown " + errorCode);
             }
-        } catch (FallbackErrorResponseException ex) {
-            throw new InvalidLecturerPreferencesException();
         }
         return null;
     }

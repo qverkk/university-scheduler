@@ -7,16 +7,17 @@ import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmission
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
 import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -27,9 +28,12 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ConstraintViolationErrorResponse(
-                        exception.getMessage(),
+                        "Validation failed for some classes",
                         exception.getClass().getSimpleName(),
-                        new ArrayList<>(exception.getConstraintViolations())
+                        exception.getConstraintViolations()
+                                .stream()
+                                .map(e -> new ConstraintViolationError(e.getMessage(), e.getPropertyPath().toString()))
+                                .collect(Collectors.toList())
                 ));
     }
 
@@ -39,6 +43,31 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(
                         new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
+        List<InvalidArgumentError> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(x ->
+                        new InvalidArgumentError(x.getDefaultMessage(), x.getField())
+                )
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new InvalidEndpointArgumentsException(
+                                "Invalid method arguments",
+                                ex.getClass().getSimpleName(),
+                                errors
+                        )
                 );
     }
 

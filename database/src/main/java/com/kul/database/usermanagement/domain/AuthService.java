@@ -52,7 +52,9 @@ public class AuthService {
                 true,
                 AuthorityEnum.ADMIN
         );
-        registerUser(user);
+        if (userRepository.findByUsername("admin@admin.com") == null) {
+            registerUser(user);
+        }
     }
 
     public String authenticate(UserLoginRequest user) {
