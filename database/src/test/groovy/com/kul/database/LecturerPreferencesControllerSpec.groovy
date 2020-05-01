@@ -38,12 +38,12 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
             response.statusCode(OK.value())
     }
 
-    def "should respond 200 when adding new request"() {
+    def "should respond 200 when lecturer preferences was successfully updated"() {
         given:
-            def preference = aNewLecturerPreference()
+            def request = aNewLecturerPreference()
 
         when:
-            def response = postAuthenticatedToPreferencesAdd(preference)
+            def response = postAuthenticatedToPreferencesAdd(request)
 
         then:
             response.statusCode(OK.value())
@@ -54,26 +54,26 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
                     .body("day", equalTo("MONDAY"))
     }
 
-    def "should respond 422 when adding new request"() {
+    def "should respond 422 when lecturer preference for given day already exists"() {
         given:
-            def preference = aNewLecturerPreference()
+            def request = aNewLecturerPreference()
 
         when:
-            def response = postAuthenticatedToPreferencesAdd(preference)
+            def response = postAuthenticatedToPreferencesAdd(request)
 
         then:
             response.statusCode(UNPROCESSABLE_ENTITY.value())
-                    .body("message", equalTo(String.format("Preference for %s already exists", preference.getDay())))
+                    .body("message", equalTo(String.format("Preference for %s already exists", request.getDay())))
     }
 
-    def "should respond 200 when updating preferences for user"() {
+    def "should respond 200 when lecturer preferences has been updated successfully"() {
         given:
-            def preference = aNewLecturerPreference()
+            def request = aNewLecturerPreference()
                     .withStartTime("09:00")
                     .withEndTime("14:00")
 
         when:
-            def response = postAuthenticatedToPreferencesUpdate(preference)
+            def response = postAuthenticatedToPreferencesUpdate(request)
 
         then:
             response.statusCode(OK.value())
@@ -86,13 +86,13 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
 
     def "should respond 422 when updating for non existent user"() {
         given:
-            def preference = aNewLecturerPreference()
+            def request = aNewLecturerPreference()
                     .withStartTime("09:00")
                     .withEndTime("14:00")
                     .withUserId(3)
 
         when:
-            def response = postAuthenticatedToPreferencesUpdate(preference)
+            def response = postAuthenticatedToPreferencesUpdate(request)
 
         then:
             response.statusCode(UNPROCESSABLE_ENTITY.value())
