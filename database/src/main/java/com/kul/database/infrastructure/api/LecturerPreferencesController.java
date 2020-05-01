@@ -23,7 +23,7 @@ class LecturerPreferencesController {
     @PostMapping(
             value = "/add"
     )
-    public AddLecturePreferenceResponse addLecturerPreferences(@RequestBody AddLecturerPreference lecturerPreference) throws Exception {
+    public AddLecturePreferenceResponse addLecturerPreferences(@RequestBody AddLecturerPreference lecturerPreference) throws RuntimeException {
         AddLecturerPreference newLecturePreference = new AddLecturerPreference(
                 lecturerPreference.getUserId(),
                 lecturerPreference.getStartTime(),
@@ -45,7 +45,7 @@ class LecturerPreferencesController {
             method = RequestMethod.PUT,
             value = "/update"
     )
-    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody @Valid UpdateLecturerPreference request) throws Exception {
+    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody @Valid UpdateLecturerPreference request) throws RuntimeException {
         final LecturerPreferences lecturerPreferences = lecturerPreferencesService.updatePreferenceForUser(request);
         return new UpdateLecturerPreferenceResponse(
                 lecturerPreferences.getId(),
@@ -59,7 +59,7 @@ class LecturerPreferencesController {
     @GetMapping(
             value = "/fetch/{userId}/{day}"
     )
-    public FetchLecturerPreferenceResponse fetchLecturerPreference(@PathVariable Long userId, @PathVariable DayOfWeek day) throws Exception {
+    public FetchLecturerPreferenceResponse fetchLecturerPreference(@PathVariable Long userId, @PathVariable DayOfWeek day) throws RuntimeException {
         LecturerPreferences lecturerPreferences = lecturerPreferencesService.fetchPreferenceForUserAndDay(userId, day);
         return new FetchLecturerPreferenceResponse(
                 lecturerPreferences.getStartTime(),

@@ -22,7 +22,7 @@ public class LecturerPreferencesService {
         this.userRepository = userRepository;
     }
 
-    public LecturerPreferences addPreferenceForUser(AddLecturerPreference userPreferenceRequest) throws Exception {
+    public LecturerPreferences addPreferenceForUser(AddLecturerPreference userPreferenceRequest) throws RuntimeException {
         final Optional<User> optionalUser = userRepository.findById(userPreferenceRequest.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
@@ -53,7 +53,7 @@ public class LecturerPreferencesService {
         return savedPreference;
     }
 
-    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreference request) throws Exception {
+    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreference request) throws RuntimeException {
         final Optional<User> optionalUser = userRepository.findById(request.getUserId());
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");
@@ -85,7 +85,7 @@ public class LecturerPreferencesService {
         return savedPreference;
     }
 
-    public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) throws Exception {
+    public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) throws RuntimeException {
         final Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new NoSuchUserException("No username provided");

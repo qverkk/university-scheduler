@@ -72,7 +72,7 @@ class UserController {
     @GetMapping(
             value = "/all"
     )
-    public List<AllUsersResponse> getAllUsers(Principal principal) throws NoSuchUserException, InsufficientPersmissionsToGetAllUserData {
+    public List<AllUsersResponse> getAllUsers(Principal principal) throws RuntimeException {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }

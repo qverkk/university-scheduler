@@ -4,8 +4,6 @@ import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmission
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
 import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
-import com.kul.database.usermanagement.domain.User;
-import com.kul.database.usermanagement.domain.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +18,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void enableUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+    public void enableUser(Long id, String username) throws RuntimeException {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
@@ -33,7 +31,7 @@ public class UserService {
         });
     }
 
-    public void disableUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+    public void disableUser(Long id, String username) throws RuntimeException {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
@@ -46,7 +44,7 @@ public class UserService {
         });
     }
 
-    public void deleteUser(Long id, String username) throws NoSuchUserException, InsufficientPersmissionsToDeleteUsersException {
+    public void deleteUser(Long id, String username) throws RuntimeException {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
@@ -69,7 +67,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public List<User> getAllUsers(String username) throws NoSuchUserException, InsufficientPersmissionsToGetAllUserData {
+    public List<User> getAllUsers(String username) throws RuntimeException {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
