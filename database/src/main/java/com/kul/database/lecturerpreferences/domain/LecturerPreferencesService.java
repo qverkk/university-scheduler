@@ -24,15 +24,16 @@ public class LecturerPreferencesService {
         final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
 
-        if (!user.canUpdatePreferencesForUserId(request.getUserId())) {
+        final LecturerPreferences preference = lecturerPreferencesRepository.findByDayAndUser(request.getDay(), user)
+                .orElse(new LecturerPreferences(user, request.getStartTime(), request.getEndTime(), request.getDay()));
+
+        if (!preference.canBeUpdatedBy(user)) {
             throw new InsufficientPermissionsToUpdateLecturerPreferences(
                     "Only admin, dziekanat or user for this permission can update them"
             );
         }
-        final LecturerPreferences preference = lecturerPreferencesRepository.findByDayAndUser(request.getDay(), user)
-                .orElse(new LecturerPreferences(user, request.getStartTime(), request.getEndTime(), request.getDay()));
 
-        preference.changeScheduleWindow(request.getStartTime(), request.getEndTime());
+        preference.changeScheduleWindow(request.getStartTime(), request.getEndTime(), user);
 
         return lecturerPreferencesRepository.save(preference);
     }

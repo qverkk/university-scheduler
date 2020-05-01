@@ -56,9 +56,9 @@ public class User {
         return authority == AuthorityEnum.ADMIN;
     }
 
-    public boolean canUpdatePreferencesForUserId(Long userId) {
+    public boolean canUpdatePreferencesOf(User user) {
         return authority == AuthorityEnum.ADMIN ||
                 authority == AuthorityEnum.DZIEKANAT ||
-                userId.equals(id);
+                user.getId().equals(id);
     }
 }

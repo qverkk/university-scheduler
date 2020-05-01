@@ -33,20 +33,32 @@ public class LecturerPreferences {
     @NotNull
     private DayOfWeek day;
 
+    @NotNull
+    private User lastUsedUser;
+
+    @Version
+    private Long version;
+
     public LecturerPreferences(Long id, User user, LocalTime startTime, LocalTime endTime, DayOfWeek day) {
         this.id = id;
         this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
         this.day = day;
+        this.lastUsedUser = null;
     }
 
     public LecturerPreferences(User user, LocalTime startTime, LocalTime endTime, DayOfWeek day) {
         this(null, user, startTime, endTime, day);
     }
 
-    public void changeScheduleWindow(LocalTime startTime, LocalTime endTime) {
+    public void changeScheduleWindow(LocalTime startTime, LocalTime endTime, User lastUsedUser) {
         this.startTime = startTime;
         this.endTime = endTime;
+        this.lastUsedUser = lastUsedUser;
+    }
+
+    public boolean canBeUpdatedBy(User user) {
+        return user.canUpdatePreferencesOf(this.user);
     }
 }

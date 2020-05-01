@@ -7,6 +7,7 @@ import com.kul.database.abilities.CallUserEndpointAbility
 import static com.kul.database.abilities.dtos.NewLecturerPreferencesRequests.aNewLecturerPreference
 import static com.kul.database.abilities.dtos.NewUserRequests.aDisabledDeaneryUser
 import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.notNullValue
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
@@ -22,7 +23,7 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
 
         then:
             response.statusCode(OK.value())
-                    .body("newUserAssignedId", equalTo(2))
+                    .body("newUserAssignedId", notNullValue())
                     .body("success", equalTo(true))
     }
 
@@ -46,8 +47,8 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
 
         then:
             response.statusCode(OK.value())
-                    .body("lecturerPreferenceId", equalTo(1))
-                    .body("userId", equalTo(2))
+                    .body("lecturerPreferenceId", notNullValue())
+                    .body("userId", notNullValue())
                     .body("startTime", equalTo("08:00"))
                     .body("endTime", equalTo("15:00"))
                     .body("day", equalTo("MONDAY"))
@@ -76,8 +77,8 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
 
         then:
             response.statusCode(OK.value())
-                    .body("lecturerPreferenceId", equalTo(1))
-                    .body("userId", equalTo(2))
+                    .body("lecturerPreferenceId", notNullValue())
+                    .body("userId", notNullValue())
                     .body("startTime", equalTo("09:00"))
                     .body("endTime", equalTo("14:00"))
                     .body("day", equalTo("MONDAY"))
