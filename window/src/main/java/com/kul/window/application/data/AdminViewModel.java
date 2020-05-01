@@ -1,6 +1,6 @@
 package com.kul.window.application.data;
 
-import com.kul.api.adapter.admin.management.lecturer.preferences.*;
+import com.kul.api.adapter.admin.management.lecturer.preferences.LecutrerPreferenecesUpdateException;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.api.domain.admin.management.UserManagement;
@@ -8,8 +8,6 @@ import com.kul.window.async.ExecutorsFactory;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -141,10 +139,20 @@ public class AdminViewModel {
                     startTimeProperty().setValue(response.getStartTime());
                     endTimeProperty().setValue(response.getEndTime());
                 }, error -> {
-                    if (error instanceof LecturerCannotBeFound) {
-                        responseMessage.setValue(messageResolver.nonExistingLecturer());
-                    } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                        responseMessage.setValue(messageResolver.nonExistingPreference());
+                    if (!(error instanceof LecutrerPreferenecesUpdateException)) {
+                        return;
+                    }
+                    LecutrerPreferenecesUpdateException ex = (LecutrerPreferenecesUpdateException) error;
+                    switch (ex.getFailureCause()) {
+                        case NoSuchUserProvided:
+                            responseMessage.setValue(messageResolver.nonExistingLecturer());
+                            break;
+                        case LecturerPreferenceDoesntExist:
+                            responseMessage.setValue(messageResolver.nonExistingPreference());
+                            break;
+                        default:
+                            responseMessage.setValue("Unknown exception");
+                            break;
                     }
                 });
     }
@@ -161,18 +169,29 @@ public class AdminViewModel {
                 .subscribe(response -> {
                     responseMessage.setValue(messageResolver.success());
                 }, error -> {
-                    if (error instanceof InsufficientLecturerPreferencesPriviliges) {
-                        responseMessage.setValue(messageResolver.insufficientLecturerPreferences());
-                    } else if (error instanceof LecturerCannotBeFound) {
-                        responseMessage.setValue(messageResolver.nonExistingLecturer());
-                    } else if (error instanceof LecturerPreferenceDoesntExistException) {
-                        responseMessage.setValue(messageResolver.nonExistingPreference());
-                    } else if (error instanceof LecturerPreferenceAlreadyExistsException) {
-                        responseMessage.setValue(messageResolver.alreadyExistingPreference());
-                    } else if (error instanceof InvalidLecturerPreferencesException) {
-                        responseMessage.setValue(messageResolver.nonValidPreferences());
-                    } else if (error instanceof BadUpdateLecturerPreferenceException) {
-                        responseMessage.setValue(messageResolver.nonValidPreferences());
+                    if (!(error instanceof LecutrerPreferenecesUpdateException)) {
+                        return;
+                    }
+                    LecutrerPreferenecesUpdateException ex = (LecutrerPreferenecesUpdateException) error;
+                    switch (ex.getFailureCause()) {
+                        case InsufficientPermissionsToUpdateLecturerPreferences:
+                            responseMessage.setValue(messageResolver.insufficientLecturerPreferences());
+                            break;
+                        case NoSuchUserProvided:
+                            responseMessage.setValue(messageResolver.nonExistingLecturer());
+                            break;
+                        case LecturerPreferenceDoesntExist:
+                            responseMessage.setValue(messageResolver.nonExistingPreference());
+                            break;
+                        case LecturerPreferenceAlreadyExists:
+                            responseMessage.setValue(messageResolver.alreadyExistingPreference());
+                            break;
+                        case MethodArgumentNotValidException:
+                            responseMessage.setValue(messageResolver.nonValidPreferences());
+                            break;
+                        default:
+                            responseMessage.setValue("Unknown exception");
+                            break;
                     }
                 });
     }

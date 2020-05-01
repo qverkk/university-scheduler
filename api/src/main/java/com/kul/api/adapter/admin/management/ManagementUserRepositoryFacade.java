@@ -44,7 +44,7 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
     }
 
     @Override
-    public LecturerPreferences updatePreferences(LecturerPreferences preferences) throws Exception {
+    public LecturerPreferences updatePreferences(LecturerPreferences preferences) throws RuntimeException {
         try {
             LecturerPreferencesResponse response = client.updatePreferences(preferences);
             return new LecturerPreferences(
@@ -54,27 +54,12 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     response.getDay()
             );
         } catch (ErrorResponseException ex) {
-            String errorCode = ex.getErrorResponse().getCode();
-            switch (errorCode) {
-                case "NoSuchUserProvided":
-                    throw new LecturerCannotBeFound();
-                case "LecturerPreferenceDoesntExist":
-                    throw new LecturerPreferenceDoesntExistException();
-                case "InsufficientPermissionsToUpdateLecturerPreferences":
-                    throw new InsufficientLecturerPreferencesPriviliges();
-                case "LecturerPreferenceAlreadyExists":
-                    throw new LecturerPreferenceAlreadyExistsException();
-                case "MethodArgumentNotValidException":
-                    throw new BadUpdateLecturerPreferenceException();
-                default:
-                    System.out.println("Unknown " + errorCode);
-            }
+            throw new LecutrerPreferenecesUpdateException(ex, FailureCause.findByCode(ex.getErrorResponse().getCode()));
         }
-        return null;
     }
 
     @Override
-    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws Exception {
+    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws RuntimeException {
         try {
             FetchLecturerPreferenceResponse response = client.fetchPreferences(userId, day);
             return new LecturerPreferences(
@@ -84,16 +69,7 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
                     day
             );
         } catch (ErrorResponseException ex) {
-            String errorCode = ex.getErrorResponse().getCode();
-            switch (errorCode) {
-                case "LecturerPreferenceDoesntExist":
-                    throw new LecturerPreferenceDoesntExistException();
-                case "NoSuchUserProvided":
-                    throw new LecturerCannotBeFound();
-                default:
-                    System.out.println("Unknown " + errorCode);
-            }
+            throw new LecutrerPreferenecesUpdateException(ex, FailureCause.findByCode(ex.getErrorResponse().getCode()));
         }
-        return null;
     }
 }
