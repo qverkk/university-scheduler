@@ -12,13 +12,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 
 import java.time.DayOfWeek;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -32,11 +29,21 @@ public class AdminViewModel {
     private final UserManagement userManagement;
     private final UserInfoViewModel currentUserInfo;
     private final StringProperty responseMessage = new SimpleStringProperty();
+    private final UpdatePreferenceViewModel updatePreferenceViewModel;
 
-    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, UserInfoViewModel currentUserInfo) {
+    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel) {
         this.preconfiguredExecutors = preconfiguredExecutors;
         this.userManagement = userManagement;
         this.currentUserInfo = currentUserInfo;
+        this.updatePreferenceViewModel = updatePreferenceViewModel;
+    }
+
+    public StringProperty startTimeProperty() {
+        return updatePreferenceViewModel.currentlyEditedPreferenceStartTimeProperty();
+    }
+
+    public StringProperty endTimeProperty() {
+        return updatePreferenceViewModel.currentlyEditedPreferenceEndTimeProperty();
     }
 
     public StringProperty responseMessageProperty() {
@@ -118,12 +125,7 @@ public class AdminViewModel {
         ).collect(Collectors.toList());
     }
 
-    public void fetchPreferences(Dialog<LecturerPreferences> dialog,
-                                  DayOfWeek selectedItem,
-                                  Long userId,
-                                  StringProperty startTimeProperty,
-                                  StringProperty endTimeProperty
-    ) {
+    public void fetchPreferences(DayOfWeek selectedItem, Long userId) {
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
                 "fetch-lecturer-preferences"
         );
@@ -133,15 +135,14 @@ public class AdminViewModel {
                 .observeOn(preconfiguredExecutors.platformScheduler())
                 .doFinally(executor::shutdown)
                 .subscribe(response -> {
-                    startTimeProperty.setValue(response.getStartTime());
-                    endTimeProperty.setValue(response.getEndTime());
+                    startTimeProperty().setValue(response.getStartTime());
+                    endTimeProperty().setValue(response.getEndTime());
                 }, error -> {
                     if (error instanceof LecturerCannotBeFound) {
                         responseMessage.setValue("This lecturer doesn't exist in our database");
                     } else if (error instanceof LecturerPreferenceDoesntExistException) {
                         responseMessage.setValue("Preference for this day doesn't exist. Please add one.");
                     }
-                    dialog.close();
                 });
     }
 

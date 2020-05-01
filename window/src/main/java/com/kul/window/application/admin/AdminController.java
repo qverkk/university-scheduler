@@ -101,21 +101,19 @@ public class AdminController implements Initializable {
         ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(updateButton, ButtonType.CANCEL);
 
-        final StringProperty startTimeProperty = new SimpleStringProperty("00:00");
-        final StringProperty endTimeProperty = new SimpleStringProperty("00:00");
+        adminViewModel.startTimeProperty().setValue("00:00");
+        adminViewModel.endTimeProperty().setValue("00:00");
 
         final TextField startTime = new TextField();
         final TextField endTime = new TextField();
         final ComboBox<DayOfWeek> day = new ComboBox<>();
 
-        startTime.textProperty().bindBidirectional(startTimeProperty);
-        endTime.textProperty().bindBidirectional(endTimeProperty);
+        startTime.textProperty().bindBidirectional(adminViewModel.startTimeProperty());
+        endTime.textProperty().bindBidirectional(adminViewModel.endTimeProperty());
+
         day.setOnAction(event -> adminViewModel.fetchPreferences(
-                dialog,
                 day.getSelectionModel().getSelectedItem(),
-                userId,
-                startTimeProperty,
-                endTimeProperty
+                userId
         ));
 
         dialog.getDialogPane().setContent(generateGridSettings(startTime, endTime, day));
