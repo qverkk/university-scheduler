@@ -29,14 +29,14 @@ public class UpdateLecturerPreferenceRequest {
 
     @NotNull
     @AnyOfEnumValues(DayOfWeek.class)
-    private String day;
+    private DayOfWeek day;
 
     public UpdateLecturerPreference toDomain() {
         return new UpdateLecturerPreference(
                 userId,
                 stringToLocalTime(startTime),
                 stringToLocalTime(endTime),
-                DayOfWeek.valueOf(day)
+                day
         );
     }
 

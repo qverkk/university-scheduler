@@ -43,7 +43,7 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
             def request = aNewLecturerPreference()
 
         when:
-            def response = postAuthenticatedToPreferencesAdd(request)
+            def response = postAuthenticatedToPreferencesUpdate(request)
 
         then:
             response.statusCode(OK.value())
@@ -52,18 +52,6 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
                     .body("startTime", equalTo("08:00"))
                     .body("endTime", equalTo("15:00"))
                     .body("day", equalTo("MONDAY"))
-    }
-
-    def "should respond 422 when lecturer preference for given day already exists"() {
-        given:
-            def request = aNewLecturerPreference()
-
-        when:
-            def response = postAuthenticatedToPreferencesAdd(request)
-
-        then:
-            response.statusCode(UNPROCESSABLE_ENTITY.value())
-                    .body("message", equalTo(String.format("Preference for %s already exists", request.getDay())))
     }
 
     def "should respond 200 when lecturer preferences has been updated successfully"() {
