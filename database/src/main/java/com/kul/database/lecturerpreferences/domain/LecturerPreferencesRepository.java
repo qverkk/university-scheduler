@@ -7,7 +7,7 @@ import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
-public interface LecturerPreferencesRepository extends JpaRepository<LecturerPreferences, Long> {
+public interface LecturerPreferencesRepository {
     Optional<LecturerPreferences> findByDayAndUser(DayOfWeek day, User user);
-    List<LecturerPreferences> findAllByUser(User user);
+    LecturerPreferences save(LecturerPreferences lecturerPreferences);
 }

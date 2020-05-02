@@ -31,4 +31,9 @@ public class DefaultAdminViewMessageResolver implements AdminViewMessageResolver
     public String success() {
         return "Success!";
     }
+
+    @Override
+    public String nonValidTime() {
+        return "Start time must be before end time";
+    }
 }

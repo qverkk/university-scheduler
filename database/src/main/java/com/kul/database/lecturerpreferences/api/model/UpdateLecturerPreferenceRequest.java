@@ -1,5 +1,6 @@
-package com.kul.database.lecturerpreferences.api;
+package com.kul.database.lecturerpreferences.api.model;
 
+import com.kul.database.infrastructure.constraints.AnyOfEnumValues;
 import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

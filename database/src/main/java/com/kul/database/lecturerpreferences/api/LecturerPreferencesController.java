@@ -1,10 +1,6 @@
-package com.kul.database.infrastructure.api;
+package com.kul.database.lecturerpreferences.api;
 
-import com.kul.database.lecturerpreferences.adapter.FetchLecturerPreferenceMapper;
-import com.kul.database.lecturerpreferences.adapter.UpdateLecturerPreferenceMapper;
-import com.kul.database.lecturerpreferences.api.FetchLecturerPreferenceResponse;
-import com.kul.database.lecturerpreferences.api.UpdateLecturerPreferenceRequest;
-import com.kul.database.lecturerpreferences.api.UpdateLecturerPreferenceResponse;
+import com.kul.database.lecturerpreferences.api.model.*;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferencesService;
 import org.springframework.web.bind.annotation.*;

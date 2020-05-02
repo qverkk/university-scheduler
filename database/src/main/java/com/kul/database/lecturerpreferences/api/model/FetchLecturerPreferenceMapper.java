@@ -1,6 +1,5 @@
-package com.kul.database.lecturerpreferences.adapter;
+package com.kul.database.lecturerpreferences.api.model;
 
-import com.kul.database.lecturerpreferences.api.FetchLecturerPreferenceResponse;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
 
 import java.time.LocalTime;

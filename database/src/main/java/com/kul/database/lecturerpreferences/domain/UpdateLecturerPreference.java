@@ -1,24 +1,16 @@
 package com.kul.database.lecturerpreferences.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Value;
 
-import javax.validation.constraints.NotNull;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-@Getter
+@Value
 @AllArgsConstructor
 public class UpdateLecturerPreference {
-    @NotNull
-    private final Long userId;
-
-    @NotNull
-    private final LocalTime startTime;
-
-    @NotNull
-    private final LocalTime endTime;
-
-    @NotNull
-    private final DayOfWeek day;
+    Long userId;
+    LocalTime startTime;
+    LocalTime endTime;
+    DayOfWeek day;
 }

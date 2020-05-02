@@ -197,6 +197,9 @@ public class AdminViewModel {
                         case MethodArgumentNotValidException:
                             responseMessage.setValue(messageResolver.nonValidPreferences());
                             break;
+                        case LecturerPreferenceInvalidTime:
+                            responseMessage.setValue(messageResolver.nonValidTime());
+                            break;
                         default:
                             responseMessage.setValue("Unknown exception");
                             break;

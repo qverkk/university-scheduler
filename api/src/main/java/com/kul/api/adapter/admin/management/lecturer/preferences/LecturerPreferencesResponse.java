@@ -11,5 +11,5 @@ public class LecturerPreferencesResponse {
     Long userId;
     String startTime;
     String endTime;
-    String day;
+    DayOfWeek day;
 }

@@ -25,7 +25,7 @@ public class LecturerPreferencesService {
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
 
         final LecturerPreferences preference = lecturerPreferencesRepository.findByDayAndUser(request.getDay(), user)
-                .orElse(new LecturerPreferences(user, request.getStartTime(), request.getEndTime(), request.getDay()));
+                .orElse(LecturerPreferences.newForDay(user, request.getDay()));
 
         if (!preference.canBeUpdatedBy(user)) {
             throw new InsufficientPermissionsToUpdateLecturerPreferences(

@@ -1,4 +1,4 @@
-package com.kul.database.lecturerpreferences.api;
+package com.kul.database.infrastructure.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {AnyOfEnumValuesValidator.class})
 @Target({FIELD})
 @Retention(RUNTIME)
-@interface AnyOfEnumValues {
+public @interface AnyOfEnumValues {
     String message() default "must match any of expected values";
     Class<?>[] groups() default {};
     Class<? extends Enum<?>> value();

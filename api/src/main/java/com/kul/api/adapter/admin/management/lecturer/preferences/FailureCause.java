@@ -8,6 +8,7 @@ public enum FailureCause {
     InsufficientPermissionsToUpdateLecturerPreferences,
     LecturerPreferenceAlreadyExists,
     MethodArgumentNotValidException,
+    LecturerPreferenceInvalidTime,
     Unknown;
 
     public static FailureCause findByCode(String code) {

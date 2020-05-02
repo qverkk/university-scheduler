@@ -1,4 +1,4 @@
-package com.kul.database.lecturerpreferences.api;
+package com.kul.database.lecturerpreferences.api.model;
 
 import lombok.Value;
 

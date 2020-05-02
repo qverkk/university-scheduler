@@ -3,6 +3,7 @@ package com.kul.database.exceptions.handlers;
 import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
+import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceInvalidTime;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
@@ -120,6 +121,15 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
     public ResponseEntity<EndpointError> handle(InsufficientPermissionsToUpdateLecturerPreferences exception) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(
+                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
+
+    @ExceptionHandler(LecturerPreferenceInvalidTime.class)
+    public ResponseEntity<EndpointError> handle(LecturerPreferenceInvalidTime exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(
                         new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
                 );

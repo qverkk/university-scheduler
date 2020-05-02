@@ -7,4 +7,5 @@ interface AdminViewMessageResolver {
     String alreadyExistingPreference();
     String nonValidPreferences();
     String success();
+    String nonValidTime();
 }

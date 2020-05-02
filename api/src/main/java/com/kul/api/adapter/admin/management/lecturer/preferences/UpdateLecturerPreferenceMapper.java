@@ -15,7 +15,7 @@ public class UpdateLecturerPreferenceMapper {
                 response.getUserId(),
                 stringToLocalTime(response.getStartTime()),
                 stringToLocalTime(response.getEndTime()),
-                DayOfWeek.valueOf(response.getDay())
+                response.getDay()
         );
     }
 
@@ -31,7 +31,7 @@ public class UpdateLecturerPreferenceMapper {
                 preferences.getUserId(),
                 localTimeToString(preferences.getStartTime()),
                 localTimeToString(preferences.getEndTime()),
-                preferences.getDay().name()
+                preferences.getDay()
         );
     }
 

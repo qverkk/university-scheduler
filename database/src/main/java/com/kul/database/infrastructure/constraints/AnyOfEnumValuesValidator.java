@@ -1,4 +1,4 @@
-package com.kul.database.lecturerpreferences.api;
+package com.kul.database.infrastructure.constraints;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class AnyOfEnumValuesValidator implements ConstraintValidator<AnyOfEnumValues, String> {
+public class AnyOfEnumValuesValidator implements ConstraintValidator<AnyOfEnumValues, String> {
     private Set<String> values;
 
     @Override
