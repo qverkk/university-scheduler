@@ -1,9 +1,9 @@
 package com.kul.api.adapter.admin.external;
 
 import com.kul.api.adapter.admin.management.lecturer.preferences.FetchLecturerPreferenceResponse;
+import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferencesRequest;
 import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferencesResponse;
 import com.kul.api.adapter.admin.management.users.AllUsersResponse;
-import com.kul.api.domain.admin.management.LecturerPreferences;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -27,7 +27,7 @@ public interface ManagementEndpointClient {
 
     @RequestLine("PUT /preferences/update")
     @Headers("Content-Type: application/json")
-    LecturerPreferencesResponse updatePreferences(LecturerPreferences preferences);
+    LecturerPreferencesResponse updatePreferences(LecturerPreferencesRequest preferences);
 
     @RequestLine("GET /preferences/fetch/{userId}/{day}")
     @Headers("Content-Type: application/json")

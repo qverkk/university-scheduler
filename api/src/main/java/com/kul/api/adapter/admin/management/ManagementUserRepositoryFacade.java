@@ -46,13 +46,10 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
     @Override
     public LecturerPreferences updatePreferences(LecturerPreferences preferences) throws RuntimeException {
         try {
-            LecturerPreferencesResponse response = client.updatePreferences(preferences);
-            return new LecturerPreferences(
-                    response.getUserId(),
-                    response.getStartTime(),
-                    response.getEndTime(),
-                    response.getDay()
+            LecturerPreferencesResponse response = client.updatePreferences(
+                    UpdateLecturerPreferenceMapper.toRequest(preferences)
             );
+            return UpdateLecturerPreferenceMapper.fromResponse(response);
         } catch (ErrorResponseException ex) {
             throw new LecutrerPreferenecesUpdateException(ex, FailureCause.findByCode(ex.getErrorResponse().getCode()));
         }
@@ -62,12 +59,7 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
     public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws RuntimeException {
         try {
             FetchLecturerPreferenceResponse response = client.fetchPreferences(userId, day);
-            return new LecturerPreferences(
-                    userId,
-                    response.getStartTime(),
-                    response.getEndTime(),
-                    day
-            );
+            return FetchLecturerPreferenceMapper.fromResponse(userId, response, day);
         } catch (ErrorResponseException ex) {
             throw new LecutrerPreferenecesUpdateException(ex, FailureCause.findByCode(ex.getErrorResponse().getCode()));
         }

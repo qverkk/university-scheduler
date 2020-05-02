@@ -34,7 +34,7 @@ public class LecturerPreferences {
     private DayOfWeek day;
 
     @NotNull
-    private User lastUsedUser;
+    private String lastUsedUsername;
 
     @Version
     private Long version;
@@ -45,7 +45,7 @@ public class LecturerPreferences {
         this.startTime = startTime;
         this.endTime = endTime;
         this.day = day;
-        this.lastUsedUser = null;
+        this.lastUsedUsername = null;
     }
 
     public LecturerPreferences(User user, LocalTime startTime, LocalTime endTime, DayOfWeek day) {
@@ -55,7 +55,7 @@ public class LecturerPreferences {
     public void changeScheduleWindow(LocalTime startTime, LocalTime endTime, User lastUsedUser) {
         this.startTime = startTime;
         this.endTime = endTime;
-        this.lastUsedUser = lastUsedUser;
+        this.lastUsedUsername = lastUsedUser.getUsername();
     }
 
     public boolean canBeUpdatedBy(User user) {

@@ -9,7 +9,7 @@ import java.time.LocalTime;
 public class LecturerPreferencesResponse {
     Long lecturerPreferenceId;
     Long userId;
-    LocalTime startTime;
-    LocalTime endTime;
-    DayOfWeek day;
+    String startTime;
+    String endTime;
+    String day;
 }
