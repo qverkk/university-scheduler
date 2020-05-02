@@ -25,9 +25,9 @@ class UserControllerSpec extends BaseIntegrationSpec implements CallAuthEndpoint
 
         then:
             response.statusCode(UNPROCESSABLE_ENTITY.value())
-                    .body("errors", hasSize(1))
-                    .body("errors[0].message", equalTo("Email should be valid"))
-                    .body("errors[0].code", equalTo("ConstraintViolationException"))
+                    .body("violations", hasSize(1))
+                    .body("violations[0].cause", equalTo("Email should be valid"))
+                    .body("violations[0].field", equalTo("username"))
     }
 
     def 'should respond 404 when user does not exist'() {
