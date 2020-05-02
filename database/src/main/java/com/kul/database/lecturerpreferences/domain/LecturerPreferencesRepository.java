@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface LecturerPreferencesRepository {
     Optional<LecturerPreferences> findByDayAndUser(DayOfWeek day, User user);
     LecturerPreferences save(LecturerPreferences lecturerPreferences);
+    void deleteAllByUserId(Long id);
 }

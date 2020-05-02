@@ -1,38 +1,28 @@
 package com.kul.database
 
-
 import com.kul.database.abilities.CallLecturerPreferencesEndpointAbility
 import com.kul.database.abilities.CallUserEndpointAbility
+import com.kul.database.abilities.dtos.RegisteredUser
+import com.kul.database.abilities.dtos.UsersManagementAbility
 
 import static com.kul.database.abilities.dtos.NewLecturerPreferencesRequests.aNewLecturerPreference
-import static com.kul.database.abilities.dtos.NewUserRequests.aDisabledDeaneryUser
+import static com.kul.database.abilities.dtos.UsersFixtures.janKowalski
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.notNullValue
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
-        implements CallLecturerPreferencesEndpointAbility, CallUserEndpointAbility {
-
-    def "should respond 200 when registering new account"() {
-        given:
-            def user = aDisabledDeaneryUser()
-
-        when:
-            def response = registerNewUser(user)
-
-        then:
-            response.statusCode(OK.value())
-                    .body("newUserAssignedId", notNullValue())
-                    .body("success", equalTo(true))
-    }
+        implements CallLecturerPreferencesEndpointAbility, CallUserEndpointAbility, UsersManagementAbility {
 
     def "should respond 200 when enabling user"() {
         given:
-            def userId = 2L
+            RegisteredUser user = hasRegisteredUser {
+                janKowalski().whoIsDisabled()
+            }
 
         when:
-            def response = enableUser(userId)
+            def response = enableUser(user.id)
 
         then:
             response.statusCode(OK.value())
@@ -40,7 +30,11 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
 
     def "should respond 200 when lecturer preferences was successfully updated"() {
         given:
+            RegisteredUser user = hasRegisteredUser {
+                janKowalski().whoIsDisabled()
+            }
             def request = aNewLecturerPreference()
+                    .withUserId(user.id)
 
         when:
             def response = postAuthenticatedToPreferencesUpdate(request)
@@ -56,15 +50,25 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
 
     def "should respond 200 when lecturer preferences has been updated successfully"() {
         given:
-            def request = aNewLecturerPreference()
+            RegisteredUser user = hasRegisteredUser {
+                janKowalski().whoIsEnabled()
+            }
+            def addPreferenceRequest = aNewLecturerPreference()
+                    .withUserId(user.id)
+
+            def updatePreferenceRequest = aNewLecturerPreference()
+                    .withUserId(user.id)
                     .withStartTime("09:00")
                     .withEndTime("14:00")
 
         when:
-            def response = postAuthenticatedToPreferencesUpdate(request)
+            def addResponse = postAuthenticatedToPreferencesUpdate(addPreferenceRequest)
+            def updateResponse = postAuthenticatedToPreferencesUpdate(updatePreferenceRequest)
 
         then:
-            response.statusCode(OK.value())
+            addResponse.statusCode(OK.value())
+
+            updateResponse.statusCode(OK.value())
                     .body("lecturerPreferenceId", notNullValue())
                     .body("userId", notNullValue())
                     .body("startTime", equalTo("09:00"))
@@ -77,7 +81,7 @@ class LecturerPreferencesControllerSpec extends BaseIntegrationSpec
             def request = aNewLecturerPreference()
                     .withStartTime("09:00")
                     .withEndTime("14:00")
-                    .withUserId(3)
+                    .withUserId(999999)
 
         when:
             def response = postAuthenticatedToPreferencesUpdate(request)

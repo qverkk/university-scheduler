@@ -30,4 +30,9 @@ class JpaLecturerPreferencesRepositoryFacade implements LecturerPreferencesRepos
 
         return LecturerPreferencesEntity.toDomain(saved);
     }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        lecturerPreferencesRepository.deleteAllByUserId(userId);
+    }
 }

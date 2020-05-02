@@ -1,5 +1,6 @@
 package com.kul.database.usermanagement.domain;
 
+import com.kul.database.lecturerpreferences.domain.LecturerPreferencesRepository;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LecturerPreferencesRepository lecturerPreferencesRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, LecturerPreferencesRepository lecturerPreferencesRepository) {
         this.userRepository = userRepository;
+        this.lecturerPreferencesRepository = lecturerPreferencesRepository;
     }
 
     public void enableUser(Long id, String username) throws RuntimeException {
@@ -51,6 +54,7 @@ public class UserService {
         } else if (!user.canDeleteUsers()) {
             throw new InsufficientPersmissionsToDeleteUsersException(user);
         }
+        lecturerPreferencesRepository.deleteAllByUserId(id);
         userRepository.deleteById(id);
     }
 

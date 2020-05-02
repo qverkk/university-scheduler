@@ -17,4 +17,11 @@ trait CallUserEndpointAbility extends RequestLocalServerAbility implements CallA
                 .post(baseUrl().resolve("/user/disable/" + id))
                 .then()
     }
+
+    ValidatableResponse deleteUser(Long id) {
+        return RestAssured.given()
+                .header("Authorization", "Bearer " + getAdminToken())
+                .delete(baseUrl().resolve("/user/delete/" + id))
+                .then()
+    }
 }
