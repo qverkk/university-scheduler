@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class FetchLecturerPreferenceMapper {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
     public static FetchLecturerPreferenceResponse toResponse(LecturerPreferences lecturerPreferences) {
         return new FetchLecturerPreferenceResponse(
                 localTimeToString(lecturerPreferences.getStartTime()),
@@ -14,7 +16,6 @@ public class FetchLecturerPreferenceMapper {
     }
 
     private static String localTimeToString(LocalTime time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return formatter.format(time);
     }
 }

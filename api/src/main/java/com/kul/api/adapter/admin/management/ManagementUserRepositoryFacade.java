@@ -44,7 +44,7 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
     }
 
     @Override
-    public LecturerPreferences updatePreferences(LecturerPreferences preferences) throws RuntimeException {
+    public LecturerPreferences updatePreferences(LecturerPreferences preferences) {
         try {
             LecturerPreferencesResponse response = client.updatePreferences(
                     UpdateLecturerPreferenceMapper.toRequest(preferences)
@@ -56,7 +56,7 @@ public class ManagementUserRepositoryFacade implements ManagementUserRepository 
     }
 
     @Override
-    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws RuntimeException {
+    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) {
         try {
             FetchLecturerPreferenceResponse response = client.fetchPreferences(userId, day);
             return FetchLecturerPreferenceMapper.fromResponse(userId, response, day);

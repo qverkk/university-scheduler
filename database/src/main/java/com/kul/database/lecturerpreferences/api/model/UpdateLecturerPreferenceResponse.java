@@ -1,16 +1,12 @@
 package com.kul.database.lecturerpreferences.api.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
+@Value
 public class UpdateLecturerPreferenceResponse {
-    private Long lecturerPreferenceId;
-    private Long userId;
-    private String startTime;
-    private String endTime;
-    private String day;
+    Long lecturerPreferenceId;
+    Long userId;
+    String startTime;
+    String endTime;
+    String day;
 }

@@ -1,7 +1,6 @@
 package com.kul.database.lecturerpreferences.api.model;
 
 import com.kul.database.infrastructure.constraints.AnyOfEnumValues;
-import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,20 +25,4 @@ public class UpdateLecturerPreferenceRequest {
     @NotNull
     @AnyOfEnumValues(DayOfWeek.class)
     private DayOfWeek day;
-
-    public UpdateLecturerPreference toDomain() {
-        return new UpdateLecturerPreference(
-                userId,
-                stringToLocalTime(startTime),
-                stringToLocalTime(endTime),
-                day
-        );
-    }
-
-    private LocalTime stringToLocalTime(String str) {
-        List<Integer> numbers = Arrays.stream(str.split(":"))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
-        return LocalTime.of(numbers.get(0), numbers.get(1));
-    }
 }

@@ -22,7 +22,9 @@ class LecturerPreferencesController {
             value = "/update"
     )
     public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreferenceRequest request) throws RuntimeException {
-        final LecturerPreferences lecturerPreferences = lecturerPreferencesService.updatePreferenceForUser(request.toDomain());
+        final LecturerPreferences lecturerPreferences = lecturerPreferencesService.updatePreferenceForUser(
+                UpdateLecturerPreferenceMapper.toDomain(request)
+        );
         return UpdateLecturerPreferenceMapper.fromDomain(lecturerPreferences);
     }
 

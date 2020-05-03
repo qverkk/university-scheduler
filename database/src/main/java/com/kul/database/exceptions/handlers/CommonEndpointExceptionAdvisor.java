@@ -38,15 +38,6 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 ));
     }
 
-    @ExceptionHandler(NoSuchUserException.class)
-    public ResponseEntity<EndpointError> handle(NoSuchUserException exception) {
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -54,17 +45,17 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             HttpStatus status,
             WebRequest request
     ) {
-        List<InvalidArgumentError> errors = ex.getBindingResult()
+        List<ConstraintViolationError> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(x ->
-                        new InvalidArgumentError(x.getDefaultMessage(), x.getField())
+                        new ConstraintViolationError(x.getDefaultMessage(), x.getField())
                 )
                 .collect(Collectors.toList());
 
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new InvalidEndpointArgumentsException(
+                .body(new ConstraintViolationErrorResponse(
                                 "Invalid method arguments",
                                 ex.getClass().getSimpleName(),
                                 errors
@@ -72,35 +63,13 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 );
     }
 
-    @ExceptionHandler(InsufficientPersmissionsToGetAllUserData.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPersmissionsToGetAllUserData exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
-    @ExceptionHandler(InsufficientPersmissionsToDeleteUsersException.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPersmissionsToDeleteUsersException exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
-    @ExceptionHandler(InsufficientPersmissionsToEnableUsersException.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPersmissionsToEnableUsersException exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
-    @ExceptionHandler(LecturerPreferenceAlreadyExists.class)
-    public ResponseEntity<EndpointError> handle(LecturerPreferenceAlreadyExists exception) {
+    @ExceptionHandler({
+            NoSuchUserException.class,
+            LecturerPreferenceAlreadyExists.class,
+            LecturerPreferenceDoesntExist.class,
+            LecturerPreferenceInvalidTime.class
+    })
+    public ResponseEntity<EndpointError> handleUnprocessable(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(
@@ -108,31 +77,17 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 );
     }
 
-    @ExceptionHandler(LecturerPreferenceDoesntExist.class)
-    public ResponseEntity<EndpointError> handle(LecturerPreferenceDoesntExist exception) {
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
-    @ExceptionHandler(InsufficientPermissionsToUpdateLecturerPreferences.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPermissionsToUpdateLecturerPreferences exception) {
+    @ExceptionHandler({
+            InsufficientPermissionsToUpdateLecturerPreferences.class,
+            InsufficientPersmissionsToEnableUsersException.class,
+            InsufficientPersmissionsToDeleteUsersException.class,
+            InsufficientPersmissionsToGetAllUserData.class
+    })
+    public ResponseEntity<EndpointError> handleForbidden(InsufficientPermissionsToUpdateLecturerPreferences exception) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(
                         new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
                 );
     }
-
-    @ExceptionHandler(LecturerPreferenceInvalidTime.class)
-    public ResponseEntity<EndpointError> handle(LecturerPreferenceInvalidTime exception) {
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
 }

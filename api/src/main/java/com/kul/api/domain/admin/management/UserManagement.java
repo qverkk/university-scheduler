@@ -21,11 +21,11 @@ public class UserManagement {
         usersRepository.disableUser(id);
     }
 
-    public LecturerPreferences updatePreferences(LecturerPreferences preferences) throws RuntimeException {
+    public LecturerPreferences updatePreferences(LecturerPreferences preferences) {
         return usersRepository.updatePreferences(preferences);
     }
 
-    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek selectedItem) throws RuntimeException {
+    public LecturerPreferences fetchPreferences(Long userId, DayOfWeek selectedItem) {
         return usersRepository.fetchPreferences(userId, selectedItem);
     }
 }

@@ -7,6 +7,6 @@ public interface ManagementUserRepository {
     List<ManagedUser> getAllUsers();
     void enableUser(Long id);
     void disableUser(Long id);
-    LecturerPreferences updatePreferences(LecturerPreferences preferences) throws RuntimeException;
-    LecturerPreferences fetchPreferences(Long userId, DayOfWeek day) throws RuntimeException;
+    LecturerPreferences updatePreferences(LecturerPreferences preferences);
+    LecturerPreferences fetchPreferences(Long userId, DayOfWeek day);
 }

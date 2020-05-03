@@ -1,11 +1,17 @@
 package com.kul.database.lecturerpreferences.api.model;
 
 import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
+import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateLecturerPreferenceMapper {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
     public static UpdateLecturerPreferenceResponse fromDomain(LecturerPreferences lecturerPreferences) {
         return new UpdateLecturerPreferenceResponse(
                 lecturerPreferences.getId(),
@@ -16,8 +22,16 @@ public class UpdateLecturerPreferenceMapper {
         );
     }
 
+    public static UpdateLecturerPreference toDomain(UpdateLecturerPreferenceRequest request) {
+        return new UpdateLecturerPreference(
+                request.getUserId(),
+                LocalTime.parse(request.getStartTime(), formatter),
+                LocalTime.parse(request.getEndTime(), formatter),
+                request.getDay()
+        );
+    }
+
     private static String localTimeToString(LocalTime time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return formatter.format(time);
     }
 }

@@ -15,9 +15,12 @@ import javafx.util.Callback;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AdminController implements Initializable {
 
@@ -43,6 +46,9 @@ public class AdminController implements Initializable {
 
     @FXML
     private JFXButton refreshUsersButton;
+
+    private static final Pattern TIME_PATTERN = Pattern.compile("^\\d{2}:\\d{2}$");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -118,10 +124,16 @@ public class AdminController implements Initializable {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == updateButton) {
+                String startTimeText = startTime.getText();
+                String endTimeText = endTime.getText();
+                if (!stringContainsTimePattern(startTimeText) || !stringContainsTimePattern(endTimeText)) {
+                    adminViewModel.setInvalidFormatForTime();
+                    return null;
+                }
                 return new LecturerPreferences(
                         userId,
-                        stringToLocalTime(startTime.getText()),
-                        stringToLocalTime(endTime.getText()),
+                        stringToLocalTime(startTimeText),
+                        stringToLocalTime(endTimeText),
                         day.getSelectionModel().getSelectedItem()
                 );
             }
@@ -131,9 +143,13 @@ public class AdminController implements Initializable {
         return dialog.showAndWait().orElse(null);
     }
 
+    private boolean stringContainsTimePattern(String str) {
+        Matcher matcher = TIME_PATTERN.matcher(str);
+        return matcher.matches();
+    }
+
     private LocalTime stringToLocalTime(String time) {
-        String[] split = time.split(":");
-        return LocalTime.of(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+        return LocalTime.parse(time, FORMATTER);
     }
 
     private LecturerPreferences addNewPreferencesDialog(Long userId) {
@@ -150,10 +166,16 @@ public class AdminController implements Initializable {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
+                String startTimeText = startTime.getText();
+                String endTimeText = endTime.getText();
+                if (!stringContainsTimePattern(startTimeText) || !stringContainsTimePattern(endTimeText)) {
+                    adminViewModel.setInvalidFormatForTime();
+                    return null;
+                }
                 return new LecturerPreferences(
                         userId,
-                        stringToLocalTime(startTime.getText()),
-                        stringToLocalTime(endTime.getText()),
+                        stringToLocalTime(startTimeText),
+                        stringToLocalTime(endTimeText),
                         day.getSelectionModel().getSelectedItem()
                 );
             }

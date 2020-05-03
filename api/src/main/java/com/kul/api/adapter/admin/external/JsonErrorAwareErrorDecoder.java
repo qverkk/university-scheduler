@@ -19,12 +19,12 @@ class JsonErrorAwareErrorDecoder implements ErrorDecoder {
         if (exception instanceof RetryableException) {
             return exception;
         } else {
-            return parseErrorResponse(exception)
+            return mapToErrorResponse(exception)
                     .orElse(exception);
         }
     }
 
-    private Optional<Exception> parseErrorResponse(Exception exception) {
+    private Optional<Exception> mapToErrorResponse(Exception exception) {
         return Optional.ofNullable(exception)
                 .filter(FeignException.class::isInstance)
                 .map(FeignException.class::cast)

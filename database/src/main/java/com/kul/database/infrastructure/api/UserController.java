@@ -38,7 +38,7 @@ class UserController {
     @PostMapping(
             value = "/disable/{id}"
     )
-    public void disableUser(Principal principal, @PathVariable Long id) throws NoSuchUserException, InsufficientPersmissionsToEnableUsersException {
+    public void disableUser(Principal principal, @PathVariable Long id) {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
@@ -48,7 +48,7 @@ class UserController {
     @DeleteMapping(
             value = "/delete/{id}"
     )
-    public void deleteUser(Principal principal, @PathVariable Long id) throws NoSuchUserException, InsufficientPersmissionsToDeleteUsersException {
+    public void deleteUser(Principal principal, @PathVariable Long id) {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }
@@ -72,7 +72,7 @@ class UserController {
     @GetMapping(
             value = "/all"
     )
-    public List<AllUsersResponse> getAllUsers(Principal principal) throws RuntimeException {
+    public List<AllUsersResponse> getAllUsers(Principal principal) {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is unauthorized for this resource");
         }

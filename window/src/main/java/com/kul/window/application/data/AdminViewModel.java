@@ -54,6 +54,10 @@ public class AdminViewModel {
         return responseMessage;
     }
 
+    public void setInvalidFormatForTime() {
+        responseMessage.setValue(messageResolver.nonValidPreferences());
+    }
+
     public ObservableList<UserInfoViewModel> users() {
         return observableUsers;
     }

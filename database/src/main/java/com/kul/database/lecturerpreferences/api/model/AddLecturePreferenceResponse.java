@@ -1,20 +1,14 @@
 package com.kul.database.lecturerpreferences.api.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Value;
 
 import java.time.DayOfWeek;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class AddLecturePreferenceResponse {
-    private Long lecturerPreferenceId;
-    private Long userId;
-    private String startTime;
-    private String endTime;
-    private DayOfWeek day;
+    Long lecturerPreferenceId;
+    Long userId;
+    String startTime;
+    String endTime;
+    DayOfWeek day;
 }

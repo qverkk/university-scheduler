@@ -21,7 +21,7 @@ public class UserService {
         this.lecturerPreferencesRepository = lecturerPreferencesRepository;
     }
 
-    public void enableUser(Long id, String username) throws RuntimeException {
+    public void enableUser(Long id, String username) {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
@@ -34,7 +34,7 @@ public class UserService {
         });
     }
 
-    public void disableUser(Long id, String username) throws RuntimeException {
+    public void disableUser(Long id, String username) {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
@@ -47,7 +47,7 @@ public class UserService {
         });
     }
 
-    public void deleteUser(Long id, String username) throws RuntimeException {
+    public void deleteUser(Long id, String username) {
         final User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
@@ -71,7 +71,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public List<User> getAllUsers(String username) throws RuntimeException {
+    public List<User> getAllUsers(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NoSuchUserException(username);
