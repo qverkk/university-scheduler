@@ -24,5 +24,5 @@ public class UpdateLecturerPreferenceRequest {
 
     @NotNull
     @AnyOfEnumValues(DayOfWeek.class)
-    private DayOfWeek day;
+    private String day;
 }

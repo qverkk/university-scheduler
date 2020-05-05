@@ -21,7 +21,7 @@ class LecturerPreferencesController {
             method = RequestMethod.PUT,
             value = "/update"
     )
-    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreferenceRequest request) throws RuntimeException {
+    public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreferenceRequest request) {
         final LecturerPreferences lecturerPreferences = lecturerPreferencesService.updatePreferenceForUser(
                 UpdateLecturerPreferenceMapper.toDomain(request)
         );
@@ -31,7 +31,7 @@ class LecturerPreferencesController {
     @GetMapping(
             value = "/fetch/{userId}/{day}"
     )
-    public FetchLecturerPreferenceResponse fetchLecturerPreference(@PathVariable Long userId, @PathVariable DayOfWeek day) throws RuntimeException {
+    public FetchLecturerPreferenceResponse fetchLecturerPreference(@PathVariable Long userId, @PathVariable DayOfWeek day) {
         LecturerPreferences lecturerPreferences = lecturerPreferencesService.fetchPreferenceForUserAndDay(userId, day);
         return FetchLecturerPreferenceMapper.toResponse(lecturerPreferences);
     }

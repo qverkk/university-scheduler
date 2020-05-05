@@ -3,11 +3,9 @@ package com.kul.database.lecturerpreferences.api.model;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.UpdateLecturerPreference;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class UpdateLecturerPreferenceMapper {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -27,7 +25,7 @@ public class UpdateLecturerPreferenceMapper {
                 request.getUserId(),
                 LocalTime.parse(request.getStartTime(), formatter),
                 LocalTime.parse(request.getEndTime(), formatter),
-                request.getDay()
+                DayOfWeek.valueOf(request.getDay())
         );
     }
 

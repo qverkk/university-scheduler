@@ -20,7 +20,7 @@ public class LecturerPreferencesService {
         this.userRepository = userRepository;
     }
 
-    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreference request) throws RuntimeException {
+    public LecturerPreferences updatePreferenceForUser(UpdateLecturerPreference request) {
         final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
 
@@ -38,7 +38,7 @@ public class LecturerPreferencesService {
         return lecturerPreferencesRepository.save(preference);
     }
 
-    public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) throws RuntimeException {
+    public LecturerPreferences fetchPreferenceForUserAndDay(Long userId, DayOfWeek day) {
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
 

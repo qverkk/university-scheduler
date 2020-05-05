@@ -146,9 +146,6 @@ public class AdminViewModel {
                     startTimeProperty().setValue(localTimeToString(response.getStartTime()));
                     endTimeProperty().setValue(localTimeToString(response.getEndTime()));
                 }, error -> {
-                    if (!(error instanceof LecutrerPreferenecesUpdateException)) {
-                        return;
-                    }
                     LecutrerPreferenecesUpdateException ex = (LecutrerPreferenecesUpdateException) error;
                     switch (ex.getFailureCause()) {
                         case NoSuchUserProvided:
@@ -159,6 +156,7 @@ public class AdminViewModel {
                             break;
                         default:
                             responseMessage.setValue("Unknown exception");
+                            // TODO: Zalogowac blad
                             break;
                     }
                 });
