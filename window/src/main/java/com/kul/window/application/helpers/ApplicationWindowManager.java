@@ -7,6 +7,7 @@ import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.window.application.admin.AdminController;
 import com.kul.window.application.data.AdminViewModel;
+import com.kul.window.application.data.UpdatePreferenceViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
 import com.kul.window.application.user.ApplicationController;
 import com.kul.window.async.ExecutorsFactory;
@@ -59,7 +60,8 @@ public class ApplicationWindowManager {
                         new AdminViewModel(
                                 preconfiguredExecutors,
                                 userManagement,
-                                userInfo
+                                userInfo,
+                                new UpdatePreferenceViewModel()
                         )
                 )
         );

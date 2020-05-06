@@ -1,10 +1,14 @@
 package com.kul.api.adapter.admin.external;
 
-import com.kul.api.adapter.admin.management.AllUsersResponse;
+import com.kul.api.adapter.admin.management.lecturer.preferences.FetchLecturerPreferenceResponse;
+import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferencesRequest;
+import com.kul.api.adapter.admin.management.lecturer.preferences.LecturerPreferencesResponse;
+import com.kul.api.adapter.admin.management.users.AllUsersResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 public interface ManagementEndpointClient {
@@ -20,4 +24,12 @@ public interface ManagementEndpointClient {
     @RequestLine("POST /user/disable/{id}")
     @Headers("Content-Type: application/json")
     void disableUser(@Param("id") Long id);
+
+    @RequestLine("PUT /preferences/update")
+    @Headers("Content-Type: application/json")
+    LecturerPreferencesResponse updatePreferences(LecturerPreferencesRequest preferences);
+
+    @RequestLine("GET /preferences/fetch/{userId}/{day}")
+    @Headers("Content-Type: application/json")
+    FetchLecturerPreferenceResponse fetchPreferences(@Param("userId") Long userId, @Param("day") DayOfWeek day);
 }

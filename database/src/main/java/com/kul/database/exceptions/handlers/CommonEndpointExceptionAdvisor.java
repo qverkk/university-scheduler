@@ -1,35 +1,75 @@
 package com.kul.database.exceptions.handlers;
 
-import com.kul.database.exceptions.InsufficientPersmissionsToDeleteUsersException;
-import com.kul.database.exceptions.InsufficientPersmissionsToEnableUsersException;
-import com.kul.database.exceptions.InsufficientPersmissionsToGetAllUserData;
-import com.kul.database.exceptions.NoSuchUserException;
+import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
+import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
+import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
+import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceInvalidTime;
+import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
+import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
+import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
+import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<EndpointErrors> handle(ConstraintViolationException exception, WebRequest webRequest) {
+    public ResponseEntity<ConstraintViolationErrorResponse> handle(ConstraintViolationException exception, WebRequest webRequest) {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new EndpointErrors(
-                        exception.getConstraintViolations().stream()
-                                .map(e -> new EndpointError(e.getMessage(), exception.getClass().getSimpleName()))
+                .body(new ConstraintViolationErrorResponse(
+                        "Validation failed for some classes",
+                        exception.getClass().getSimpleName(),
+                        exception.getConstraintViolations()
+                                .stream()
+                                .map(e -> new ConstraintViolationError(e.getMessage(), e.getPropertyPath().toString()))
                                 .collect(Collectors.toList())
                 ));
     }
 
-    @ExceptionHandler(NoSuchUserException.class)
-    public ResponseEntity<EndpointError> handle(NoSuchUserException exception) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
+        List<ConstraintViolationError> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(x ->
+                        new ConstraintViolationError(x.getDefaultMessage(), x.getField())
+                )
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ConstraintViolationErrorResponse(
+                                "Invalid method arguments",
+                                ex.getClass().getSimpleName(),
+                                errors
+                        )
+                );
+    }
+
+    @ExceptionHandler({
+            NoSuchUserException.class,
+            LecturerPreferenceAlreadyExists.class,
+            LecturerPreferenceDoesntExist.class,
+            LecturerPreferenceInvalidTime.class
+    })
+    public ResponseEntity<EndpointError> handleUnprocessable(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(
@@ -37,26 +77,13 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                 );
     }
 
-    @ExceptionHandler(InsufficientPersmissionsToGetAllUserData.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPersmissionsToGetAllUserData exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
-    @ExceptionHandler(InsufficientPersmissionsToDeleteUsersException.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPersmissionsToDeleteUsersException exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(
-                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
-                );
-    }
-
-    @ExceptionHandler(InsufficientPersmissionsToEnableUsersException.class)
-    public ResponseEntity<EndpointError> handle(InsufficientPersmissionsToEnableUsersException exception) {
+    @ExceptionHandler({
+            InsufficientPermissionsToUpdateLecturerPreferences.class,
+            InsufficientPersmissionsToEnableUsersException.class,
+            InsufficientPersmissionsToDeleteUsersException.class,
+            InsufficientPersmissionsToGetAllUserData.class
+    })
+    public ResponseEntity<EndpointError> handleForbidden(InsufficientPermissionsToUpdateLecturerPreferences exception) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(

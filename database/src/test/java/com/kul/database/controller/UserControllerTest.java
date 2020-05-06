@@ -1,9 +1,9 @@
 package com.kul.database.controller;
 
 import com.google.gson.Gson;
-import com.kul.database.constants.AuthorityEnum;
-import com.kul.database.model.User;
-import com.kul.database.model.UserLoginRequest;
+import com.kul.database.usermanagement.domain.AuthorityEnum;
+import com.kul.database.usermanagement.domain.User;
+import com.kul.database.usermanagement.api.login.UserLoginRequest;
 import org.junit.Assert;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
