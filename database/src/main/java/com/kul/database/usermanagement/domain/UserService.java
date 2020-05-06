@@ -1,5 +1,6 @@
 package com.kul.database.usermanagement.domain;
 
+import com.kul.database.lecturerlessons.domain.LecturerLessonsRepository;
 import com.kul.database.lecturerpreferences.domain.LecturerPreferencesRepository;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToDeleteUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
@@ -15,17 +16,18 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LecturerPreferencesRepository lecturerPreferencesRepository;
+    private final LecturerLessonsRepository lecturerLessonsRepository;
 
-    public UserService(UserRepository userRepository, LecturerPreferencesRepository lecturerPreferencesRepository) {
+    public UserService(UserRepository userRepository, LecturerPreferencesRepository lecturerPreferencesRepository, LecturerLessonsRepository lecturerLessonsRepository) {
         this.userRepository = userRepository;
         this.lecturerPreferencesRepository = lecturerPreferencesRepository;
+        this.lecturerLessonsRepository = lecturerLessonsRepository;
     }
 
     public void enableUser(Long id, String username) {
-        final User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new NoSuchUserException(username);
-        } else if (!user.canEnableUsers()) {
+        final User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchUserException(username));
+        if (!user.canEnableUsers()) {
             throw new InsufficientPersmissionsToEnableUsersException(user);
         }
         userRepository.findById(id).ifPresent(u -> {
@@ -35,10 +37,9 @@ public class UserService {
     }
 
     public void disableUser(Long id, String username) {
-        final User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new NoSuchUserException(username);
-        } else if (!user.canDisableUsers()) {
+        final User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchUserException(username));
+        if (!user.canDisableUsers()) {
             throw new InsufficientPersmissionsToEnableUsersException(user);
         }
         userRepository.findById(id).ifPresent(u -> {
@@ -48,12 +49,12 @@ public class UserService {
     }
 
     public void deleteUser(Long id, String username) {
-        final User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new NoSuchUserException(username);
-        } else if (!user.canDeleteUsers()) {
+        final User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchUserException(username));
+        if (!user.canDeleteUsers()) {
             throw new InsufficientPersmissionsToDeleteUsersException(user);
         }
+        lecturerLessonsRepository.deleteAllByUserId(id);
         lecturerPreferencesRepository.deleteAllByUserId(id);
         userRepository.deleteById(id);
     }
@@ -68,14 +69,14 @@ public class UserService {
     }
 
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username)
+                .orElse(null);
     }
 
     public List<User> getAllUsers(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new NoSuchUserException(username);
-        } else if (!user.hasAccessToAllUserData()) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchUserException(username));
+        if (!user.hasAccessToAllUserData()) {
             throw new InsufficientPersmissionsToGetAllUserData(username);
         }
         return userRepository.findAll();

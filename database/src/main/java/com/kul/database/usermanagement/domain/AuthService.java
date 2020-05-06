@@ -58,10 +58,9 @@ public class AuthService {
     }
 
     public String authenticate(UserLoginRequest user) {
-        User repositoryUser = userRepository.findByUsername(user.getUsername());
-        if (repositoryUser == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't exist");
-        }
+        User repositoryUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't exist"));
+
         if (!passwordEncoder.matches(user.getPassword(), repositoryUser.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Passwords don't match!");
         }
@@ -81,7 +80,9 @@ public class AuthService {
                     .parseClaimsJws(token.replace("Bearer ", ""));
             String username = claims.getBody().getSubject();
 
-            final User user = userRepository.findByUsername(username);
+            final User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't exist"));
+
             return new UserLoginWithTokenResponse(
                     user.getUsername(),
                     user.getFirstName(),

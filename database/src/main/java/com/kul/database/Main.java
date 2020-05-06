@@ -91,7 +91,8 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     @Override
     public UserDetailsService userDetailsService() {
         return username -> {
-            com.kul.database.usermanagement.domain.User account = userRepository.findByUsername(username);
+            com.kul.database.usermanagement.domain.User account = userRepository.findByUsername(username)
+                    .orElse(null);
             if (account != null) {
                 return new User(
                         account.getUsername(),

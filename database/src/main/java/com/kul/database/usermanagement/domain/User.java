@@ -61,4 +61,16 @@ public class User {
                 authority == AuthorityEnum.DZIEKANAT ||
                 user.getId().equals(id);
     }
+
+    public boolean canUpdateLessonOf(User user) {
+        return authority == AuthorityEnum.ADMIN ||
+                authority == AuthorityEnum.DZIEKANAT ||
+                user.getId().equals(id);
+    }
+
+    public boolean canDeleteLessonOf(User user) {
+        return authority == AuthorityEnum.ADMIN ||
+                authority == AuthorityEnum.DZIEKANAT ||
+                user.getId().equals(id);
+    }
 }
