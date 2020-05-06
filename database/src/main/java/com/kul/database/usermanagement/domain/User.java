@@ -73,4 +73,8 @@ public class User {
                 authority == AuthorityEnum.DZIEKANAT ||
                 user.getId().equals(id);
     }
+
+    public boolean canHaveLessons() {
+        return authority == AuthorityEnum.PROWADZACY;
+    }
 }

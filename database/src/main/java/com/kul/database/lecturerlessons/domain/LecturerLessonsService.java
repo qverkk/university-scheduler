@@ -3,6 +3,7 @@ package com.kul.database.lecturerlessons.domain;
 import com.kul.database.lecturerlessons.domain.exceptions.InsufficientPermissionsToDeleteLesson;
 import com.kul.database.lecturerlessons.domain.exceptions.InsufficientPermissionsToUpdateLesson;
 import com.kul.database.lecturerlessons.domain.exceptions.NoSuchLecturerLesson;
+import com.kul.database.lecturerlessons.domain.exceptions.UserCannotHaveLessons;
 import com.kul.database.usermanagement.domain.User;
 import com.kul.database.usermanagement.domain.UserRepository;
 import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
@@ -29,6 +30,10 @@ public class LecturerLessonsService {
     public LecturerLessons updateOrAddLessonForLecturer(UpdateOrAddLecturerLesson request) {
         final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
+
+        if (!user.canHaveLessons()) {
+            throw new UserCannotHaveLessons(user.getUsername());
+        }
         final LecturerLessons lesson = lecturerLessonsRepository.findByLessonNameAndUser(request.getLessonName(), user)
                 .orElse(LecturerLessons.newForLessonName(user, request.getLessonName()));
 
