@@ -91,7 +91,7 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             InsufficientPermissionsToUpdateLesson.class,
             UserCannotHaveLessons.class
     })
-    public ResponseEntity<EndpointError> handleForbidden(InsufficientPermissionsToUpdateLecturerPreferences exception) {
+    public ResponseEntity<EndpointError> handleForbidden(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(

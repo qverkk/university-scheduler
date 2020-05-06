@@ -15,6 +15,11 @@ class NewUserRequest {
     AuthorityEnum authority
 }
 
+@Builder(builderStrategy = SimpleStrategy, prefix = "with")
+class TokenRequest {
+    String token;
+}
+
 class NewUserRequests {
     static NewUserRequest aNewUserRequest() {
         return new NewUserRequest()

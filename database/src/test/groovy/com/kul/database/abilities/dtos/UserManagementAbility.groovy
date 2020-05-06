@@ -80,6 +80,14 @@ class UserConfiguration {
             .withAuthority(authority)
             .withEnabled(false)
     }
+
+    String username() {
+        username
+    }
+
+    String password() {
+        password
+    }
 }
 
 trait UsersManagementAbility implements CallUserEndpointAbility {

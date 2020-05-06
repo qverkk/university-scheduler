@@ -52,7 +52,7 @@ public class AuthService {
                 true,
                 AuthorityEnum.ADMIN
         );
-        if (userRepository.findByUsername("admin@admin.com") == null) {
+        if (!userRepository.findByUsername("admin@admin.com").isPresent()) {
             registerUser(user);
         }
     }
@@ -96,7 +96,7 @@ public class AuthService {
     }
 
     public UserRegistrationResponse registerUser(User user) {
-        if (userRepository.findByUsername(user.getUsername()) != null) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
         }
         user.setId(null);

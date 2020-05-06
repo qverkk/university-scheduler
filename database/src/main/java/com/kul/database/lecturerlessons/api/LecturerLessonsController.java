@@ -1,4 +1,4 @@
-package com.kul.database.lecturerlessons;
+package com.kul.database.lecturerlessons.api;
 
 import com.kul.database.lecturerlessons.api.model.*;
 import com.kul.database.lecturerlessons.domain.AreaOfStudy;

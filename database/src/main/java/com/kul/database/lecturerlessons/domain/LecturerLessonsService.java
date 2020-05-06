@@ -65,10 +65,14 @@ public class LecturerLessonsService {
                 .orElseThrow(() -> new NoSuchUserException(username));
 
         LecturerLessons lesson = lecturerLessonsRepository.findById(id)
-                .orElseThrow(NoSuchLecturerLesson::new);
+                .orElseThrow(() -> new NoSuchLecturerLesson(
+                        id + " does not exist"
+                ));
 
         if (!lesson.canBeDeletedBy(user)) {
-            throw new InsufficientPermissionsToDeleteLesson();
+            throw new InsufficientPermissionsToDeleteLesson(
+                    "Only admin, dziekanat and an authenticated user for this lesson can delete it"
+            );
         }
 
         lecturerLessonsRepository.deleteById(id);
