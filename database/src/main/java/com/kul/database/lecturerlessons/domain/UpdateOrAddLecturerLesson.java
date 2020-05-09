@@ -1,5 +1,6 @@
 package com.kul.database.lecturerlessons.domain;
 
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import lombok.Value;
 
 @Value

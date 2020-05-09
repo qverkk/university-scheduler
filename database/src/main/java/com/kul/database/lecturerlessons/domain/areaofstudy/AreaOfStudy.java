@@ -1,4 +1,4 @@
-package com.kul.database.lecturerlessons.domain;
+package com.kul.database.lecturerlessons.domain.areaofstudy;
 
 import lombok.Getter;
 

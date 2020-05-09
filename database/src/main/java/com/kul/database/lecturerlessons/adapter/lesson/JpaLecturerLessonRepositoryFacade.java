@@ -26,11 +26,11 @@ public class JpaLecturerLessonRepositoryFacade implements LecturerLessonsReposit
 
     @Override
     public LecturerLessons save(LecturerLessons lecturerLessons) {
-        LecturerLessonEntity entity = LecturerLessonEntity.fromDomain(lecturerLessons);
+        LecturerLessonEntity entity = LecturerLessonsEntityMapper.fromDomain(lecturerLessons);
 
         LecturerLessonEntity saved = lecturerLessonRepository.save(entity);
 
-        return LecturerLessonEntity.toDomain(saved);
+        return LecturerLessonsEntityMapper.toDomain(saved);
     }
 
     @Override
@@ -41,14 +41,14 @@ public class JpaLecturerLessonRepositoryFacade implements LecturerLessonsReposit
     @Override
     public List<LecturerLessons> findAllLessons() {
         return lecturerLessonRepository.findAll().stream()
-                .map(LecturerLessonEntity::toDomain)
+                .map(LecturerLessonsEntityMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<LecturerLessons> findAllLessonsByUser(User user) {
         return lecturerLessonRepository.findAllByUser(user).stream()
-                .map(LecturerLessonEntity::toDomain)
+                .map(LecturerLessonsEntityMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
@@ -60,6 +60,6 @@ public class JpaLecturerLessonRepositoryFacade implements LecturerLessonsReposit
     @Override
     public Optional<LecturerLessons> findById(Long id) {
         return lecturerLessonRepository.findById(id)
-                .map(LecturerLessonEntity::toDomain);
+                .map(LecturerLessonsEntityMapper::toDomain);
     }
 }

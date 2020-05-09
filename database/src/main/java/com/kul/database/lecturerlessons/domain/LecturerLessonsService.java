@@ -82,9 +82,4 @@ public class LecturerLessonsService {
 
         lecturerLessonsRepository.deleteById(id);
     }
-
-    public List<AreaOfStudy> findAllAreaOfStudies() {
-        // TODO: add area of studies
-        return null;
-    }
 }

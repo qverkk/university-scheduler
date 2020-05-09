@@ -70,7 +70,8 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             LecturerPreferenceDoesntExist.class,
             LecturerPreferenceInvalidTime.class,
             NoSuchLecturerLesson.class,
-            NoSuchLessonType.class
+            NoSuchLessonType.class,
+            NoSuchAreaOfStudy.class
     })
     public ResponseEntity<EndpointError> handleUnprocessable(Exception exception) {
         return ResponseEntity

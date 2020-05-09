@@ -24,4 +24,8 @@ public class LessonTypeService {
 
         return lessonTypeRepository.save(lessonType);
     }
+
+    public void deleteById(String lessonName) {
+        lessonTypeRepository.delete(lessonName);
+    }
 }

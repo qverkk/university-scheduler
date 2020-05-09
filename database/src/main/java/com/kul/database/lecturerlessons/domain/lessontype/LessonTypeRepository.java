@@ -9,4 +9,6 @@ public interface LessonTypeRepository {
     List<LessonType> findAllLessonTypes();
 
     LessonType save(LessonType lessonType);
+
+    void delete(String lessonName);
 }

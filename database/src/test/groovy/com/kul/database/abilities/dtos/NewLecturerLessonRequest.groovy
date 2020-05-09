@@ -1,6 +1,6 @@
 package com.kul.database.abilities.dtos
 
-import com.kul.database.lecturerlessons.domain.AreaOfStudy
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 

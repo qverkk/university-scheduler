@@ -1,5 +1,6 @@
 package com.kul.database.lecturerlessons.adapter.lessontype;
 
+import com.kul.database.lecturerlessons.domain.exceptions.NoSuchLessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeRepository;
 import org.springframework.stereotype.Repository;
@@ -34,5 +35,13 @@ public class JpaLessonTypeRepositoryFacade implements LessonTypeRepository {
     public LessonType save(LessonType lessonType) {
         LessonTypeEntity lessonTypeEntity = lessonTypeRepository.save(LessonTypeEntityMapper.fromDomain(lessonType));
         return LessonTypeEntityMapper.toDomain(lessonTypeEntity);
+    }
+
+    @Override
+    public void delete(String lessonType) {
+        LessonTypeEntity lessonTypeEntity = lessonTypeRepository.findByType(lessonType)
+                .orElseThrow(() -> new NoSuchLessonType("Cannot delete " + lessonType + " as it doesnt exist"));
+
+        lessonTypeRepository.delete(lessonTypeEntity);
     }
 }

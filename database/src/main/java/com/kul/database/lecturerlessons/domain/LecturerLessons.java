@@ -1,5 +1,6 @@
 package com.kul.database.lecturerlessons.domain;
 
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.usermanagement.domain.User;
 import lombok.Getter;

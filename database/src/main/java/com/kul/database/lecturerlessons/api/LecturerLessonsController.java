@@ -7,9 +7,10 @@ import com.kul.database.lecturerlessons.api.model.lessons.*;
 import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeRequest;
 import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeResponse;
 import com.kul.database.lecturerlessons.api.model.lessontypes.FetchAllLessonTypesResponse;
-import com.kul.database.lecturerlessons.domain.AreaOfStudy;
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.lecturerlessons.domain.LecturerLessonsService;
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudyService;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeService;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +24,12 @@ public class LecturerLessonsController {
 
     private final LecturerLessonsService lecturerLessonsService;
     private final LessonTypeService lessonTypeService;
+    private final AreaOfStudyService areaOfStudyService;
 
-    public LecturerLessonsController(LecturerLessonsService lecturerLessonsService, LessonTypeService lessonTypeService) {
+    public LecturerLessonsController(LecturerLessonsService lecturerLessonsService, LessonTypeService lessonTypeService, AreaOfStudyService areaOfStudyService) {
         this.lecturerLessonsService = lecturerLessonsService;
         this.lessonTypeService = lessonTypeService;
+        this.areaOfStudyService = areaOfStudyService;
     }
 
     @RequestMapping(
@@ -44,15 +47,24 @@ public class LecturerLessonsController {
             value = "/area-of-studies"
     )
     public FetchAreaOfStudiesResponse fetchAreaOfStudies() {
-        List<AreaOfStudy> allAreaOfStudies = lecturerLessonsService.findAllAreaOfStudies();
+        List<AreaOfStudy> allAreaOfStudies = areaOfStudyService.findAllAreaOfStudies();
         return new FetchAreaOfStudiesResponse(allAreaOfStudies);
     }
 
-    @PostMapping(
-            value = "/area-of-studies"
+    @RequestMapping(
+            value = "/area-of-studies",
+            method = RequestMethod.PUT
     )
-    public AddOrUpdateAreaOfStudiesResponse addAreaOfStudies(AddOrUpdateAreaOfStudiesRequest request) {
-        return null;
+    public AddOrUpdateAreaOfStudiesResponse addAreaOfStudies(@RequestBody AddOrUpdateAreaOfStudiesRequest request) {
+        AreaOfStudy areaOfStudy = areaOfStudyService.addOrUpdateAreaOfStudy(request);
+        return new AddOrUpdateAreaOfStudiesResponse(areaOfStudy);
+    }
+
+    @DeleteMapping(
+            value = "/area-of-studies/{area}/{department}"
+    )
+    public void deleteAreaOfStudy(@PathVariable String area, @PathVariable String department) {
+        areaOfStudyService.delete(area, department);
     }
 
     @GetMapping(
@@ -66,9 +78,16 @@ public class LecturerLessonsController {
     @PostMapping(
             value = "/types"
     )
-    public AddLessonTypeResponse addLessonType(AddLessonTypeRequest request) {
+    public AddLessonTypeResponse addLessonType(@RequestBody AddLessonTypeRequest request) {
         LessonType lessonType = lessonTypeService.addLessonType(request);
         return new AddLessonTypeResponse(lessonType);
+    }
+
+    @DeleteMapping(
+            value = "/types/{lessonName}"
+    )
+    public void deleteLessonType(@PathVariable String lessonName) {
+        lessonTypeService.deleteById(lessonName);
     }
 
     @GetMapping(

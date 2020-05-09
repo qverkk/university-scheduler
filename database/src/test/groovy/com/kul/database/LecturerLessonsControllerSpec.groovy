@@ -1,14 +1,10 @@
 package com.kul.database
 
 import com.kul.database.abilities.CallLecturerLessonsEndpointAbility
-import com.kul.database.abilities.CallUserEndpointAbility
 import com.kul.database.abilities.dtos.RegisteredUser
-import com.kul.database.abilities.dtos.TokenRequest
-import com.kul.database.abilities.dtos.UserConfiguration
 import com.kul.database.abilities.dtos.UsersManagementAbility
-import com.kul.database.lecturerlessons.domain.AreaOfStudy
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy
 import com.kul.database.usermanagement.domain.AuthorityEnum
-import io.restassured.response.ValidatableResponse
 
 import static com.kul.database.abilities.dtos.NewLecturerLessonsRequests.aNewLecturerLesson
 import static com.kul.database.abilities.dtos.UsersFixtures.janKowalski

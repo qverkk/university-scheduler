@@ -1,6 +1,6 @@
 package com.kul.database.lecturerlessons.api.model.lessons;
 
-import com.kul.database.lecturerlessons.domain.AreaOfStudy;
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import lombok.Value;
 
 @Value
