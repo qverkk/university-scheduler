@@ -44,11 +44,12 @@ public class LecturerLessons {
         return user.canUpdateLessonOf(this.user);
     }
 
-    public void changeLessonDetails(AreaOfStudy areaOfStudy, int semester, int year, LessonType lessonType) {
+    public void changeLessonDetails(AreaOfStudy areaOfStudy, int semester, int year, LessonType lessonType, AreaOfStudy ofStudy) {
         this.areaOfStudy = areaOfStudy;
         this.semester = semester;
         this.year = year;
         this.lessonType = lessonType;
+        this.areaOfStudy = ofStudy;
     }
 
     public boolean canBeDeletedBy(User user) {

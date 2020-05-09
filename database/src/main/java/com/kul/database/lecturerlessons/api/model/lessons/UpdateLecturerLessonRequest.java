@@ -1,6 +1,5 @@
 package com.kul.database.lecturerlessons.api.model.lessons;
 
-import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,9 @@ import lombok.NoArgsConstructor;
 public class UpdateLecturerLessonRequest {
     Long userId;
     String lessonName;
-    AreaOfStudy areaOfStudy;
+    String area;
+    String department;
+    String lessonType;
     int semester;
     int year;
 }

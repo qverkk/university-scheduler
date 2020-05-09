@@ -1,5 +1,7 @@
 package com.kul.database.lecturerlessons.domain;
 
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudyRepository;
 import com.kul.database.lecturerlessons.domain.exceptions.*;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeRepository;
@@ -15,11 +17,13 @@ import java.util.List;
 public class LecturerLessonsService {
 
     private final LecturerLessonsRepository lecturerLessonsRepository;
+    private final AreaOfStudyRepository areaOfStudyRepository;
     private final LessonTypeRepository lessonTypeRepository;
     private final UserRepository userRepository;
 
-    public LecturerLessonsService(LecturerLessonsRepository lecturerLessonsRepository, LessonTypeRepository lessonTypeRepository, UserRepository userRepository) {
+    public LecturerLessonsService(LecturerLessonsRepository lecturerLessonsRepository, AreaOfStudyRepository areaOfStudyRepository, LessonTypeRepository lessonTypeRepository, UserRepository userRepository) {
         this.lecturerLessonsRepository = lecturerLessonsRepository;
+        this.areaOfStudyRepository = areaOfStudyRepository;
         this.lessonTypeRepository = lessonTypeRepository;
         this.userRepository = userRepository;
     }
@@ -31,6 +35,13 @@ public class LecturerLessonsService {
     public LecturerLessons updateOrAddLessonForLecturer(UpdateOrAddLecturerLesson request) {
         LessonType lessonType = lessonTypeRepository.findByLessonTypeName(request.getLessonType())
                 .orElseThrow(() -> new NoSuchLessonType(request.getLessonType() + " cannot be found"));
+
+        AreaOfStudy areaOfStudy = areaOfStudyRepository.findByAreaAndDepartment(
+                request.getAreaOfStudy().getArea(),
+                request.getAreaOfStudy().getDepartment()
+        ).orElseThrow(() -> new NoSuchAreaOfStudy(
+                request.getAreaOfStudy().getArea() + " cannot be found in department " + request.getAreaOfStudy().getDepartment()
+        ));
 
         final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
@@ -51,7 +62,8 @@ public class LecturerLessonsService {
                 request.getAreaOfStudy(),
                 request.getSemester(),
                 request.getYear(),
-                lessonType
+                lessonType,
+                areaOfStudy
         );
 
         return lecturerLessonsRepository.save(lesson);

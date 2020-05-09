@@ -1,8 +1,12 @@
 package com.kul.database.lecturerlessons.api.model.lessontypes;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class AddLessonTypeRequest {
-    String type;
+    private String type;
 }

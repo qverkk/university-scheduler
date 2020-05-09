@@ -38,7 +38,7 @@ public class LecturerLessonsController {
     )
     public UpdateLecturerLessonResponse updateLecturerLesson(@RequestBody UpdateLecturerLessonRequest request) {
         final LecturerLessons lecturerLessons = lecturerLessonsService.updateOrAddLessonForLecturer(
-                UpdateOrAddLecturerLessonMapper.toDomain(request)
+                UpdateOrAddLecturerLessonMapper.toAreaOfStudyDomain(request)
         );
         return UpdateOrAddLecturerLessonMapper.fromDomain(lecturerLessons);
     }
@@ -56,7 +56,8 @@ public class LecturerLessonsController {
             method = RequestMethod.PUT
     )
     public AddOrUpdateAreaOfStudiesResponse addAreaOfStudies(@RequestBody AddOrUpdateAreaOfStudiesRequest request) {
-        AreaOfStudy areaOfStudy = areaOfStudyService.addOrUpdateAreaOfStudy(request);
+        AreaOfStudy newOrUpdateAreaOfStudy = AreaOfStudy.newForDepartmentAndArea(request.getDepartment(), request.getArea());
+        AreaOfStudy areaOfStudy = areaOfStudyService.addOrUpdateAreaOfStudy(newOrUpdateAreaOfStudy);
         return new AddOrUpdateAreaOfStudiesResponse(areaOfStudy);
     }
 

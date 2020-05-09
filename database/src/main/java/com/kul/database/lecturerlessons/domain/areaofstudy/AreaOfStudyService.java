@@ -18,9 +18,8 @@ public class AreaOfStudyService {
         return areaOfStudyRepository.findAll();
     }
 
-    public AreaOfStudy addOrUpdateAreaOfStudy(AddOrUpdateAreaOfStudiesRequest request) {
-        AreaOfStudy areaOfStudy = new AreaOfStudy(request.getDepartment(), request.getArea());
-        return areaOfStudyRepository.addOrUpdateAreaOfStudy(areaOfStudy);
+    public AreaOfStudy addOrUpdateAreaOfStudy(AreaOfStudy request) {
+        return areaOfStudyRepository.addOrUpdateAreaOfStudy(request);
     }
 
     public void delete(String area, String department) {

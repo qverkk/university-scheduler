@@ -1,9 +1,13 @@
 package com.kul.database.lecturerlessons.api.model.areaofstudies;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class AddOrUpdateAreaOfStudiesRequest {
-    String area;
-    String department;
+    private String area;
+    private String department;
 }

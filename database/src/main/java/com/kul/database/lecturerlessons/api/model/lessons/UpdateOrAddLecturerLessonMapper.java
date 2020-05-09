@@ -1,19 +1,18 @@
 package com.kul.database.lecturerlessons.api.model.lessons;
 
-import com.kul.database.lecturerlessons.api.model.lessons.UpdateLecturerLessonRequest;
-import com.kul.database.lecturerlessons.api.model.lessons.UpdateLecturerLessonResponse;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.lecturerlessons.domain.UpdateOrAddLecturerLesson;
+import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 
 public class UpdateOrAddLecturerLessonMapper {
-    public static UpdateOrAddLecturerLesson toDomain(UpdateLecturerLessonRequest request) {
+    public static UpdateOrAddLecturerLesson toAreaOfStudyDomain(UpdateLecturerLessonRequest request) {
         return new UpdateOrAddLecturerLesson(
                 request.getUserId(),
                 request.getLessonName(),
-                request.getAreaOfStudy(),
+                toAreaOfStudyDomain(request.getArea(), request.getDepartment()),
                 request.getSemester(),
                 request.getYear(),
-                request.getLessonName()
+                request.getLessonType()
         );
     }
 
@@ -24,7 +23,12 @@ public class UpdateOrAddLecturerLessonMapper {
                 lecturerLessons.getLessonName(),
                 lecturerLessons.getAreaOfStudy(),
                 lecturerLessons.getSemester(),
-                lecturerLessons.getYear()
+                lecturerLessons.getYear(),
+                lecturerLessons.getLessonType()
         );
+    }
+
+    private static AreaOfStudy toAreaOfStudyDomain(String area, String department) {
+        return AreaOfStudy.newForDepartmentAndArea(department, area);
     }
 }

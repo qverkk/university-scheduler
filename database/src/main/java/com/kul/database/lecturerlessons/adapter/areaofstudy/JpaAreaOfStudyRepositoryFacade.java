@@ -6,6 +6,7 @@ import com.kul.database.lecturerlessons.domain.exceptions.NoSuchAreaOfStudy;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -42,5 +43,11 @@ public class JpaAreaOfStudyRepositoryFacade implements AreaOfStudyRepository {
                 .orElseThrow(() -> new NoSuchAreaOfStudy("Area " + area + " department " + department));
 
         areaOfStudyRepository.delete(areaOfStudyEntity);
+    }
+
+    @Override
+    public Optional<AreaOfStudy> findByAreaAndDepartment(String area, String department) {
+        return areaOfStudyRepository.findByAreaAndDepartment(area, department)
+                .map(AreaOfStudyEntityMapper::toDomain);
     }
 }

@@ -13,9 +13,26 @@ import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.OK
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.notNullValue
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 class LecturerLessonsControllerSpec extends BaseIntegrationSpec
     implements CallLecturerLessonsEndpointAbility, UsersManagementAbility {
+
+    def "should respond 422 when trying to add a new lesson for prowadzacy"() {
+        given:
+            def kowalski = janKowalski()
+            RegisteredUser user = hasRegisteredUser {
+                kowalski.whoIsEnabled()
+            }
+            def lesson = aNewLecturerLesson()
+                    .withUserId(user.id)
+
+        when:
+            def response = postAuthenticatedLecturerLessonForUser(lesson, aUser(kowalski.username(), kowalski.password()))
+
+        then:
+            response.statusCode(UNPROCESSABLE_ENTITY.value())
+    }
 
     def "should respond 200 when adding new lesson for prowadzacy"() {
         given:

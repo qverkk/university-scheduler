@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public class AreaOfStudy {
     private final Long id;
-    private final String department;
     private final String area;
+    private String department;
 
     public AreaOfStudy(Long id, String department, String area) {
         this.id = id;
@@ -20,5 +20,9 @@ public class AreaOfStudy {
 
     public static AreaOfStudy newForDepartmentAndArea(String department, String area) {
         return new AreaOfStudy(department, area);
+    }
+
+    public void changeDepartment(String department) {
+        this.department = department;
     }
 }
