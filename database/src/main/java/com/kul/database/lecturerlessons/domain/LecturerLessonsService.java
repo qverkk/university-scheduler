@@ -1,9 +1,8 @@
 package com.kul.database.lecturerlessons.domain;
 
-import com.kul.database.lecturerlessons.domain.exceptions.InsufficientPermissionsToDeleteLesson;
-import com.kul.database.lecturerlessons.domain.exceptions.InsufficientPermissionsToUpdateLesson;
-import com.kul.database.lecturerlessons.domain.exceptions.NoSuchLecturerLesson;
-import com.kul.database.lecturerlessons.domain.exceptions.UserCannotHaveLessons;
+import com.kul.database.lecturerlessons.domain.exceptions.*;
+import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
+import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeRepository;
 import com.kul.database.usermanagement.domain.User;
 import com.kul.database.usermanagement.domain.UserRepository;
 import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
@@ -16,10 +15,12 @@ import java.util.List;
 public class LecturerLessonsService {
 
     private final LecturerLessonsRepository lecturerLessonsRepository;
+    private final LessonTypeRepository lessonTypeRepository;
     private final UserRepository userRepository;
 
-    public LecturerLessonsService(LecturerLessonsRepository lecturerLessonsRepository, UserRepository userRepository) {
+    public LecturerLessonsService(LecturerLessonsRepository lecturerLessonsRepository, LessonTypeRepository lessonTypeRepository, UserRepository userRepository) {
         this.lecturerLessonsRepository = lecturerLessonsRepository;
+        this.lessonTypeRepository = lessonTypeRepository;
         this.userRepository = userRepository;
     }
 
@@ -28,6 +29,9 @@ public class LecturerLessonsService {
     }
 
     public LecturerLessons updateOrAddLessonForLecturer(UpdateOrAddLecturerLesson request) {
+        LessonType lessonType = lessonTypeRepository.findByLessonTypeName(request.getLessonType())
+                .orElseThrow(() -> new NoSuchLessonType(request.getLessonType() + " cannot be found"));
+
         final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NoSuchUserException("No username provided"));
 
@@ -46,7 +50,8 @@ public class LecturerLessonsService {
         lesson.changeLessonDetails(
                 request.getAreaOfStudy(),
                 request.getSemester(),
-                request.getYear()
+                request.getYear(),
+                lessonType
         );
 
         return lecturerLessonsRepository.save(lesson);
@@ -76,5 +81,10 @@ public class LecturerLessonsService {
         }
 
         lecturerLessonsRepository.deleteById(id);
+    }
+
+    public List<AreaOfStudy> findAllAreaOfStudies() {
+        // TODO: add area of studies
+        return null;
     }
 }

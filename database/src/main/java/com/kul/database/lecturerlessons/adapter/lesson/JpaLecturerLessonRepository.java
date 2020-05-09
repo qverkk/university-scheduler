@@ -1,4 +1,4 @@
-package com.kul.database.lecturerlessons.adapter;
+package com.kul.database.lecturerlessons.adapter.lesson;
 
 import com.kul.database.usermanagement.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -9,4 +9,5 @@ public class UpdateOrAddLecturerLesson {
     AreaOfStudy areaOfStudy;
     int semester;
     int year;
+    String lessonType;
 }

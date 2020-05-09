@@ -1,9 +1,6 @@
 package com.kul.database.exceptions.handlers;
 
-import com.kul.database.lecturerlessons.domain.exceptions.InsufficientPermissionsToDeleteLesson;
-import com.kul.database.lecturerlessons.domain.exceptions.InsufficientPermissionsToUpdateLesson;
-import com.kul.database.lecturerlessons.domain.exceptions.NoSuchLecturerLesson;
-import com.kul.database.lecturerlessons.domain.exceptions.UserCannotHaveLessons;
+import com.kul.database.lecturerlessons.domain.exceptions.*;
 import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
@@ -72,7 +69,8 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             LecturerPreferenceAlreadyExists.class,
             LecturerPreferenceDoesntExist.class,
             LecturerPreferenceInvalidTime.class,
-            NoSuchLecturerLesson.class
+            NoSuchLecturerLesson.class,
+            NoSuchLessonType.class
     })
     public ResponseEntity<EndpointError> handleUnprocessable(Exception exception) {
         return ResponseEntity

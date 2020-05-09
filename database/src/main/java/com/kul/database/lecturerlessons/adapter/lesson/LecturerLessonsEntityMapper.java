@@ -1,5 +1,6 @@
-package com.kul.database.lecturerlessons.adapter;
+package com.kul.database.lecturerlessons.adapter.lesson;
 
+import com.kul.database.lecturerlessons.adapter.lessontype.LessonTypeEntityMapper;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 
 public class LecturerLessonsEntityMapper {
@@ -9,6 +10,7 @@ public class LecturerLessonsEntityMapper {
                 lecturerLessonEntity.getUser(),
                 lecturerLessonEntity.getLessonName(),
                 lecturerLessonEntity.getAreaOfStudy(),
+                LessonTypeEntityMapper.toDomain(lecturerLessonEntity.getLessonType()),
                 lecturerLessonEntity.getSemester(),
                 lecturerLessonEntity.getYear(),
                 lecturerLessonEntity.getVersion()

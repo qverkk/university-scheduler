@@ -1,5 +1,6 @@
 package com.kul.database.lecturerlessons.domain;
 
+import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.usermanagement.domain.User;
 import lombok.Getter;
 
@@ -9,15 +10,17 @@ public class LecturerLessons {
     private final User user;
     private final String lessonName;
     private AreaOfStudy areaOfStudy;
+    private LessonType lessonType;
     private Integer semester;
     private Integer year;
     private final Long version;
 
-    public LecturerLessons(Long id, User user, String lessonName, AreaOfStudy areaOfStudy, Integer semester, Integer year, Long version) {
+    public LecturerLessons(Long id, User user, String lessonName, AreaOfStudy areaOfStudy, LessonType lessonType, Integer semester, Integer year, Long version) {
         this.id = id;
         this.user = user;
         this.lessonName = lessonName;
         this.areaOfStudy = areaOfStudy;
+        this.lessonType = lessonType;
         this.semester = semester;
         this.year = year;
         this.version = version;
@@ -31,6 +34,7 @@ public class LecturerLessons {
                 null,
                 null,
                 null,
+                null,
                 1L
         );
     }
@@ -39,10 +43,11 @@ public class LecturerLessons {
         return user.canUpdateLessonOf(this.user);
     }
 
-    public void changeLessonDetails(AreaOfStudy areaOfStudy, int semester, int year) {
+    public void changeLessonDetails(AreaOfStudy areaOfStudy, int semester, int year, LessonType lessonType) {
         this.areaOfStudy = areaOfStudy;
         this.semester = semester;
         this.year = year;
+        this.lessonType = lessonType;
     }
 
     public boolean canBeDeletedBy(User user) {

@@ -1,4 +1,4 @@
-package com.kul.database.lecturerlessons.adapter;
+package com.kul.database.lecturerlessons.adapter.lesson;
 
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.lecturerlessons.domain.LecturerLessonsRepository;

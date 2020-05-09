@@ -1,13 +1,20 @@
 package com.kul.database.lecturerlessons.api;
 
-import com.kul.database.lecturerlessons.api.model.*;
+import com.kul.database.lecturerlessons.api.model.areaofstudies.AddOrUpdateAreaOfStudiesRequest;
+import com.kul.database.lecturerlessons.api.model.areaofstudies.AddOrUpdateAreaOfStudiesResponse;
+import com.kul.database.lecturerlessons.api.model.areaofstudies.FetchAreaOfStudiesResponse;
+import com.kul.database.lecturerlessons.api.model.lessons.*;
+import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeRequest;
+import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeResponse;
+import com.kul.database.lecturerlessons.api.model.lessontypes.FetchAllLessonTypesResponse;
 import com.kul.database.lecturerlessons.domain.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.lecturerlessons.domain.LecturerLessonsService;
+import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
+import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeService;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -15,9 +22,11 @@ import java.util.List;
 public class LecturerLessonsController {
 
     private final LecturerLessonsService lecturerLessonsService;
+    private final LessonTypeService lessonTypeService;
 
-    public LecturerLessonsController(LecturerLessonsService lecturerLessonsService) {
+    public LecturerLessonsController(LecturerLessonsService lecturerLessonsService, LessonTypeService lessonTypeService) {
         this.lecturerLessonsService = lecturerLessonsService;
+        this.lessonTypeService = lessonTypeService;
     }
 
     @RequestMapping(
@@ -32,10 +41,34 @@ public class LecturerLessonsController {
     }
 
     @GetMapping(
-            value = "/fetch/area-of-studies"
+            value = "/area-of-studies"
     )
     public FetchAreaOfStudiesResponse fetchAreaOfStudies() {
-        return new FetchAreaOfStudiesResponse(Arrays.asList(AreaOfStudy.values()));
+        List<AreaOfStudy> allAreaOfStudies = lecturerLessonsService.findAllAreaOfStudies();
+        return new FetchAreaOfStudiesResponse(allAreaOfStudies);
+    }
+
+    @PostMapping(
+            value = "/area-of-studies"
+    )
+    public AddOrUpdateAreaOfStudiesResponse addAreaOfStudies(AddOrUpdateAreaOfStudiesRequest request) {
+        return null;
+    }
+
+    @GetMapping(
+            value = "/types"
+    )
+    public FetchAllLessonTypesResponse fetchLessonTypes() {
+        List<LessonType> lessonTypes = lessonTypeService.fetchAllLessonTypes();
+        return new FetchAllLessonTypesResponse(lessonTypes);
+    }
+
+    @PostMapping(
+            value = "/types"
+    )
+    public AddLessonTypeResponse addLessonType(AddLessonTypeRequest request) {
+        LessonType lessonType = lessonTypeService.addLessonType(request);
+        return new AddLessonTypeResponse(lessonType);
     }
 
     @GetMapping(
