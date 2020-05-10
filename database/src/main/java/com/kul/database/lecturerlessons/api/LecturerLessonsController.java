@@ -58,7 +58,7 @@ public class LecturerLessonsController {
     public AddOrUpdateAreaOfStudiesResponse addAreaOfStudies(@RequestBody AddOrUpdateAreaOfStudiesRequest request) {
         AreaOfStudy newOrUpdateAreaOfStudy = AreaOfStudy.newForDepartmentAndArea(request.getDepartment(), request.getArea());
         AreaOfStudy areaOfStudy = areaOfStudyService.addOrUpdateAreaOfStudy(newOrUpdateAreaOfStudy);
-        return new AddOrUpdateAreaOfStudiesResponse(areaOfStudy);
+        return new AddOrUpdateAreaOfStudiesResponse(areaOfStudy.getId(), areaOfStudy.getArea(), areaOfStudy.getDepartment());
     }
 
     @DeleteMapping(
@@ -81,7 +81,7 @@ public class LecturerLessonsController {
     )
     public AddLessonTypeResponse addLessonType(@RequestBody AddLessonTypeRequest request) {
         LessonType lessonType = lessonTypeService.addLessonType(request);
-        return new AddLessonTypeResponse(lessonType);
+        return new AddLessonTypeResponse(lessonType.getId(), lessonType.getType());
     }
 
     @DeleteMapping(
