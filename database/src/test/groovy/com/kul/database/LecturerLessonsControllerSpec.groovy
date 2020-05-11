@@ -79,6 +79,11 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
             hasAlreadyDefined {
                 new LecturesDefinedElementsConfiguration()
                     .withAreaOfStudy(areaOfstudy)
+//                it
+//                    .withAreaOfStudy(mathematics {
+//                        it.normalLesson()
+//                        it.conductedByLecturer(user)
+//                    })
                     .withLessonType(lessonType)
             }
             def lesson = aNewLecturerLesson()
@@ -103,7 +108,8 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
                         .whoIsEnabled()
             }
             hasAlreadyDefined {
-                new LecturesDefinedElementsConfiguration()
+//                new LecturesDefinedElementsConfiguration()
+                it
                         .withAreaOfStudy(areaOfstudy)
                         .withLessonType(lessonType)
             }
@@ -140,15 +146,17 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
                     .withLessonType(lessonType.type)
 
             hasAlreadyDefined {
-                new LecturesDefinedElementsConfiguration()
+//                new LecturesDefinedElementsConfiguration()
+                it
                         .withAreaOfStudy(areaOfstudy)
                         .withLessonType(lessonType)
                         .withLesson(lesson)
             }
 
             hasAlreadyDefined {
-                new LecturesDefinedElementsConfiguration()
-                    .withAreaOfStudy(updatedAreaOfStudy)
+                it.withAreaOfStudy(updatedAreaOfStudy)
+//                new LecturesDefinedElementsConfiguration()
+//                    .withAreaOfStudy(updatedAreaOfStudy)
             }
 
         and:
