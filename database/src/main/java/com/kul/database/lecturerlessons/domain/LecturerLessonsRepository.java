@@ -7,10 +7,10 @@ import java.util.Optional;
 
 public interface LecturerLessonsRepository {
     Optional<LecturerLessons> findByLessonNameAndUser(String lessonName, User user);
-    LecturerLessons save(LecturerLessons lecturerLessons);
-    void deleteAllByUserId(Long id);
+    Optional<LecturerLessons> findById(Long id);
     List<LecturerLessons> findAllLessons();
     List<LecturerLessons> findAllLessonsByUser(User user);
+    LecturerLessons save(LecturerLessons lecturerLessons);
+    void deleteAllByUserId(Long id);
     void deleteById(Long id);
-    Optional<LecturerLessons> findById(Long id);
 }
