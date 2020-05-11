@@ -8,7 +8,7 @@ public class UpdateOrAddLecturerLesson {
     Long userId;
     String lessonName;
     AreaOfStudy areaOfStudy;
-    int semester;
-    int year;
+    Semester semester;
+    StudyYear year;
     String lessonType;
 }

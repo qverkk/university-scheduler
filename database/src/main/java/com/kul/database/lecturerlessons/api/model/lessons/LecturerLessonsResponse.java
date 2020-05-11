@@ -1,5 +1,7 @@
 package com.kul.database.lecturerlessons.api.model.lessons;
 
+import com.kul.database.lecturerlessons.domain.Semester;
+import com.kul.database.lecturerlessons.domain.StudyYear;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.usermanagement.domain.User;
@@ -12,6 +14,6 @@ public class LecturerLessonsResponse {
     String lessonName;
     AreaOfStudy areaOfStudy;
     LessonType lessonType;
-    Integer semester;
-    Integer year;
+    Semester semester;
+    StudyYear year;
 }

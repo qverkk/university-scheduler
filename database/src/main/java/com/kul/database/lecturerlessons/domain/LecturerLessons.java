@@ -5,6 +5,8 @@ import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.usermanagement.domain.User;
 import lombok.Getter;
 
+import java.time.Year;
+
 @Getter
 public class LecturerLessons {
     private final Long id;
@@ -12,11 +14,11 @@ public class LecturerLessons {
     private final String lessonName;
     private AreaOfStudy areaOfStudy;
     private LessonType lessonType;
-    private Integer semester;
-    private Integer year;
+    private Semester semester;
+    private StudyYear year;
     private final Long version;
 
-    public LecturerLessons(Long id, User user, String lessonName, AreaOfStudy areaOfStudy, LessonType lessonType, Integer semester, Integer year, Long version) {
+    public LecturerLessons(Long id, User user, String lessonName, AreaOfStudy areaOfStudy, LessonType lessonType, Semester semester, StudyYear year, Long version) {
         this.id = id;
         this.user = user;
         this.lessonName = lessonName;
@@ -44,7 +46,7 @@ public class LecturerLessons {
         return user.canUpdateLessonOf(this.user);
     }
 
-    public void changeLessonDetails(AreaOfStudy areaOfStudy, int semester, int year, LessonType lessonType, AreaOfStudy ofStudy) {
+    public void changeLessonDetails(AreaOfStudy areaOfStudy, Semester semester, StudyYear year, LessonType lessonType, AreaOfStudy ofStudy) {
         this.areaOfStudy = areaOfStudy;
         this.semester = semester;
         this.year = year;

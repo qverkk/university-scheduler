@@ -11,8 +11,8 @@ class NewLecturerLessonRequest {
     String area;
     String department;
     String lessonType;
-    int semester;
-    int year;
+    String semester;
+    String year;
 }
 
 
@@ -20,8 +20,8 @@ class NewLecturerLessonsRequests {
     static aNewLecturerLesson() {
         return new NewLecturerLessonRequest()
                 .withLessonName("Lekcja")
-                .withSemester(2)
-                .withYear(4)
+                .withSemester("SUMMER")
+                .withYear("FOURTH")
                 .withUserId(0)
                 .withDepartment("Jakis tam wydzial")
                 .withArea("Informatyka")

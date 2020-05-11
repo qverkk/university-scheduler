@@ -3,6 +3,8 @@ package com.kul.database.lecturerlessons.adapter.lesson;
 import com.kul.database.lecturerlessons.adapter.areaofstudy.AreaOfStudyEntity;
 import com.kul.database.lecturerlessons.adapter.lessontype.LessonTypeEntity;
 import com.kul.database.lecturerlessons.adapter.lessontype.LessonTypeEntityMapper;
+import com.kul.database.lecturerlessons.domain.Semester;
+import com.kul.database.lecturerlessons.domain.StudyYear;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.usermanagement.domain.User;
@@ -10,6 +12,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.Year;
 
 @Entity(name = "lecturer_lesson")
 @NoArgsConstructor
@@ -35,10 +38,10 @@ public class LecturerLessonEntity {
     private LessonTypeEntity lessonType;
 
     @NotNull
-    private int semester;
+    private Semester semester;
 
     @NotNull
-    private int year;
+    private StudyYear year;
 
     @Version
     private Long version;
