@@ -14,6 +14,8 @@ import static com.kul.database.abilities.dtos.NewUserRequests.aDisabledDeaneryUs
 @Builder(prefix = "with")
 class RegisteredUser {
     Long id
+    String username
+    String password
 }
 
 class UsersFixtures {
@@ -29,12 +31,12 @@ class UsersFixtures {
 }
 
 class UserConfiguration {
-    private boolean disabled
-    private String username
-    private String password
-    private String firstName
-    private String lastName
-    private AuthorityEnum authority
+    boolean disabled
+    String username
+    String password
+    String firstName
+    String lastName
+    AuthorityEnum authority
 
     UserConfiguration whoIsDisabled() {
         disabled = true
@@ -105,6 +107,8 @@ trait UsersManagementAbility implements CallUserEndpointAbility {
 
         return RegisteredUser.builder()
                 .withId(id)
+                .withPassword(userConfiguration.password())
+                .withUsername(userConfiguration.username())
                 .build()
                 .with {
                     registeredUsers.add(it)

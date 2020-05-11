@@ -23,15 +23,15 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
 
     def "should respond 422 when trying to add a new lesson for prowadzacy"() {
         given:
-            def kowalski = janKowalski()
             RegisteredUser user = hasRegisteredUser {
-                kowalski.whoIsEnabled()
+                janKowalski()
+                        .whoIsEnabled()
             }
             def lesson = aNewLecturerLesson()
                     .withUserId(user.id)
 
         when:
-            def response = postAuthenticatedLecturerLessonForUser(lesson, aUser(kowalski.username(), kowalski.password()))
+            def response = postAuthenticatedLecturerLessonForUser(lesson, aUser(user.username, user.password))
 
         then:
             response.statusCode(UNPROCESSABLE_ENTITY.value())
@@ -40,12 +40,12 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
     def "should respond 200 when adding a new lesson type"() {
         given:
             def type = aNewLessonType()
-            def kowalski = janKowalski()
             RegisteredUser user = hasRegisteredUser {
-                kowalski.whoIsEnabled()
+                janKowalski()
+                        .whoIsEnabled()
             }
         when:
-            def response = postAuthenticatedAddLessonType(type, aUser(kowalski.username(), kowalski.password()))
+            def response = postAuthenticatedAddLessonType(type, aUser(user.username, user.password))
 
         then:
             response.statusCode(OK.value())
@@ -54,12 +54,12 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
     def "should respond 200 when adding a new area of study"() {
         given:
             def areaOfstudy = aNewAreaOfStudy()
-            def kowalski = janKowalski()
             RegisteredUser user = hasRegisteredUser {
-                kowalski.whoIsEnabled()
+                janKowalski()
+                        .whoIsEnabled()
             }
         when:
-            def response = postAuthenticatedUpdateAreaOfStudy(areaOfstudy, aUser(kowalski.username(), kowalski.password()))
+            def response = postAuthenticatedUpdateAreaOfStudy(areaOfstudy, aUser(user.username, user.password))
 
         then:
             response.statusCode(OK.value())
@@ -72,9 +72,9 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
         given:
             def lessonType = aNewLessonType()
             def areaOfstudy = aNewAreaOfStudy()
-            def kowalski = janKowalski()
             RegisteredUser user = hasRegisteredUser {
-                    kowalski.whoIsEnabled()
+                janKowalski()
+                        .whoIsEnabled()
             }
             hasAlreadyDefined {
                 new LecturesDefinedElementsConfiguration()
@@ -88,7 +88,7 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
                     .withLessonType(lessonType.type)
 
         when:
-            def addLessonResponse = postAuthenticatedLecturerLessonForUser(lesson, aUser(kowalski.username(), kowalski.password()))
+            def addLessonResponse = postAuthenticatedLecturerLessonForUser(lesson, aUser(user.username, user.password))
         then:
             addLessonResponse.statusCode(OK.value())
     }
@@ -97,10 +97,10 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
         given:
             def lessonType = aNewLessonType()
             def areaOfstudy = aNewAreaOfStudy()
-            def kowalski = janKowalski()
-                    .whoHasAuthority(AuthorityEnum.DZIEKANAT)
             RegisteredUser user = hasRegisteredUser  {
-                kowalski.whoIsEnabled()
+                janKowalski()
+                        .whoHasAuthority(AuthorityEnum.DZIEKANAT)
+                        .whoIsEnabled()
             }
             hasAlreadyDefined {
                 new LecturesDefinedElementsConfiguration()
@@ -113,7 +113,7 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
                     .withArea(areaOfstudy.area)
                     .withLessonType(lessonType.type)
         when:
-            def response = postAuthenticatedLecturerLessonForUser(lesson, aUser(kowalski.username(), kowalski.password()))
+            def response = postAuthenticatedLecturerLessonForUser(lesson, aUser(user.username, user.password))
 
         then:
             response.statusCode(FORBIDDEN.value())
@@ -128,9 +128,9 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
             def updatedAreaOfStudy = aNewAreaOfStudy()
                 .withArea("Matematyka")
 
-            def kowalski = janKowalski()
             RegisteredUser user = hasRegisteredUser {
-                kowalski.whoIsEnabled()
+                janKowalski()
+                        .whoIsEnabled()
             }
 
             def lesson = aNewLecturerLesson()
@@ -151,6 +151,7 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
                     .withAreaOfStudy(updatedAreaOfStudy)
             }
 
+        and:
             def updateLesson = aNewLecturerLesson()
                     .withUserId(user.id)
                     .withDepartment(updatedAreaOfStudy.department)
@@ -158,7 +159,7 @@ class LecturerLessonsControllerSpec extends BaseIntegrationSpec
                     .withLessonType(lessonType.type)
 
         when:
-            def updateResponse = postAuthenticatedLecturerLessonForUser(updateLesson, aUser(kowalski.username(), kowalski.password()))
+            def updateResponse = postAuthenticatedLecturerLessonForUser(updateLesson, aUser(user.username, user.password))
 
         then:
             updateResponse.statusCode(OK.value())
