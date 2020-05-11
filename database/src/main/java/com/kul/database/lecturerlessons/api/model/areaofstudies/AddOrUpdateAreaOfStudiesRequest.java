@@ -6,14 +6,14 @@ import lombok.Value;
 
 @Value
 public class AddOrUpdateAreaOfStudiesRequest {
-    @JsonProperty
     String area;
-
-    @JsonProperty
     String department;
 
     @JsonCreator
-    public AddOrUpdateAreaOfStudiesRequest(String area, String department) {
+    public AddOrUpdateAreaOfStudiesRequest(
+            @JsonProperty("area") String area,
+            @JsonProperty("department") String department
+    ) {
         this.area = area;
         this.department = department;
     }
