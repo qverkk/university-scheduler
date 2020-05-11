@@ -1,13 +1,20 @@
 package com.kul.database.lecturerlessons.api.model.areaofstudies;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
+@Value
 public class AddOrUpdateAreaOfStudiesRequest {
-    private String area;
-    private String department;
+    @JsonProperty
+    String area;
+
+    @JsonProperty
+    String department;
+
+    @JsonCreator
+    public AddOrUpdateAreaOfStudiesRequest(String area, String department) {
+        this.area = area;
+        this.department = department;
+    }
 }

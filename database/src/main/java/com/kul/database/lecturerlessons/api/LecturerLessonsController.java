@@ -7,6 +7,7 @@ import com.kul.database.lecturerlessons.api.model.lessons.*;
 import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeRequest;
 import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeResponse;
 import com.kul.database.lecturerlessons.api.model.lessontypes.FetchAllLessonTypesResponse;
+import com.kul.database.lecturerlessons.api.model.lessontypes.LessonTypeResponse;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.lecturerlessons.domain.LecturerLessonsService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/lessons")
@@ -73,7 +75,11 @@ public class LecturerLessonsController {
     )
     public FetchAllLessonTypesResponse fetchLessonTypes() {
         List<LessonType> lessonTypes = lessonTypeService.fetchAllLessonTypes();
-        return new FetchAllLessonTypesResponse(lessonTypes);
+        List<LessonTypeResponse> response = lessonTypes.stream().map(l -> new LessonTypeResponse(
+                l.getId(),
+                l.getType()
+        )).collect(Collectors.toList());
+        return new FetchAllLessonTypesResponse(response);
     }
 
     @PostMapping(
@@ -95,7 +101,17 @@ public class LecturerLessonsController {
             value = "/fetch/all"
     )
     public FetchAllLecturerLessonsResponse fetchAllLecturerLessons() {
-        return new FetchAllLecturerLessonsResponse(lecturerLessonsService.fetchAllLecturerLessons());
+        List<LecturerLessons> lecturerLessons = lecturerLessonsService.fetchAllLecturerLessons();
+        List<LecturerLessonsResponse> response = lecturerLessons.stream().map(l -> new LecturerLessonsResponse(
+                l.getId(),
+                l.getUser(),
+                l.getLessonName(),
+                l.getAreaOfStudy(),
+                l.getLessonType(),
+                l.getSemester(),
+                l.getYear()
+        )).collect(Collectors.toList());
+        return new FetchAllLecturerLessonsResponse(response);
     }
 
     @GetMapping(
@@ -103,7 +119,16 @@ public class LecturerLessonsController {
     )
     public FetchLecturerLessonsResponse fetchLecturerLessons(@PathVariable Long userId) {
         List<LecturerLessons> lecturerLessons = lecturerLessonsService.fetchAllLecturerLessons(userId);
-        return new FetchLecturerLessonsResponse(lecturerLessons);
+        List<LecturerLessonsResponse> response = lecturerLessons.stream().map(l -> new LecturerLessonsResponse(
+                l.getId(),
+                l.getUser(),
+                l.getLessonName(),
+                l.getAreaOfStudy(),
+                l.getLessonType(),
+                l.getSemester(),
+                l.getYear()
+        )).collect(Collectors.toList());
+        return new FetchLecturerLessonsResponse(response);
     }
 
     @DeleteMapping(

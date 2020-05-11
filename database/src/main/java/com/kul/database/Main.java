@@ -1,7 +1,7 @@
 package com.kul.database;
 
-import com.kul.database.usermanagement.domain.AuthorityEnum;
 import com.kul.database.infrastructure.filter.JwtAuthorizationFilter;
+import com.kul.database.usermanagement.domain.AuthorityEnum;
 import com.kul.database.usermanagement.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -91,22 +91,17 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
     @Override
     public UserDetailsService userDetailsService() {
         return username -> {
-            com.kul.database.usermanagement.domain.User account = userRepository.findByUsername(username)
-                    .orElse(null);
-            if (account != null) {
-                return new User(
-                        account.getUsername(),
-                        account.getPassword(),
-                        account.getEnabled(),
-                        true,
-                        true,
-                        true,
-                        AuthorityUtils.createAuthorityList(account.getAuthority().name())
-                );
-            } else {
-                throw new UsernameNotFoundException("could not find the user '"
-                        + username + "'");
-            }
+            return userRepository.findByUsername(username)
+                    .map(account -> new User(
+                            account.getUsername(),
+                            account.getPassword(),
+                            account.getEnabled(),
+                            true,
+                            true,
+                            true,
+                            AuthorityUtils.createAuthorityList(account.getAuthority().name())
+                    ))
+                    .orElseThrow(() -> new UsernameNotFoundException("could not find the user '" + username + "'"));
         };
     }
 
@@ -128,9 +123,9 @@ public class Main extends WebSecurityConfigurerAdapter implements WebMvcConfigur
                         "/user/enable/*",
                         "/user/disable/*"
                 ).hasAnyAuthority(
-                    AuthorityEnum.ADMIN.name(),
-                    AuthorityEnum.DZIEKANAT.name()
-                )
+                AuthorityEnum.ADMIN.name(),
+                AuthorityEnum.DZIEKANAT.name()
+        )
                 .antMatchers(
                         "/user/delete/*",
                         "/user/all"
