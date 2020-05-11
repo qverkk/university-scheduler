@@ -97,4 +97,15 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                         new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
                 );
     }
+
+    @ExceptionHandler({
+            LessonTypeAlreadyExists.class
+    })
+    public ResponseEntity<EndpointError> handleConflict(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(
+                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
 }

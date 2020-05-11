@@ -1,9 +1,11 @@
 package com.kul.database.lecturerlessons.domain.lessontype;
 
 import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeRequest;
+import com.kul.database.lecturerlessons.domain.exceptions.LessonTypeAlreadyExists;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LessonTypeService {
@@ -19,10 +21,12 @@ public class LessonTypeService {
     }
 
     public LessonType addLessonType(AddLessonTypeRequest request) {
-        LessonType lessonType = lessonTypeRepository.findByLessonTypeName(request.getType())
-                .orElse(LessonType.newLessonType(request.getType()));
+        Optional<LessonType> lessonType = lessonTypeRepository.findByLessonTypeName(request.getType());
+        if (lessonType.isPresent()) {
+            throw new LessonTypeAlreadyExists(request.getType() + " already exists");
+        }
 
-        return lessonTypeRepository.save(lessonType);
+        return lessonTypeRepository.save(LessonType.newLessonType(request.getType()));
     }
 
     public void deleteById(String lessonName) {
