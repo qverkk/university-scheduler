@@ -2,8 +2,11 @@ package com.kul.database.lecturerlessons.api.model.lessons;
 
 import com.kul.database.lecturerlessons.api.model.areaofstudies.AreaOfStudyResponse;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
+import com.kul.database.lecturerlessons.domain.Semester;
+import com.kul.database.lecturerlessons.domain.StudyYear;
 import com.kul.database.lecturerlessons.domain.UpdateOrAddLecturerLesson;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
+import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 
 public class UpdateOrAddLecturerLessonMapper {
     public static UpdateOrAddLecturerLesson toAreaOfStudyDomain(UpdateLecturerLessonRequest request) {
@@ -11,9 +14,9 @@ public class UpdateOrAddLecturerLessonMapper {
                 request.getUserId(),
                 request.getLessonName(),
                 toAreaOfStudyDomain(request.getArea(), request.getDepartment()),
-                request.getSemester(),
-                request.getYear(),
-                request.getLessonType()
+                Semester.valueOf(request.getSemester()),
+                StudyYear.valueOf(request.getYear()),
+                LessonType.newLessonType(request.getLessonType())
         );
     }
 

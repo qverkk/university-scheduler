@@ -1,6 +1,7 @@
 package com.kul.database.lecturerlessons.domain;
 
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
+import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import lombok.Value;
 
 @Value
@@ -10,5 +11,5 @@ public class UpdateOrAddLecturerLesson {
     AreaOfStudy areaOfStudy;
     Semester semester;
     StudyYear year;
-    String lessonType;
+    LessonType lessonType;
 }

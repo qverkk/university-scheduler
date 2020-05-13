@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Year;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,7 +17,7 @@ public class UpdateLecturerLessonRequest {
     String department;
     String lessonType;
     @AnyOfEnumValues(Semester.class)
-    Semester semester;
+    String semester;
     @AnyOfEnumValues(StudyYear.class)
-    StudyYear year;
+    String year;
 }

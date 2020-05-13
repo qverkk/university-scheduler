@@ -33,7 +33,7 @@ public class LecturerLessonsService {
     }
 
     public LecturerLessons updateOrAddLessonForLecturer(UpdateOrAddLecturerLesson request) {
-        LessonType lessonType = lessonTypeRepository.findByLessonTypeName(request.getLessonType())
+        LessonType lessonType = lessonTypeRepository.findByLessonTypeName(request.getLessonType().getType())
                 .orElseThrow(() -> new NoSuchLessonType(request.getLessonType() + " cannot be found"));
 
         AreaOfStudy areaOfStudy = areaOfStudyRepository.findByAreaAndDepartment(

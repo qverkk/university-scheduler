@@ -34,8 +34,7 @@ public class LecturerLessonsController {
         this.areaOfStudyService = areaOfStudyService;
     }
 
-    @RequestMapping(
-            method = RequestMethod.PUT,
+    @PutMapping(
             value = "/update"
     )
     public UpdateLecturerLessonResponse updateLecturerLesson(@RequestBody UpdateLecturerLessonRequest request) {
@@ -53,9 +52,8 @@ public class LecturerLessonsController {
         return new FetchAreaOfStudiesResponse(allAreaOfStudies);
     }
 
-    @RequestMapping(
-            value = "/area-of-studies",
-            method = RequestMethod.PUT
+    @PutMapping(
+            value = "/area-of-studies"
     )
     public AddOrUpdateAreaOfStudiesResponse addAreaOfStudies(@RequestBody AddOrUpdateAreaOfStudiesRequest request) {
         AreaOfStudy newOrUpdateAreaOfStudy = AreaOfStudy.newForDepartmentAndArea(request.getDepartment(), request.getArea());
