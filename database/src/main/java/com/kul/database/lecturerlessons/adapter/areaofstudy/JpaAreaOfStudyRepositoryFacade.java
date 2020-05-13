@@ -3,6 +3,7 @@ package com.kul.database.lecturerlessons.adapter.areaofstudy;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudyRepository;
 import com.kul.database.lecturerlessons.domain.exceptions.NoSuchAreaOfStudy;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,14 +14,16 @@ import java.util.stream.Collectors;
 public class JpaAreaOfStudyRepositoryFacade implements AreaOfStudyRepository {
 
     private final JpaAreaOfStudyRepository areaOfStudyRepository;
+    private final PagingAndSortingAreaOfStudyRepository andSortingAreaOfStudyRepository;
 
-    public JpaAreaOfStudyRepositoryFacade(JpaAreaOfStudyRepository areaOfStudyRepository) {
+    public JpaAreaOfStudyRepositoryFacade(JpaAreaOfStudyRepository areaOfStudyRepository, PagingAndSortingAreaOfStudyRepository andSortingAreaOfStudyRepository) {
         this.areaOfStudyRepository = areaOfStudyRepository;
+        this.andSortingAreaOfStudyRepository = andSortingAreaOfStudyRepository;
     }
 
     @Override
     public List<AreaOfStudy> findAll() {
-        return areaOfStudyRepository.findAll().stream()
+        return andSortingAreaOfStudyRepository.findAll(Pageable.unpaged()).get()
                 .map(AreaOfStudyEntityMapper::toDomain)
                 .collect(Collectors.toList());
     }
