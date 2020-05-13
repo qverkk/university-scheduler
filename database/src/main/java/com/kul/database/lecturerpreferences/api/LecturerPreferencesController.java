@@ -17,8 +17,7 @@ class LecturerPreferencesController {
         this.lecturerPreferencesService = lecturerPreferencesService;
     }
 
-    @RequestMapping(
-            method = RequestMethod.PUT,
+    @PutMapping(
             value = "/update"
     )
     public UpdateLecturerPreferenceResponse updateLecturerPreference(@RequestBody UpdateLecturerPreferenceRequest request) {

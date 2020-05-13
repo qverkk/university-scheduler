@@ -1,5 +1,6 @@
 package com.kul.database.exceptions.handlers;
 
+import com.kul.database.lecturerlessons.domain.exceptions.*;
 import com.kul.database.lecturerpreferences.domain.exceptions.InsufficientPermissionsToUpdateLecturerPreferences;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceAlreadyExists;
 import com.kul.database.lecturerpreferences.domain.exceptions.LecturerPreferenceDoesntExist;
@@ -67,7 +68,10 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             NoSuchUserException.class,
             LecturerPreferenceAlreadyExists.class,
             LecturerPreferenceDoesntExist.class,
-            LecturerPreferenceInvalidTime.class
+            LecturerPreferenceInvalidTime.class,
+            NoSuchLecturerLesson.class,
+            NoSuchLessonType.class,
+            NoSuchAreaOfStudy.class
     })
     public ResponseEntity<EndpointError> handleUnprocessable(Exception exception) {
         return ResponseEntity
@@ -81,11 +85,25 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             InsufficientPermissionsToUpdateLecturerPreferences.class,
             InsufficientPersmissionsToEnableUsersException.class,
             InsufficientPersmissionsToDeleteUsersException.class,
-            InsufficientPersmissionsToGetAllUserData.class
+            InsufficientPersmissionsToGetAllUserData.class,
+            InsufficientPermissionsToDeleteLesson.class,
+            InsufficientPermissionsToUpdateLesson.class,
+            UserCannotHaveLessons.class
     })
-    public ResponseEntity<EndpointError> handleForbidden(InsufficientPermissionsToUpdateLecturerPreferences exception) {
+    public ResponseEntity<EndpointError> handleForbidden(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(
+                        new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
+                );
+    }
+
+    @ExceptionHandler({
+            LessonTypeAlreadyExists.class
+    })
+    public ResponseEntity<EndpointError> handleConflict(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(
                         new EndpointError(exception.getMessage(), exception.getClass().getSimpleName())
                 );
