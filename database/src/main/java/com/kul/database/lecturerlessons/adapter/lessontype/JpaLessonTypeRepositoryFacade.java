@@ -3,6 +3,7 @@ package com.kul.database.lecturerlessons.adapter.lessontype;
 import com.kul.database.lecturerlessons.domain.exceptions.NoSuchLessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,20 +14,23 @@ import java.util.stream.Collectors;
 public class JpaLessonTypeRepositoryFacade implements LessonTypeRepository {
 
     private final JpaLessonTypeRepository lessonTypeRepository;
+    private final PagingAndSortingLessonTypeRepository pagingAndSortingLessonTypeRepository;
 
-    public JpaLessonTypeRepositoryFacade(JpaLessonTypeRepository lessonTypeRepository) {
+    public JpaLessonTypeRepositoryFacade(JpaLessonTypeRepository lessonTypeRepository, PagingAndSortingLessonTypeRepository pagingAndSortingLessonTypeRepository) {
         this.lessonTypeRepository = lessonTypeRepository;
+        this.pagingAndSortingLessonTypeRepository = pagingAndSortingLessonTypeRepository;
     }
 
     @Override
     public Optional<LessonType> findByLessonTypeName(String lessonType) {
-        return lessonTypeRepository.findByType(lessonType)
-                .map(LessonTypeEntityMapper::toDomain);
+        return pagingAndSortingLessonTypeRepository.findByType(lessonType, Pageable.unpaged()).stream()
+                .map(LessonTypeEntityMapper::toDomain)
+                .findFirst();
     }
 
     @Override
     public List<LessonType> findAllLessonTypes() {
-        return lessonTypeRepository.findAll().stream()
+        return pagingAndSortingLessonTypeRepository.findAll(Pageable.unpaged()).stream()
                 .map(LessonTypeEntityMapper::toDomain)
                 .collect(Collectors.toList());
     }
