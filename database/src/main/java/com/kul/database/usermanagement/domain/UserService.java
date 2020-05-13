@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserManagementPermissions {
 
     private final UserRepository userRepository;
     private final LecturerPreferencesRepository lecturerPreferencesRepository;
@@ -25,10 +25,8 @@ public class UserService {
     }
 
     public void enableUser(Long id, String username) {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchUserException(username));
-        if (!user.canEnableUsers()) {
-            throw new InsufficientPersmissionsToEnableUsersException(user);
+        if (!canEnableUsers(username)) {
+            throw new InsufficientPersmissionsToEnableUsersException(username);
         }
         userRepository.findById(id).ifPresent(u -> {
             u.setEnabled(true);
@@ -37,10 +35,8 @@ public class UserService {
     }
 
     public void disableUser(Long id, String username) {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchUserException(username));
-        if (!user.canDisableUsers()) {
-            throw new InsufficientPersmissionsToEnableUsersException(user);
+        if (!canDisableUsers(username)) {
+            throw new InsufficientPersmissionsToEnableUsersException(username);
         }
         userRepository.findById(id).ifPresent(u -> {
             u.setEnabled(false);
@@ -49,10 +45,8 @@ public class UserService {
     }
 
     public void deleteUser(Long id, String username) {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchUserException(username));
-        if (!user.canDeleteUsers()) {
-            throw new InsufficientPersmissionsToDeleteUsersException(user);
+        if (!canDeleteUsers(username)) {
+            throw new InsufficientPersmissionsToDeleteUsersException(username);
         }
         lecturerLessonsRepository.deleteAllByUserId(id);
         lecturerPreferencesRepository.deleteAllByUserId(id);
@@ -68,17 +62,39 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElse(null);
-    }
-
     public List<User> getAllUsers(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchUserException(username));
-        if (!user.hasAccessToAllUserData()) {
+        if (!canHaveAccessToAllUserData(username)) {
             throw new InsufficientPersmissionsToGetAllUserData(username);
         }
         return userRepository.findAll();
+    }
+
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchUserException(username));
+    }
+
+    @Override
+    public boolean canDeleteUsers(String username) {
+        final User user = getUserByUsername(username);
+        return user.canDeleteUsers();
+    }
+
+    @Override
+    public boolean canHaveAccessToAllUserData(String username) {
+        User user = getUserByUsername(username);
+        return user.hasAccessToAllUserData();
+    }
+
+    @Override
+    public boolean canDisableUsers(String username) {
+        final User user = getUserByUsername(username);
+        return user.canDisableUsers();
+    }
+
+    @Override
+    public boolean canEnableUsers(String username) {
+        final User user = getUserByUsername(username);
+        return user.canEnableUsers();
     }
 }
