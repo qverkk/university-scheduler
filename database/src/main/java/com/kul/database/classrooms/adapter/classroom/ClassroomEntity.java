@@ -20,4 +20,12 @@ public class ClassroomEntity {
     private String name;
     @ManyToOne
     private ClassroomTypeEntity classroomTypeEntity;
+
+    public static ClassroomEntity newForName(String name) {
+        return new ClassroomEntity(
+                null,
+                name,
+                null
+        );
+    }
 }

@@ -2,22 +2,27 @@ package com.kul.database.classrooms.adapter.classroomtype;
 
 import com.kul.database.classrooms.domain.classroomtype.ClassroomType;
 import com.kul.database.classrooms.domain.classroomtype.ClassroomTypeRepository;
+import com.kul.database.classrooms.domain.exceptions.ClassroomTypeAlreadyExists;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class JpaClassroomRepositoryFacade implements ClassroomTypeRepository {
+public class JpaClassroomTypeRepositoryFacade implements ClassroomTypeRepository {
 
     private final JpaClassroomTypeRepository classroomRepository;
 
-    public JpaClassroomRepositoryFacade(JpaClassroomTypeRepository classroomRepository) {
+    public JpaClassroomTypeRepositoryFacade(JpaClassroomTypeRepository classroomRepository) {
         this.classroomRepository = classroomRepository;
     }
 
     @Override
     public ClassroomType save(ClassroomType classroomType) {
+        boolean dbEntityIsPresent = classroomRepository.findByName(classroomType.getName()).isPresent();
+        if (dbEntityIsPresent) {
+            throw new ClassroomTypeAlreadyExists(classroomType.getName());
+        }
         ClassroomTypeEntity savedEntity = classroomRepository.save(ClassroomTypeEntityMapper.fromDomain(classroomType));
         return ClassroomTypeEntityMapper.toDomain(savedEntity);
     }

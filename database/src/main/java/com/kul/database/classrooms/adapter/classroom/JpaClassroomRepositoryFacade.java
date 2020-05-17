@@ -1,9 +1,12 @@
 package com.kul.database.classrooms.adapter.classroom;
 
+import com.kul.database.classrooms.adapter.classroomtype.ClassroomTypeEntity;
 import com.kul.database.classrooms.adapter.classroomtype.ClassroomTypeEntityMapper;
+import com.kul.database.classrooms.adapter.classroomtype.JpaClassroomTypeRepository;
 import com.kul.database.classrooms.domain.classroom.Classroom;
 import com.kul.database.classrooms.domain.classroom.ClassroomsRepository;
 import com.kul.database.classrooms.domain.classroomtype.ClassroomType;
+import com.kul.database.classrooms.domain.exceptions.ClassroomTypeDoesntExist;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,14 +16,26 @@ import java.util.stream.Collectors;
 public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
 
     private final JpaClassroomRepository classroomRepository;
+    private final JpaClassroomTypeRepository classroomTypeRepository;
 
-    public JpaClassroomRepositoryFacade(JpaClassroomRepository classroomRepository) {
+    public JpaClassroomRepositoryFacade(JpaClassroomRepository classroomRepository, JpaClassroomTypeRepository classroomTypeRepository) {
         this.classroomRepository = classroomRepository;
+        this.classroomTypeRepository = classroomTypeRepository;
     }
 
     @Override
     public Classroom addOrUpdate(Classroom classroom) {
-        return null;
+        ClassroomTypeEntity classroomType = classroomTypeRepository.findByName(classroom.getClassroomType().getName())
+                .orElseThrow(() -> new ClassroomTypeDoesntExist(classroom.getClassroomType().getName()));
+
+        ClassroomEntity classroomEntity = classroomRepository.findByName(classroom.getName())
+                .orElseGet(() -> ClassroomEntity.newForName(classroom.getName()));
+
+        classroomEntity.setClassroomTypeEntity(classroomType);
+
+        return ClassroomEntityMapper.toDomain(
+                classroomRepository.save(classroomEntity)
+        );
     }
 
     @Override
