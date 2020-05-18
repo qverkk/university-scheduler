@@ -1,5 +1,6 @@
 package com.kul.database.exceptions.handlers;
 
+import com.kul.database.classrooms.domain.exceptions.ClassroomDoesntExist;
 import com.kul.database.classrooms.domain.exceptions.ClassroomTypeAlreadyExists;
 import com.kul.database.classrooms.domain.exceptions.ClassroomTypeDoesntExist;
 import com.kul.database.lecturerlessons.domain.exceptions.*;
@@ -75,7 +76,8 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
             NoSuchLessonType.class,
             NoSuchAreaOfStudy.class,
             ClassroomTypeDoesntExist.class,
-            ClassroomTypeAlreadyExists.class
+            ClassroomTypeAlreadyExists.class,
+            ClassroomDoesntExist.class
     })
     public ResponseEntity<EndpointError> handleUnprocessable(Exception exception) {
         return ResponseEntity

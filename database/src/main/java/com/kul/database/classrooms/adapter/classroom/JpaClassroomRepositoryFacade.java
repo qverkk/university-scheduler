@@ -10,6 +10,7 @@ import com.kul.database.classrooms.domain.exceptions.ClassroomTypeDoesntExist;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -50,6 +51,14 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
         return classroomRepository.findAllByName(name).stream()
                 .map(ClassroomEntityMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Classroom> findByNameAndType(String name, ClassroomType type) {
+        return classroomRepository.findByClassroomTypeEntityAndName(
+                ClassroomTypeEntityMapper.fromDomain(type),
+                name
+        ).map(ClassroomEntityMapper::toDomain);
     }
 
     @Override

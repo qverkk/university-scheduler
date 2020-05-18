@@ -8,4 +8,12 @@ public class Classroom {
     Long id;
     String name;
     ClassroomType classroomType;
+
+    public static Classroom newForNameAndTypeName(String classroomName, String classroomTypeName) {
+        return new Classroom(
+                null,
+                classroomName,
+                ClassroomType.newForName(classroomTypeName)
+        );
+    }
 }

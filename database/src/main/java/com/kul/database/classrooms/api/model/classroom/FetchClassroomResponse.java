@@ -7,5 +7,5 @@ import lombok.Value;
 public class FetchClassroomResponse {
     Long id;
     String name;
-    FetchClassroomTypesResponse fetchClassroomTypesResponse;
+    FetchClassroomTypesResponse classroomType;
 }

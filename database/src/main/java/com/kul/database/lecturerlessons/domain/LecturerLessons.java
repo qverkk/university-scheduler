@@ -42,6 +42,19 @@ public class LecturerLessons {
         );
     }
 
+    public static LecturerLessons existingForId(Long lessonId) {
+        return new LecturerLessons(
+                lessonId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1L
+        );
+    }
+
     public boolean canBeUpdatedBy(User user) {
         return user.canUpdateLessonOf(this.user);
     }

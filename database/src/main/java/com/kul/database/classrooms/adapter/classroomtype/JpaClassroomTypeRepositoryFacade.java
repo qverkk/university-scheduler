@@ -6,6 +6,7 @@ import com.kul.database.classrooms.domain.exceptions.ClassroomTypeAlreadyExists;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -32,5 +33,11 @@ public class JpaClassroomTypeRepositoryFacade implements ClassroomTypeRepository
         return classroomRepository.findAll().stream()
                 .map(ClassroomTypeEntityMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<ClassroomType> findByName(String name) {
+        return classroomRepository.findByName(name)
+                .map(ClassroomTypeEntityMapper::toDomain);
     }
 }
