@@ -19,4 +19,8 @@ public class ClassroomTypeService {
     public List<ClassroomType> findAll() {
         return classroomTypeRepository.findAll();
     }
+
+    public void delete(Long id) {
+        classroomTypeRepository.delete(id);
+    }
 }

@@ -32,6 +32,13 @@ public class ClassRoomsController {
         return AddClassroomTypeMapper.fromDomain(type);
     }
 
+    @DeleteMapping(
+            value = "/delete/type/{id}"
+    )
+    public void deleteClassroomType(@PathVariable Long id) {
+        classroomTypeService.delete(id);
+    }
+
     @PutMapping(
             value = "/add"
     )

@@ -40,4 +40,9 @@ public class JpaClassroomTypeRepositoryFacade implements ClassroomTypeRepository
         return classroomRepository.findByName(name)
                 .map(ClassroomTypeEntityMapper::toDomain);
     }
+
+    @Override
+    public void delete(Long id) {
+        classroomRepository.deleteById(id);
+    }
 }
