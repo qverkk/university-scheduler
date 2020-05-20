@@ -13,4 +13,6 @@ public interface CurrentSubjectsRepository {
     List<CurrentSubjects> fetchAll();
 
     Optional<CurrentSubjects> findByClassRoomAndLesson(Classroom classroom, LecturerLessons lecturerLessons);
+
+    void deleteById(Long id);
 }

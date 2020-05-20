@@ -56,4 +56,8 @@ public class CurrentSubjectsService {
             editedEntity
         );
     }
+
+    public void deleteById(Long id) {
+        currentSubjectsRepository.deleteById(id);
+    }
 }

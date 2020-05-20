@@ -46,4 +46,9 @@ public class JpaCurrentSubjectsRepositoryFacade implements CurrentSubjectsReposi
                 lecturerLessonEntity
         ).map(CurrentSubjectsEntityMapper::toDomain);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        currentSubjectsRepository.deleteById(id);
+    }
 }

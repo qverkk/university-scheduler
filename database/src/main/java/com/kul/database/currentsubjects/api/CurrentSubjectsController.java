@@ -36,4 +36,11 @@ public class CurrentSubjectsController {
         );
         return AddOrUpdateCurrentSubjectsMapper.fromDomain(currentSubjects);
     }
+
+    @DeleteMapping(
+            value = "/{id}"
+    )
+    public void deleteCurrentSubject(@PathVariable Long id) {
+        service.deleteById(id);
+    }
 }
