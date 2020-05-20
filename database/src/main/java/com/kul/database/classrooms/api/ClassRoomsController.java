@@ -47,6 +47,13 @@ public class ClassRoomsController {
         return AddOrUpdateClassroomMapper.fromDomain(classroom);
     }
 
+    @DeleteMapping(
+            value = "/delete/classroom/{id}"
+    )
+    public void deleteClassroom(@PathVariable Long id) {
+        classroomService.delete(id);
+    }
+
     @GetMapping(
             value = "/types"
     )

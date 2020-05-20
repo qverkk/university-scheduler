@@ -68,4 +68,9 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
                 name
         );
     }
+
+    @Override
+    public void delete(Long id) {
+        classroomRepository.deleteById(id);
+    }
 }

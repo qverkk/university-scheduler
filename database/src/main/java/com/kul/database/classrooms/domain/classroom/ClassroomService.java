@@ -20,4 +20,8 @@ public class ClassroomService {
     public Classroom addOrUpdate(Classroom classroom) {
         return classroomsRepository.addOrUpdate(classroom);
     }
+
+    public void delete(Long id) {
+        classroomsRepository.delete(id);
+    }
 }
