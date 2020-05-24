@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.List;
 
 @Entity(name = "classrooms")
 @NoArgsConstructor
@@ -18,14 +20,16 @@ public class ClassroomEntity {
     private Long id;
     @NotNull
     private String name;
-    @ManyToOne
-    private ClassroomTypeEntity classroomTypeEntity;
+    @ManyToMany
+    private List<ClassroomTypeEntity> classroomTypeEntity;
+    private Integer classroomSize;
 
     public static ClassroomEntity newForName(String name) {
         return new ClassroomEntity(
                 null,
                 name,
-                null
+                Collections.emptyList(),
+                0
         );
     }
 }

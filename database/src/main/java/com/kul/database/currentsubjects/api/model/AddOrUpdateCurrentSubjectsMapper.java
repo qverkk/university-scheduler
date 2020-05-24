@@ -5,14 +5,15 @@ import com.kul.database.classrooms.api.model.classroomtype.FetchClassroomTypesRe
 import com.kul.database.classrooms.domain.classroom.Classroom;
 import com.kul.database.currentsubjects.domain.CurrentSubjects;
 import com.kul.database.currentsubjects.domain.UpdateCurrentSubjects;
-import com.kul.database.lecturerlessons.api.model.lessons.FetchSecureLecturerLesson;
 import com.kul.database.lecturerlessons.api.model.areaofstudies.AreaOfStudyResponse;
+import com.kul.database.lecturerlessons.api.model.lessons.FetchSecureLecturerLesson;
 import com.kul.database.lecturerlessons.api.model.lessontypes.LessonTypeResponse;
 import com.kul.database.lecturerlessons.domain.LecturerLessons;
 import com.kul.database.usermanagement.domain.User;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 public class AddOrUpdateCurrentSubjectsMapper {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -20,7 +21,7 @@ public class AddOrUpdateCurrentSubjectsMapper {
     public static UpdateCurrentSubjects toDomain(AddOrUpdateCurrentSubjectsRequest request) {
         return new UpdateCurrentSubjects(
                 null,
-                Classroom.newForNameAndTypeName(request.getClassroomName(), request.getClassroomTypeName()),
+                Classroom.newForName(request.getClassroomName()),
                 LecturerLessons.existingForId(request.getLessonId()),
                 stringToLocalTime(request.getStartTime()),
                 stringToLocalTime(request.getEndTime())
@@ -65,10 +66,12 @@ public class AddOrUpdateCurrentSubjectsMapper {
         return new FetchClassroomResponse(
                 classroom.getId(),
                 classroom.getName(),
-                new FetchClassroomTypesResponse(
-                        classroom.getClassroomType().getId(),
-                        classroom.getClassroomType().getName()
-                )
+                classroom.getClassroomTypes().stream()
+                        .map(c -> new FetchClassroomTypesResponse(
+                                c.getId(),
+                                c.getName()
+                        )).collect(Collectors.toList()),
+                classroom.getClassroomSize()
         );
     }
 

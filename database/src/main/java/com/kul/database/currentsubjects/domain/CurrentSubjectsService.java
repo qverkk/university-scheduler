@@ -12,6 +12,7 @@ import com.kul.database.lecturerlessons.domain.exceptions.NoSuchLecturerLesson;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CurrentSubjectsService {
@@ -33,14 +34,25 @@ public class CurrentSubjectsService {
     }
 
     public CurrentSubjects addOrUpdate(UpdateCurrentSubjects currentSubjects) {
-        final String classroomTypeName = currentSubjects.getClassroom().getClassroomType().getName();
-        final ClassroomType classroomType = classroomTypeRepository.findByName(
-                classroomTypeName
-        ).orElseThrow(() -> new ClassroomTypeDoesntExist(classroomTypeName));
+        final List<String> classroomTypeNames = currentSubjects.getClassroom().getClassroomTypes().stream()
+                .map(ClassroomType::getName)
+                .collect(Collectors.toList());
 
-        final Classroom classroom = classroomsRepository.findByNameAndType(
+        final List<ClassroomType> classroomTypes = classroomTypeRepository.findAllByNames(classroomTypeNames);
+        List<String> classroomTypesNamesResult = classroomTypes.stream()
+                .map(ClassroomType::getName)
+                .collect(Collectors.toList());
+        if (!classroomTypeNames.containsAll(classroomTypesNamesResult)) {
+            classroomTypeNames.removeAll(classroomTypesNamesResult);
+            String missingTypes = classroomTypeNames.stream()
+                    .map(e -> e + " ")
+                    .toString();
+            throw new ClassroomTypeDoesntExist(missingTypes);
+        }
+
+        final Classroom classroom = classroomsRepository.findByNameAndTypes(
                 currentSubjects.getClassroom().getName(),
-                classroomType
+                classroomTypes
         ).orElseThrow(() -> new ClassroomDoesntExist(currentSubjects.getClassroom().getName()));
 
         final LecturerLessons lecturerLessons = lecturerLessonsRepository.findById(currentSubjects.getLecturerLesson().getId())

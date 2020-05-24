@@ -4,17 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
+import java.util.List;
+
 @Value
 public class AddOrUpdateClassroomRequest {
     String name;
-    String classroomType;
+    List<String> classroomTypes;
+    Integer classroomSize;
 
     @JsonCreator
     public AddOrUpdateClassroomRequest(
             @JsonProperty("name") String name,
-            @JsonProperty("classroomType") String classroomType
+            @JsonProperty("classroomType") List<String> classroomTypes,
+            @JsonProperty("classroomSize") Integer classroomSize
     ) {
         this.name = name;
-        this.classroomType = classroomType;
+        this.classroomTypes = classroomTypes;
+        this.classroomSize = classroomSize;
     }
 }

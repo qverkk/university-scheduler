@@ -12,6 +12,7 @@ import com.kul.database.usermanagement.domain.User;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 public class FetchCurrentSubjectsMapper {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -54,10 +55,12 @@ public class FetchCurrentSubjectsMapper {
         return new FetchClassroomResponse(
                 classroom.getId(),
                 classroom.getName(),
-                new FetchClassroomTypesResponse(
-                        classroom.getClassroomType().getId(),
-                        classroom.getClassroomType().getName()
-                )
+                classroom.getClassroomTypes().stream()
+                        .map(c -> new FetchClassroomTypesResponse(
+                                c.getId(),
+                                c.getName()
+                        )).collect(Collectors.toList()),
+                classroom.getClassroomSize()
         );
     }
 

@@ -36,6 +36,13 @@ public class JpaClassroomTypeRepositoryFacade implements ClassroomTypeRepository
     }
 
     @Override
+    public List<ClassroomType> findAllByNames(List<String> names) {
+        return classroomRepository.findAllByNames(names).stream()
+                .map(ClassroomTypeEntityMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Optional<ClassroomType> findByName(String name) {
         return classroomRepository.findByName(name)
                 .map(ClassroomTypeEntityMapper::toDomain);

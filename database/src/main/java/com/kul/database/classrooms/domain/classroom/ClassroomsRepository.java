@@ -12,9 +12,9 @@ public interface ClassroomsRepository {
 
     List<Classroom> findAllForClassroom(String name);
 
-    Optional<Classroom> findByNameAndType(String name, ClassroomType type);
+    Optional<Classroom> findByNameAndTypes(String name, List<ClassroomType> types);
 
-    void delete(String name, ClassroomType classroomType);
+    void delete(String name, List<ClassroomType> classroomType);
 
     void delete(Long id);
 }

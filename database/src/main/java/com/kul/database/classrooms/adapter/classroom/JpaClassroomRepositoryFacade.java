@@ -26,13 +26,30 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
 
     @Override
     public Classroom addOrUpdate(Classroom classroom) {
-        ClassroomTypeEntity classroomType = classroomTypeRepository.findByName(classroom.getClassroomType().getName())
-                .orElseThrow(() -> new ClassroomTypeDoesntExist(classroom.getClassroomType().getName()));
+        List<String> initialClassroomTypeNames = classroom.getClassroomTypes().stream()
+                .map(ClassroomType::getName)
+                .collect(Collectors.toList());
+        List<ClassroomTypeEntity> classroomTypeEntities = classroomTypeRepository.findAllByNames(
+                initialClassroomTypeNames);
+        List<String> classroomTypeEntitiesNames = classroomTypeEntities.stream()
+                .map(ClassroomTypeEntity::getName)
+                .collect(Collectors.toList());
+        if (!initialClassroomTypeNames.containsAll(classroomTypeEntitiesNames)) {
+            initialClassroomTypeNames.removeAll(classroomTypeEntitiesNames);
+            String missingTypes = initialClassroomTypeNames.stream()
+                    .map(e -> e + " ")
+                    .toString();
+            throw new ClassroomTypeDoesntExist(missingTypes);
+        }
+
+//        ClassroomTypeEntity classroomType = classroomTypeRepository.findByName(classroom.getClassroomType().getName())
+//                .orElseThrow(() -> new ClassroomTypeDoesntExist(classroom.getClassroomType().getName()));
 
         ClassroomEntity classroomEntity = classroomRepository.findByName(classroom.getName())
                 .orElseGet(() -> ClassroomEntity.newForName(classroom.getName()));
 
-        classroomEntity.setClassroomTypeEntity(classroomType);
+        classroomEntity.setClassroomTypeEntity(classroomTypeEntities);
+        classroomEntity.setClassroomSize(classroom.getClassroomSize());
 
         return ClassroomEntityMapper.toDomain(
                 classroomRepository.save(classroomEntity)
@@ -54,17 +71,21 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
     }
 
     @Override
-    public Optional<Classroom> findByNameAndType(String name, ClassroomType type) {
+    public Optional<Classroom> findByNameAndTypes(String name, List<ClassroomType> types) {
         return classroomRepository.findByClassroomTypeEntityAndName(
-                ClassroomTypeEntityMapper.fromDomain(type),
+                types.stream()
+                        .map(ClassroomTypeEntityMapper::fromDomain)
+                        .collect(Collectors.toList()),
                 name
         ).map(ClassroomEntityMapper::toDomain);
     }
 
     @Override
-    public void delete(String name, ClassroomType classroomType) {
+    public void delete(String name, List<ClassroomType> classroomType) {
         classroomRepository.deleteByClassroomTypeEntityAndName(
-                ClassroomTypeEntityMapper.fromDomain(classroomType),
+                classroomType.stream()
+                    .map(ClassroomTypeEntityMapper::fromDomain)
+                    .collect(Collectors.toList()),
                 name
         );
     }

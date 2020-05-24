@@ -8,6 +8,8 @@ public interface ClassroomTypeRepository {
 
     List<ClassroomType> findAll();
 
+    List<ClassroomType> findAllByNames(List<String> names);
+
     Optional<ClassroomType> findByName(String name);
 
     void delete(Long id);

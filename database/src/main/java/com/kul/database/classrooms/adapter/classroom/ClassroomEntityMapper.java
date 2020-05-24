@@ -3,12 +3,17 @@ package com.kul.database.classrooms.adapter.classroom;
 import com.kul.database.classrooms.adapter.classroomtype.ClassroomTypeEntityMapper;
 import com.kul.database.classrooms.domain.classroom.Classroom;
 
+import java.util.stream.Collectors;
+
 public class ClassroomEntityMapper {
     public static Classroom toDomain(ClassroomEntity classroomEntity) {
         return new Classroom(
                 classroomEntity.getId(),
                 classroomEntity.getName(),
-                ClassroomTypeEntityMapper.toDomain(classroomEntity.getClassroomTypeEntity())
+                classroomEntity.getClassroomTypeEntity().stream()
+                        .map(ClassroomTypeEntityMapper::toDomain)
+                        .collect(Collectors.toList()),
+                classroomEntity.getClassroomSize()
         );
     }
 
@@ -16,7 +21,10 @@ public class ClassroomEntityMapper {
         return new ClassroomEntity(
                 classroom.getId(),
                 classroom.getName(),
-                ClassroomTypeEntityMapper.fromDomain(classroom.getClassroomType())
+                classroom.getClassroomTypes().stream()
+                        .map(ClassroomTypeEntityMapper::fromDomain)
+                        .collect(Collectors.toList()),
+                classroom.getClassroomSize()
         );
     }
 }
