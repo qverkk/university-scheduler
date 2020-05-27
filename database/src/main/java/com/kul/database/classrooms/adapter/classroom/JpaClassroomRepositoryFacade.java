@@ -6,7 +6,9 @@ import com.kul.database.classrooms.adapter.classroomtype.JpaClassroomTypeReposit
 import com.kul.database.classrooms.domain.classroom.Classroom;
 import com.kul.database.classrooms.domain.classroom.ClassroomsRepository;
 import com.kul.database.classrooms.domain.classroomtype.ClassroomType;
+import com.kul.database.classrooms.domain.exceptions.CannotAddClassroomWithEmptyType;
 import com.kul.database.classrooms.domain.exceptions.ClassroomTypeDoesntExist;
+import com.kul.database.classrooms.domain.exceptions.NoClassroomTypes;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,11 +28,19 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
 
     @Override
     public Classroom addOrUpdate(Classroom classroom) {
+        if (classroom.getClassroomTypes().isEmpty()) {
+            throw new CannotAddClassroomWithEmptyType();
+        }
         List<String> initialClassroomTypeNames = classroom.getClassroomTypes().stream()
                 .map(ClassroomType::getName)
                 .collect(Collectors.toList());
         List<ClassroomTypeEntity> classroomTypeEntities = classroomTypeRepository.findAllByNames(
                 initialClassroomTypeNames);
+
+        if (classroomTypeEntities.isEmpty()) {
+            throw new NoClassroomTypes();
+        }
+
         List<String> classroomTypeEntitiesNames = classroomTypeEntities.stream()
                 .map(ClassroomTypeEntity::getName)
                 .collect(Collectors.toList());

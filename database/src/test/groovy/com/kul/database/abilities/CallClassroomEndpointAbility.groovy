@@ -25,4 +25,20 @@ trait CallClassroomEndpointAbility extends RequestLocalServerAbility implements 
                 .put(baseUrl().resolve("/classroom/type/add"))
                 .then()
     }
+
+    ValidatableResponse postAuthenticatedDeleteClassroom(Long id) {
+        return RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + getAdminToken())
+                .delete(baseUrl().resolve("/classroom/delete/classroom/" + id))
+                .then()
+    }
+
+    ValidatableResponse postAuthenticatedDeleteClassroomType(Long id) {
+        return RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + getAdminToken())
+                .delete(baseUrl().resolve("/classroom/delete/type/" + id))
+                .then()
+    }
 }
