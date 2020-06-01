@@ -100,14 +100,14 @@ trait ClassroomManagementAbility implements CallClassroomEndpointAbility {
             addedClassrooms.add(
                     AddedClassrooms.builder()
                         .withName(jsonPath.get("name"))
-                        .withId(Integer.parseInt(jsonPath.get("id")))
+                        .withId(Integer.parseInt(jsonPath.get("id").toString()))
                     .build()
             )
             return AddedClassroom.builder()
                     .withClassroomName(classroomConfiguration.classroomName)
                     .withClassroomSize(classroomConfiguration.classroomSize)
                     .withTypes(addedClassroomTypes)
-                    .withClassroomId(Integer.parseInt(jsonPath.get("id")))
+                    .withClassroomId(Integer.parseInt(jsonPath.get("id").toString()))
                     .build()
         }
 
@@ -136,11 +136,11 @@ trait ClassroomManagementAbility implements CallClassroomEndpointAbility {
 
     @After
     void deleteAllEntities() {
-        addedClassroomTypes.forEach {
-            postAuthenticatedDeleteClassroomType(it.id)
-        }
         addedClassrooms.forEach {
             postAuthenticatedDeleteClassroom(it.id)
+        }
+        addedClassroomTypes.forEach {
+            postAuthenticatedDeleteClassroomType(it.id)
         }
     }
 }

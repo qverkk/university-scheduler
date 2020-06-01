@@ -82,6 +82,9 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
 
     @Override
     public Optional<Classroom> findByNameAndTypes(String name, List<ClassroomType> types) {
+        if (types.isEmpty()) {
+            return Optional.empty();
+        }
         return classroomRepository.findByClassroomTypeEntityAndName(
                 types.stream()
                         .map(ClassroomTypeEntityMapper::fromDomain)

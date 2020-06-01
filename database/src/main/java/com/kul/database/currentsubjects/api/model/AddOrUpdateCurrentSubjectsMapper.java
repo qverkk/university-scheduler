@@ -3,6 +3,7 @@ package com.kul.database.currentsubjects.api.model;
 import com.kul.database.classrooms.api.model.classroom.FetchClassroomResponse;
 import com.kul.database.classrooms.api.model.classroomtype.FetchClassroomTypesResponse;
 import com.kul.database.classrooms.domain.classroom.Classroom;
+import com.kul.database.classrooms.domain.classroomtype.ClassroomType;
 import com.kul.database.currentsubjects.domain.CurrentSubjects;
 import com.kul.database.currentsubjects.domain.UpdateCurrentSubjects;
 import com.kul.database.lecturerlessons.api.model.areaofstudies.AreaOfStudyResponse;
@@ -19,9 +20,11 @@ public class AddOrUpdateCurrentSubjectsMapper {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public static UpdateCurrentSubjects toDomain(AddOrUpdateCurrentSubjectsRequest request) {
+        final Classroom classroom = Classroom.newForName(request.getClassroomName());
+        classroom.getClassroomTypes().add(ClassroomType.newForName(request.getClassroomTypeName()));
         return new UpdateCurrentSubjects(
                 null,
-                Classroom.newForName(request.getClassroomName()),
+                classroom,
                 LecturerLessons.existingForId(request.getLessonId()),
                 stringToLocalTime(request.getStartTime()),
                 stringToLocalTime(request.getEndTime())
