@@ -3,6 +3,7 @@ package com.kul.window.application.admin;
 import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.AdminViewModel;
+import com.kul.window.application.data.ClassroomTypesInfoViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,11 +25,11 @@ import java.util.regex.Pattern;
 
 public class AdminController implements Initializable {
 
+    private static final Pattern TIME_PATTERN = Pattern.compile("^\\d{2}:\\d{2}$");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private final AdminViewModel adminViewModel;
-
     @FXML
     private TableView<UserInfoViewModel> usersTable;
-
     @FXML
     private TableColumn<UserInfoViewModel, Number> idCol;
     @FXML
@@ -43,12 +44,18 @@ public class AdminController implements Initializable {
     private TableColumn<UserInfoViewModel, String> authorityCol;
     @FXML
     private TableColumn<UserInfoViewModel, String> actionsCol;
-
+    @FXML
+    private TableView<ClassroomTypesInfoViewModel> classroomTypesTable;
+    @FXML
+    private TableColumn<ClassroomTypesInfoViewModel, String> typeNameCol;
+    @FXML
+    private TableColumn<ClassroomTypesInfoViewModel, String> typeActions;
     @FXML
     private JFXButton refreshUsersButton;
-
-    private static final Pattern TIME_PATTERN = Pattern.compile("^\\d{2}:\\d{2}$");
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    @FXML
+    private JFXButton addTypeButton;
+    @FXML
+    private JFXButton refreshTypesButton;
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -57,8 +64,11 @@ public class AdminController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         usersTable.setItems(adminViewModel.users());
-        initializeColumns();
+        classroomTypesTable.setItems(adminViewModel.classroomTypes());
+        initializeUserColumns();
+        initializeClassroomTypesColumns();
         refreshUsers();
+        refreshClassTypes();
         initializeErrorAlertListener();
     }
 
@@ -195,8 +205,42 @@ public class AdminController implements Initializable {
         return grid;
     }
 
-    private void initializeColumns() {
-        idCol.setCellValueFactory(param -> param.getValue().id());
+    private void initializeClassroomTypesColumns() {
+        typeNameCol.setCellValueFactory(param -> param.getValue().typeName());
+        typeActions.setCellFactory(getTypeActionsCellFactory());
+    }
+
+    private Callback<TableColumn<ClassroomTypesInfoViewModel, String>, TableCell<ClassroomTypesInfoViewModel, String>> getTypeActionsCellFactory() {
+        return new Callback<TableColumn<ClassroomTypesInfoViewModel, String>, TableCell<ClassroomTypesInfoViewModel, String>>() {
+            @Override
+            public TableCell<ClassroomTypesInfoViewModel, String> call(TableColumn<ClassroomTypesInfoViewModel, String> classroomTypesInfoViewModelStringTableColumn) {
+                final TableCell<ClassroomTypesInfoViewModel, String> cell = new TableCell<ClassroomTypesInfoViewModel, String>() {
+
+                    final Button removeBtn = new Button("Remove");
+
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            removeBtn.setMinWidth(150);
+                            ClassroomTypesInfoViewModel classroomType = getTableView().getItems().get(getIndex());
+
+                            removeBtn.setOnAction(e -> {
+                                Long id = classroomType.id().get();
+                                adminViewModel.removeClassroomTypeById(id);
+                            });
+                            setGraphic(removeBtn);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+    }
+
+    private void initializeUserColumns() {
         idCol.setCellValueFactory(param -> param.getValue().id());
         firstnameCol.setCellValueFactory(param -> param.getValue().firstName());
         lastnameCol.setCellValueFactory(param -> param.getValue().lastName());
@@ -263,5 +307,15 @@ public class AdminController implements Initializable {
     @FXML
     void refreshUsers() {
         adminViewModel.refresh();
+    }
+
+    @FXML
+    void refreshClassTypes() {
+        adminViewModel.refreshClassTypes();
+    }
+
+    @FXML
+    void addNewClassType() {
+        adminViewModel.refreshClassTypes();
     }
 }

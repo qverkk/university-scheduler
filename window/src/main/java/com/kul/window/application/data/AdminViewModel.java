@@ -1,6 +1,8 @@
 package com.kul.window.application.data;
 
 import com.kul.api.adapter.admin.management.lecturer.preferences.LecutrerPreferenecesUpdateException;
+import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
+import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.api.domain.admin.management.UserManagement;
@@ -26,18 +28,22 @@ import java.util.stream.Collectors;
 public class AdminViewModel {
 
     private final List<UserInfoViewModel> users = new LinkedList<>();
+    private final List<ClassroomTypesInfoViewModel> classroomTypes = new LinkedList<>();
     private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
+    private final ObservableList<ClassroomTypesInfoViewModel> observableClassroomTypes = FXCollections.observableList(classroomTypes);
     private final AtomicBoolean fetchingLocked = new AtomicBoolean(false);
     private final ExecutorsFactory preconfiguredExecutors;
     private final UserManagement userManagement;
+    private final ClassroomTypesManagement classroomTypesManagement;
     private final UserInfoViewModel currentUserInfo;
     private final StringProperty responseMessage = new SimpleStringProperty();
     private final UpdatePreferenceViewModel updatePreferenceViewModel;
     private final AdminViewMessageResolver messageResolver = new DefaultAdminViewMessageResolver();
 
-    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel) {
+    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, ClassroomTypesManagement classroomTypesManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel) {
         this.preconfiguredExecutors = preconfiguredExecutors;
         this.userManagement = userManagement;
+        this.classroomTypesManagement = classroomTypesManagement;
         this.currentUserInfo = currentUserInfo;
         this.updatePreferenceViewModel = updatePreferenceViewModel;
     }
@@ -133,6 +139,16 @@ public class AdminViewModel {
         ).collect(Collectors.toList());
     }
 
+    private List<ClassroomTypesInfoViewModel> getAllClassroomTypes() {
+        final List<ClassroomTypes> requestedUsers = classroomTypesManagement.getAllClassroomTypes();
+        return requestedUsers.stream().map(u ->
+                new ClassroomTypesInfoViewModel(
+                        u.getId(),
+                        u.getClassroomTypeName()
+                )
+        ).collect(Collectors.toList());
+    }
+
     public void fetchPreferences(DayOfWeek selectedItem, Long userId) {
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor(
                 "fetch-lecturer-preferences"
@@ -206,6 +222,45 @@ public class AdminViewModel {
                             responseMessage.setValue("Unknown exception");
                             break;
                     }
+                });
+    }
+
+    public void refreshClassTypes() {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-classroom-types");
+
+        Single.fromCallable(this::getAllClassroomTypes)
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(typesList -> {
+                    observableClassroomTypes.clear();
+                    observableClassroomTypes.addAll(typesList);
+                    fetchingLocked.set(false);
+                });
+    }
+
+    public ObservableList<ClassroomTypesInfoViewModel> classroomTypes() {
+        return observableClassroomTypes;
+    }
+
+    public void removeClassroomTypeById(Long id) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("remove-classroom-type");
+
+        Completable.fromRunnable(() -> classroomTypesManagement.removeClassroomTypeById(id))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllClassroomTypes))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(typesList -> {
+                    observableClassroomTypes.clear();
+                    observableClassroomTypes.addAll(typesList);
+                    fetchingLocked.set(false);
                 });
     }
 }
