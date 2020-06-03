@@ -36,4 +36,9 @@ public class DefaultAdminViewMessageResolver implements AdminViewMessageResolver
     public String nonValidTime() {
         return "Start time must be before end time";
     }
+
+    @Override
+    public String classroomTypeAlreadyExists() {
+        return "This classroom type already exists! Please try a different one!";
+    }
 }

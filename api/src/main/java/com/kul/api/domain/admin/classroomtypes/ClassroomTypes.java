@@ -5,5 +5,5 @@ import lombok.Value;
 @Value
 public class ClassroomTypes {
     Long id;
-    String classroomTypeName;
+    String name;
 }

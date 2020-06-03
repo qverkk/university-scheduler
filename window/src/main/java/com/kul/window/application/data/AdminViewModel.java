@@ -1,5 +1,6 @@
 package com.kul.window.application.data;
 
+import com.kul.api.adapter.admin.classroomtypes.AddNewClassroomTypeException;
 import com.kul.api.adapter.admin.management.lecturer.preferences.LecutrerPreferenecesUpdateException;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
@@ -21,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -144,7 +146,7 @@ public class AdminViewModel {
         return requestedUsers.stream().map(u ->
                 new ClassroomTypesInfoViewModel(
                         u.getId(),
-                        u.getClassroomTypeName()
+                        u.getName()
                 )
         ).collect(Collectors.toList());
     }
@@ -262,5 +264,57 @@ public class AdminViewModel {
                     observableClassroomTypes.addAll(typesList);
                     fetchingLocked.set(false);
                 });
+    }
+
+    public void addNewClassroomType(ClassroomTypes result) {
+        if (result.getName() == null) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("add-classroom-type");
+
+        Completable.fromRunnable(() -> classroomTypesManagement.addNewClassroomType(result.getName()))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllClassroomTypes))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(typesList -> {
+                    observableClassroomTypes.clear();
+                    observableClassroomTypes.addAll(typesList);
+                    fetchingLocked.set(false);
+                }, error -> {
+                    if (!(error instanceof AddNewClassroomTypeException)) {
+                        return;
+                    }
+                    responseMessage.setValue(messageResolver.classroomTypeAlreadyExists());
+                });
+    }
+
+    public void updateInfo() {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info");
+
+        Single.fromCallable(this::getAllUsers)
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(usersList -> {
+                    observableUsers.clear();
+                    observableUsers.addAll(usersList);
+                    fetchingLocked.set(false);
+                });
+
+        Single.fromCallable(this::getAllClassroomTypes)
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(typesList -> {
+                    observableClassroomTypes.clear();
+                    observableClassroomTypes.addAll(typesList);
+                    fetchingLocked.set(false);
+                });
+
+
     }
 }

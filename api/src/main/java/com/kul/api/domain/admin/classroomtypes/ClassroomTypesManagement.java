@@ -15,4 +15,8 @@ public class ClassroomTypesManagement {
     public void removeClassroomTypeById(Long id) {
         classroomTypesRepository.removeClassroomTypeById(id);
     }
+
+    public void addNewClassroomType(String classroomTypeName) {
+        classroomTypesRepository.addNewClassroomType(classroomTypeName);
+    }
 }

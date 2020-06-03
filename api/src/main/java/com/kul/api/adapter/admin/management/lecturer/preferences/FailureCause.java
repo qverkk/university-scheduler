@@ -9,6 +9,7 @@ public enum FailureCause {
     LecturerPreferenceAlreadyExists,
     MethodArgumentNotValidException,
     LecturerPreferenceInvalidTime,
+    ClassroomTypeAlreadyExists,
     Unknown;
 
     public static FailureCause findByCode(String code) {

@@ -6,4 +6,6 @@ public interface ClassroomTypesRepository {
     List<ClassroomTypes> getAllClassroomTypes();
 
     void removeClassroomTypeById(Long id);
+
+    void addNewClassroomType(String classroomTypeName);
 }

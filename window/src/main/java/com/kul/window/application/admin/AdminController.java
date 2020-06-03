@@ -1,10 +1,14 @@
 package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
+import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.ClassroomTypesInfoViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -67,8 +71,7 @@ public class AdminController implements Initializable {
         classroomTypesTable.setItems(adminViewModel.classroomTypes());
         initializeUserColumns();
         initializeClassroomTypesColumns();
-        refreshUsers();
-        refreshClassTypes();
+        adminViewModel.updateInfo();
         initializeErrorAlertListener();
     }
 
@@ -316,6 +319,31 @@ public class AdminController implements Initializable {
 
     @FXML
     void addNewClassType() {
-        adminViewModel.refreshClassTypes();
+        Dialog<ClassroomTypes> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final TextField classTypeName = new TextField();
+        final GridPane grid = new GridPane();
+        grid.addRow(0, new Label("Classroom type: "), classTypeName);
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                String startTimeText = classTypeName.getText();
+                return new ClassroomTypes(
+                        null,
+                        startTimeText
+                );
+            }
+            return null;
+        });
+
+        ClassroomTypes result = dialog.showAndWait().orElse(null);
+        if (result == null) {
+            return;
+        }
+        adminViewModel.addNewClassroomType(result);
     }
 }

@@ -1,5 +1,7 @@
 package com.kul.api.adapter.admin.external;
 
+import com.kul.api.adapter.admin.classroomtypes.AddClassroomType;
+import com.kul.api.adapter.admin.classroomtypes.AddNewClassroomTypeResponse;
 import com.kul.api.adapter.admin.classroomtypes.AllClassroomTypesResponse;
 import feign.Headers;
 import feign.Param;
@@ -15,4 +17,8 @@ public interface ClassroomsEndpointClient {
     @RequestLine("DELETE /classroom/delete/type/{id}")
     @Headers("Content-Type: application/json")
     void deleteClassroomTypeById(@Param("id") Long id);
+
+    @RequestLine("PUT /classroom/type/add")
+    @Headers("Content-Type: application/json")
+    AddNewClassroomTypeResponse addNewClassroomType(AddClassroomType addClassroomType);
 }
