@@ -8,7 +8,6 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -80,9 +79,26 @@
                </content>
             </Tab>
             <Tab text="Classrooms">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <TableView fx:id="classroomsTable" prefHeight="500.0" prefWidth="200.0">
+                           <columns>
+                              <TableColumn fx:id="classroomNameCol" prefWidth="250.0" text="Name" />
+                              <TableColumn fx:id="classroomSizeCol" prefWidth="75.0" text="Size" />
+                              <TableColumn fx:id="classroomTypesCol" prefWidth="250.0" text="Types" />
+                              <TableColumn fx:id="classroomActionsCol" prefWidth="225.0" text="Actions" />
+                           </columns>
+                        </TableView>
+                        <HBox alignment="TOP_CENTER" prefHeight="50.0" prefWidth="200.0" spacing="50.0">
+                           <children>
+                              <JFXButton fx:id="addClassroomButton" buttonType="RAISED" onAction="#addNewClassroom" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Add new classroom" />
+                              <JFXButton fx:id="refreshClassroomsButton" buttonType="RAISED" onAction="#refreshClassrooms" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
             </Tab>
           <Tab text="Subjects" />
         </tabs>

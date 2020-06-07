@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -314,7 +313,5 @@ public class AdminViewModel {
                     observableClassroomTypes.addAll(typesList);
                     fetchingLocked.set(false);
                 });
-
-
     }
 }

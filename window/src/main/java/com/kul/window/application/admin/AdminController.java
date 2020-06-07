@@ -2,13 +2,14 @@ package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
+import com.kul.api.domain.admin.classroomtypes.Classrooms;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.AdminViewModel;
 import com.kul.window.application.data.ClassroomTypesInfoViewModel;
+import com.kul.window.application.data.ClassroomsInfoViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
-import io.reactivex.Completable;
-import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,17 +22,19 @@ import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class AdminController implements Initializable {
 
     private static final Pattern TIME_PATTERN = Pattern.compile("^\\d{2}:\\d{2}$");
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private final AdminViewModel adminViewModel;
+    /**
+     * Users
+     */
     @FXML
     private TableView<UserInfoViewModel> usersTable;
     @FXML
@@ -49,17 +52,40 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<UserInfoViewModel, String> actionsCol;
     @FXML
+    private JFXButton refreshUsersButton;
+
+    /**
+     * Classroom types
+     */
+    @FXML
     private TableView<ClassroomTypesInfoViewModel> classroomTypesTable;
     @FXML
     private TableColumn<ClassroomTypesInfoViewModel, String> typeNameCol;
     @FXML
     private TableColumn<ClassroomTypesInfoViewModel, String> typeActions;
     @FXML
-    private JFXButton refreshUsersButton;
-    @FXML
     private JFXButton addTypeButton;
     @FXML
     private JFXButton refreshTypesButton;
+
+    /**
+     * Classrooms
+     */
+    @FXML
+    private TableView<ClassroomsInfoViewModel> classroomsTable;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomNameCol;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, Integer> classroomSizeCol;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomTypesCol;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomActionsCol;
+    @FXML
+    private JFXButton addClassroomButton;
+    @FXML
+    private JFXButton refreshClassroomsButton;
+
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -315,6 +341,90 @@ public class AdminController implements Initializable {
     @FXML
     void refreshClassTypes() {
         adminViewModel.refreshClassTypes();
+    }
+
+    @FXML
+    void addNewClassroom() {
+        Dialog<Classrooms> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final List<String> _addedTypes = new ArrayList<>();
+        final ObservableList<String> addedTypes = FXCollections.observableList(_addedTypes);
+        final TextField classroomName = new TextField();
+        final TextField classroomSize = new TextField();
+        final Button addTypeButton = new Button("Add");
+        final ComboBox<String> fetchedTypes = new ComboBox<>(FXCollections.observableList(
+                adminViewModel.classroomTypes()
+                        .stream()
+                        .map(item -> item.typeName().get())
+                        .collect(Collectors.toList())
+        ));
+        final GridPane grid = new GridPane();
+        final ListView<String> stringListView = new ListView<>(addedTypes);
+
+        final ContextMenu menu = new ContextMenu();
+        final MenuItem deleteButton = new MenuItem("Delete");
+        deleteButton.setOnAction(actionEvent -> {
+            final String selectedItem = stringListView.getSelectionModel().getSelectedItem();
+            if (selectedItem == null) {
+                return;
+            }
+            addedTypes.remove(selectedItem);
+        });
+
+        menu.getItems().add(deleteButton);
+        stringListView.setContextMenu(menu);
+
+        stringListView.setItems(addedTypes);
+        stringListView.setMaxHeight(150);
+        fetchedTypes.setMinWidth(200);
+        addTypeButton.setMinWidth(200);
+        addTypeButton.setOnAction(event -> {
+            final String selectedItem = fetchedTypes.getSelectionModel().getSelectedItem();
+            if (selectedItem == null) {
+                System.out.println("Nothing is selected");
+                return;
+            }
+            if (addedTypes.contains(selectedItem)) {
+                System.out.println(selectedItem + " is already added");
+                return;
+            }
+            addedTypes.add(selectedItem);
+        });
+
+        grid.setHgap(5);
+        grid.setVgap(5);
+        grid.addRow(0, new Label("Classroom name"), new Label("Classroom size"));
+        grid.addRow(1, classroomName, classroomSize);
+        grid.addRow(2, new Label("Types: "));
+        grid.addRow(3, fetchedTypes, addTypeButton);
+        grid.addRow(4, stringListView);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                return new Classrooms(
+                        null,
+                        classroomName.getText(),
+                        _addedTypes,
+                        Integer.parseInt(classroomSize.getText())
+                );
+            }
+            return null;
+        });
+
+        final Classrooms newClassroom = dialog.showAndWait().orElse(null);
+        if (newClassroom == null) {
+            return;
+        }
+    }
+
+    @FXML
+    void refreshClassrooms() {
+
     }
 
     @FXML
