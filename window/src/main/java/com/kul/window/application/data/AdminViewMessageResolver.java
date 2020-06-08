@@ -8,4 +8,6 @@ interface AdminViewMessageResolver {
     String nonValidPreferences();
     String success();
     String nonValidTime();
+    String classroomTypeAlreadyExists();
+    String entityHasChildren();
 }

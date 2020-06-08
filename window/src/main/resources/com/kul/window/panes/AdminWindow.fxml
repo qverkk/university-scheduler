@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar>
@@ -37,26 +36,72 @@
         <tabs>
           <Tab text="Users">
                <content>
-                  <TableView fx:id="usersTable" prefHeight="200.0" prefWidth="200.0">
-                    <columns>
-                      <TableColumn fx:id="idCol" prefWidth="50.0" text="Id" />
-                      <TableColumn fx:id="firstnameCol" prefWidth="115.0" text="Firstname" />
-                        <TableColumn fx:id="lastnameCol" prefWidth="115.0" text="Lastname" />
-                        <TableColumn fx:id="usernameCol" prefWidth="115.0" text="Username" />
-                        <TableColumn fx:id="enabledCol" prefWidth="115.0" text="Enabled" />
-                        <TableColumn fx:id="authorityCol" prefWidth="115.0" text="Authority" />
-                        <TableColumn fx:id="actionsCol" prefWidth="175.0" text="Actions" />
-                    </columns>
-                  </TableView>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <TableView fx:id="usersTable" prefHeight="550.0" prefWidth="200.0">
+                          <columns>
+                            <TableColumn fx:id="idCol" prefWidth="50.0" text="Id" />
+                            <TableColumn fx:id="firstnameCol" prefWidth="115.0" text="Firstname" />
+                              <TableColumn fx:id="lastnameCol" prefWidth="115.0" text="Lastname" />
+                              <TableColumn fx:id="usernameCol" prefWidth="115.0" text="Username" />
+                              <TableColumn fx:id="enabledCol" prefWidth="115.0" text="Enabled" />
+                              <TableColumn fx:id="authorityCol" prefWidth="115.0" text="Authority" />
+                              <TableColumn fx:id="actionsCol" prefWidth="175.0" text="Actions" />
+                          </columns>
+                        </TableView>
+                        <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXButton fx:id="refreshUsersButton" buttonType="RAISED" onAction="#refreshUsers" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh users" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+            <Tab text="Classroom types">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <TableView fx:id="classroomTypesTable" prefHeight="500.0" prefWidth="200.0">
+                          <columns>
+                            <TableColumn fx:id="typeNameCol" prefWidth="350.0" text="Type" />
+                            <TableColumn fx:id="typeActions" prefWidth="350.0" text="Actions" />
+                          </columns>
+                        </TableView>
+                        <HBox alignment="TOP_CENTER" prefHeight="50.0" prefWidth="200.0" spacing="50.0">
+                           <children>
+                              <JFXButton fx:id="addTypeButton" buttonType="RAISED" onAction="#addNewClassType" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Add new type" />
+                              <JFXButton fx:id="refreshTypesButton" buttonType="RAISED" onAction="#refreshClassTypes" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+            <Tab text="Classrooms">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <TableView fx:id="classroomsTable" prefHeight="500.0" prefWidth="200.0">
+                           <columns>
+                              <TableColumn fx:id="classroomNameCol" prefWidth="250.0" text="Name" />
+                              <TableColumn fx:id="classroomSizeCol" prefWidth="75.0" text="Size" />
+                              <TableColumn fx:id="classroomTypesCol" prefWidth="250.0" text="Types" />
+                              <TableColumn fx:id="classroomActionsCol" prefWidth="225.0" text="Actions" />
+                           </columns>
+                        </TableView>
+                        <HBox alignment="TOP_CENTER" prefHeight="50.0" prefWidth="200.0" spacing="50.0">
+                           <children>
+                              <JFXButton fx:id="addClassroomButton" buttonType="RAISED" onAction="#addNewClassroom" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Add new classroom" />
+                              <JFXButton fx:id="refreshClassroomsButton" buttonType="RAISED" onAction="#refreshClassrooms" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
                </content>
             </Tab>
           <Tab text="Subjects" />
         </tabs>
       </TabPane>
-      <HBox alignment="TOP_CENTER" prefWidth="200.0">
-         <children>
-            <JFXButton fx:id="refreshUsersButton" buttonType="RAISED" onAction="#refreshUsers" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh users" />
-         </children>
-      </HBox>
    </children>
 </VBox>

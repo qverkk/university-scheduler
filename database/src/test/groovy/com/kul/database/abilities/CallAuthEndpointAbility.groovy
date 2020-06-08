@@ -1,6 +1,7 @@
 package com.kul.database.abilities
 
 import com.kul.database.abilities.dtos.NewUserRequest
+import com.kul.database.abilities.dtos.TokenRequest
 import com.kul.database.abilities.dtos.UserLoginRequest
 import io.restassured.RestAssured
 import io.restassured.response.ValidatableResponse
@@ -23,11 +24,24 @@ trait CallAuthEndpointAbility extends RequestLocalServerAbility {
                 .then()
     }
 
+    ValidatableResponse getUserFromToken(TokenRequest token) {
+        return RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(objectMapper().writeValueAsString(token))
+                .post(baseUrl().resolve("/auth/login"))
+                .then()
+    }
+
     String getAdminToken() {
         return authenticateUser(
                 new UserLoginRequest()
                         .withPassword("admin")
                         .withUsername("admin@admin.com")
         ).extract().body().jsonPath().get("token").toString()
+    }
+
+    String getUserToken(UserLoginRequest request) {
+        return authenticateUser(request)
+                .extract().body().jsonPath().get("token").toString()
     }
 }

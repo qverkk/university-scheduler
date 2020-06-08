@@ -1,9 +1,15 @@
 package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
+import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
+import com.kul.api.domain.admin.classroomtypes.Classrooms;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.AdminViewModel;
+import com.kul.window.application.data.ClassroomTypesInfoViewModel;
+import com.kul.window.application.data.ClassroomsInfoViewModel;
 import com.kul.window.application.data.UserInfoViewModel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,19 +22,21 @@ import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class AdminController implements Initializable {
 
+    private static final Pattern TIME_PATTERN = Pattern.compile("^\\d{2}:\\d{2}$");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private final AdminViewModel adminViewModel;
-
+    /**
+     * Users
+     */
     @FXML
     private TableView<UserInfoViewModel> usersTable;
-
     @FXML
     private TableColumn<UserInfoViewModel, Number> idCol;
     @FXML
@@ -43,12 +51,41 @@ public class AdminController implements Initializable {
     private TableColumn<UserInfoViewModel, String> authorityCol;
     @FXML
     private TableColumn<UserInfoViewModel, String> actionsCol;
-
     @FXML
     private JFXButton refreshUsersButton;
 
-    private static final Pattern TIME_PATTERN = Pattern.compile("^\\d{2}:\\d{2}$");
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    /**
+     * Classroom types
+     */
+    @FXML
+    private TableView<ClassroomTypesInfoViewModel> classroomTypesTable;
+    @FXML
+    private TableColumn<ClassroomTypesInfoViewModel, String> typeNameCol;
+    @FXML
+    private TableColumn<ClassroomTypesInfoViewModel, String> typeActions;
+    @FXML
+    private JFXButton addTypeButton;
+    @FXML
+    private JFXButton refreshTypesButton;
+
+    /**
+     * Classrooms
+     */
+    @FXML
+    private TableView<ClassroomsInfoViewModel> classroomsTable;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomNameCol;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomSizeCol;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomTypesCol;
+    @FXML
+    private TableColumn<ClassroomsInfoViewModel, String> classroomActionsCol;
+    @FXML
+    private JFXButton addClassroomButton;
+    @FXML
+    private JFXButton refreshClassroomsButton;
+
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -57,9 +94,43 @@ public class AdminController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         usersTable.setItems(adminViewModel.users());
-        initializeColumns();
-        refreshUsers();
+        classroomTypesTable.setItems(adminViewModel.classroomTypes());
+        classroomsTable.setItems(adminViewModel.classrooms());
+
+        initializeUserColumns();
+        initializeClassroomTypesColumns();
+        initializeClassroomsColumns();
+        initializeClassroomsMenuActions();
+
+        adminViewModel.updateInfo();
         initializeErrorAlertListener();
+    }
+
+    private void initializeClassroomsMenuActions() {
+        final ContextMenu contextMenu = new ContextMenu();
+
+        final MenuItem edit = new MenuItem("Edit");
+        final MenuItem delete = new MenuItem("Delete");
+
+        delete.setOnAction(actionEvent -> {
+            final ClassroomsInfoViewModel item = classroomsTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            adminViewModel.deleteClassroom(item.id().get());
+        });
+
+        edit.setOnAction(actionEvent -> {
+            final ClassroomsInfoViewModel item = classroomsTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            displayUpdateClassroomDialog(item.classroomName().get(), item.classroomSize().get(), item.types(), true);
+        });
+
+        contextMenu.getItems().addAll(edit, delete);
+
+        classroomsTable.setContextMenu(contextMenu);
     }
 
     private void initializeErrorAlertListener() {
@@ -195,8 +266,42 @@ public class AdminController implements Initializable {
         return grid;
     }
 
-    private void initializeColumns() {
-        idCol.setCellValueFactory(param -> param.getValue().id());
+    private void initializeClassroomTypesColumns() {
+        typeNameCol.setCellValueFactory(param -> param.getValue().typeName());
+        typeActions.setCellFactory(getTypeActionsCellFactory());
+    }
+
+    private Callback<TableColumn<ClassroomTypesInfoViewModel, String>, TableCell<ClassroomTypesInfoViewModel, String>> getTypeActionsCellFactory() {
+        return new Callback<TableColumn<ClassroomTypesInfoViewModel, String>, TableCell<ClassroomTypesInfoViewModel, String>>() {
+            @Override
+            public TableCell<ClassroomTypesInfoViewModel, String> call(TableColumn<ClassroomTypesInfoViewModel, String> classroomTypesInfoViewModelStringTableColumn) {
+                final TableCell<ClassroomTypesInfoViewModel, String> cell = new TableCell<ClassroomTypesInfoViewModel, String>() {
+
+                    final Button removeBtn = new Button("Remove");
+
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            removeBtn.setMinWidth(150);
+                            ClassroomTypesInfoViewModel classroomType = getTableView().getItems().get(getIndex());
+
+                            removeBtn.setOnAction(e -> {
+                                Long id = classroomType.id().get();
+                                adminViewModel.removeClassroomTypeById(id);
+                            });
+                            setGraphic(removeBtn);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+    }
+
+    private void initializeUserColumns() {
         idCol.setCellValueFactory(param -> param.getValue().id());
         firstnameCol.setCellValueFactory(param -> param.getValue().firstName());
         lastnameCol.setCellValueFactory(param -> param.getValue().lastName());
@@ -204,6 +309,12 @@ public class AdminController implements Initializable {
         enabledCol.setCellValueFactory(param -> param.getValue().enabled());
         authorityCol.setCellValueFactory(param -> param.getValue().authority());
         actionsCol.setCellFactory(getActionsCellFactory());
+    }
+
+    private void initializeClassroomsColumns() {
+        classroomNameCol.setCellValueFactory(param -> param.getValue().classroomName());
+        classroomSizeCol.setCellValueFactory(param -> param.getValue().classroomSize());
+        classroomTypesCol.setCellValueFactory(param -> param.getValue().classroomTypes());
     }
 
     private Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>> getActionsCellFactory() {
@@ -263,5 +374,140 @@ public class AdminController implements Initializable {
     @FXML
     void refreshUsers() {
         adminViewModel.refresh();
+    }
+
+    @FXML
+    void refreshClassTypes() {
+        adminViewModel.refreshClassTypes();
+    }
+
+    @FXML
+    void addNewClassroom() {
+        displayUpdateClassroomDialog("", "", Collections.emptyList(), false);
+    }
+
+    private void displayUpdateClassroomDialog(String name, String size, List<String> items, boolean update) {
+        Dialog<Classrooms> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType(update ? "Update" : "Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final List<String> _addedTypes = new ArrayList<>();
+        final ObservableList<String> addedTypes = FXCollections.observableList(_addedTypes);
+        addedTypes.addAll(items);
+        final TextField classroomName = new TextField(name);
+        final TextField classroomSize = new TextField(size);
+        final Button addTypeButton = new Button("Add");
+        final ComboBox<String> fetchedTypes = new ComboBox<>(FXCollections.observableList(
+                adminViewModel.classroomTypes()
+                        .stream()
+                        .map(item -> item.typeName().get())
+                        .collect(Collectors.toList())
+        ));
+        final GridPane grid = new GridPane();
+        final ListView<String> stringListView = new ListView<>(addedTypes);
+
+        final ContextMenu menu = new ContextMenu();
+        final MenuItem deleteButton = new MenuItem("Delete");
+        deleteButton.setOnAction(actionEvent -> {
+            final String selectedItem = stringListView.getSelectionModel().getSelectedItem();
+            if (selectedItem == null) {
+                return;
+            }
+            addedTypes.remove(selectedItem);
+        });
+
+        menu.getItems().add(deleteButton);
+        stringListView.setContextMenu(menu);
+
+        stringListView.setItems(addedTypes);
+        stringListView.setMaxHeight(150);
+        fetchedTypes.setMinWidth(200);
+        addTypeButton.setMinWidth(200);
+        addTypeButton.setOnAction(event -> {
+            final String selectedItem = fetchedTypes.getSelectionModel().getSelectedItem();
+            if (selectedItem == null) {
+                System.out.println("Nothing is selected");
+                return;
+            }
+            if (addedTypes.contains(selectedItem)) {
+                System.out.println(selectedItem + " is already added");
+                return;
+            }
+            addedTypes.add(selectedItem);
+        });
+
+        grid.setHgap(5);
+        grid.setVgap(5);
+        grid.addRow(0, new Label("Classroom name"), new Label("Classroom size"));
+        grid.addRow(1, classroomName, classroomSize);
+        grid.addRow(2, new Label("Types: "));
+        grid.addRow(3, fetchedTypes, addTypeButton);
+        grid.addRow(4, stringListView);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                if (
+                        stringListView.getItems().isEmpty() ||
+                                !classroomSize.getText().matches("\\d+") ||
+                                classroomName.getText().isEmpty()
+                ) {
+                    adminViewModel.responseMessageProperty().setValue("Classroom types has to have minimum 1 type \n" +
+                            "Classroom size has to be a number \n" +
+                            "Classroom name has to be filled");
+                    return null;
+                }
+                return new Classrooms(
+                        null,
+                        classroomName.getText(),
+                        _addedTypes,
+                        Integer.parseInt(classroomSize.getText())
+                );
+            }
+            return null;
+        });
+
+        final Classrooms newClassroom = dialog.showAndWait().orElse(null);
+        if (newClassroom == null) {
+            return;
+        }
+        adminViewModel.addNewClassroom(newClassroom);
+    }
+
+    @FXML
+    void refreshClassrooms() {
+        adminViewModel.refreshClassrooms();
+    }
+
+    @FXML
+    void addNewClassType() {
+        Dialog<ClassroomTypes> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final TextField classTypeName = new TextField();
+        final GridPane grid = new GridPane();
+        grid.addRow(0, new Label("Classroom type: "), classTypeName);
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                String startTimeText = classTypeName.getText();
+                return new ClassroomTypes(
+                        null,
+                        startTimeText
+                );
+            }
+            return null;
+        });
+
+        ClassroomTypes result = dialog.showAndWait().orElse(null);
+        if (result == null) {
+            return;
+        }
+        adminViewModel.addNewClassroomType(result);
     }
 }

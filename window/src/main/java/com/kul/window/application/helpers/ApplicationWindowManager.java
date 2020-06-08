@@ -1,8 +1,12 @@
 package com.kul.window.application.helpers;
 
+import com.kul.api.adapter.admin.classroomtypes.ClassroomTypesRepositoryFacade;
+import com.kul.api.adapter.admin.external.ClassroomTypesEndpointClientFactory;
+import com.kul.api.adapter.admin.external.ClassroomsEndpointClient;
 import com.kul.api.adapter.admin.external.ManagementEndpointClient;
 import com.kul.api.adapter.admin.external.ManagementEndpointClientFactory;
 import com.kul.api.adapter.admin.management.ManagementUserRepositoryFacade;
+import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
 import com.kul.window.application.admin.AdminController;
@@ -48,9 +52,14 @@ public class ApplicationWindowManager {
 
     public void openAdminPanel(UserInfoViewModel userInfo, ExistingUserToken existingUserToken) throws IOException {
         ManagementEndpointClient endpointClient = new ManagementEndpointClientFactory(existingUserToken).create();
+        ClassroomsEndpointClient classroomEndpointClient = new ClassroomTypesEndpointClientFactory(existingUserToken).create();
 
         UserManagement userManagement = new UserManagement(
                 new ManagementUserRepositoryFacade(endpointClient)
+        );
+
+        ClassroomTypesManagement classroomTypesManagement = new ClassroomTypesManagement(
+                new ClassroomTypesRepositoryFacade(classroomEndpointClient)
         );
 
         changeWindow(
@@ -60,6 +69,7 @@ public class ApplicationWindowManager {
                         new AdminViewModel(
                                 preconfiguredExecutors,
                                 userManagement,
+                                classroomTypesManagement,
                                 userInfo,
                                 new UpdatePreferenceViewModel()
                         )
