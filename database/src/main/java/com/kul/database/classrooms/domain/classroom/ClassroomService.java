@@ -22,6 +22,8 @@ public class ClassroomService {
     }
 
     public void delete(Long id) {
-        classroomsRepository.delete(id);
+        classroomsRepository.findById(id).ifPresent(e -> {
+            classroomsRepository.delete(id);
+        });
     }
 }

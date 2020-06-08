@@ -27,4 +27,8 @@ public class ClassroomTypesManagement {
     public List<Classrooms> getAllClassrooms() {
         return classroomTypesRepository.getAllClassrooms();
     }
+
+    public void removeClassroomById(long id) {
+        classroomTypesRepository.removeClassroomById(id);
+    }
 }

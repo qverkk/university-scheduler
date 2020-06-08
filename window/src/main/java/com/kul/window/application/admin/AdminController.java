@@ -100,9 +100,37 @@ public class AdminController implements Initializable {
         initializeUserColumns();
         initializeClassroomTypesColumns();
         initializeClassroomsColumns();
+        initializeClassroomsMenuActions();
 
         adminViewModel.updateInfo();
         initializeErrorAlertListener();
+    }
+
+    private void initializeClassroomsMenuActions() {
+        final ContextMenu contextMenu = new ContextMenu();
+
+        final MenuItem edit = new MenuItem("Edit");
+        final MenuItem delete = new MenuItem("Delete");
+
+        delete.setOnAction(actionEvent -> {
+            final ClassroomsInfoViewModel item = classroomsTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            adminViewModel.deleteClassroom(item.id().get());
+        });
+
+        edit.setOnAction(actionEvent -> {
+            final ClassroomsInfoViewModel item = classroomsTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            displayUpdateClassroomDialog(item.classroomName().get(), item.classroomSize().get(), item.types(), true);
+        });
+
+        contextMenu.getItems().addAll(edit, delete);
+
+        classroomsTable.setContextMenu(contextMenu);
     }
 
     private void initializeErrorAlertListener() {
@@ -355,15 +383,20 @@ public class AdminController implements Initializable {
 
     @FXML
     void addNewClassroom() {
+        displayUpdateClassroomDialog("", "", Collections.emptyList(), false);
+    }
+
+    private void displayUpdateClassroomDialog(String name, String size, List<String> items, boolean update) {
         Dialog<Classrooms> dialog = new Dialog<>();
 
-        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        ButtonType addButton = new ButtonType(update ? "Update" : "Add", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
 
         final List<String> _addedTypes = new ArrayList<>();
         final ObservableList<String> addedTypes = FXCollections.observableList(_addedTypes);
-        final TextField classroomName = new TextField();
-        final TextField classroomSize = new TextField();
+        addedTypes.addAll(items);
+        final TextField classroomName = new TextField(name);
+        final TextField classroomSize = new TextField(size);
         final Button addTypeButton = new Button("Add");
         final ComboBox<String> fetchedTypes = new ComboBox<>(FXCollections.observableList(
                 adminViewModel.classroomTypes()

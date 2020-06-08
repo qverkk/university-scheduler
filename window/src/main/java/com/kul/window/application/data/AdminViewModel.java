@@ -389,4 +389,24 @@ public class AdminViewModel {
                     fetchingLocked.set(false);
                 });
     }
+
+    public void deleteClassroom(long id) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("remove-classroom");
+
+        Completable.fromRunnable(() -> classroomTypesManagement.removeClassroomById(id))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllClassrooms))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(classrooms -> {
+                    observableClassrooms.clear();
+                    observableClassrooms.addAll(classrooms);
+                    fetchingLocked.set(false);
+                }, error -> {
+
+                });
+    }
 }

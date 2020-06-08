@@ -74,4 +74,9 @@ public class ClassroomTypesRepositoryFacade implements ClassroomTypesRepository 
                 c.getClassroomSize()
         )).collect(Collectors.toList());
     }
+
+    @Override
+    public void removeClassroomById(long id) {
+        client.deleteClassroomById(id);
+    }
 }

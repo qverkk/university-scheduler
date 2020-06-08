@@ -12,4 +12,6 @@ public interface ClassroomTypesRepository {
     void addNewClassroom(Classrooms newClassroom);
 
     List<Classrooms> getAllClassrooms();
+
+    void removeClassroomById(long id);
 }

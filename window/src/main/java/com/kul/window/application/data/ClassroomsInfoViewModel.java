@@ -4,6 +4,8 @@ import javafx.beans.binding.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -14,7 +16,6 @@ public class ClassroomsInfoViewModel {
     private final StringProperty classroomName;
     private final ListProperty<String> classroomTypes;
     private final IntegerProperty classroomSize;
-
 
     public ClassroomsInfoViewModel(Long id, String name, List<String> classroomTypes, Integer classroomSize) {
         this.id = new SimpleLongProperty(id);
@@ -47,5 +48,9 @@ public class ClassroomsInfoViewModel {
 
     public StringBinding classroomSize() {
         return Bindings.selectString(classroomSize);
+    }
+
+    public List<String> types() {
+        return new LinkedList<>(classroomTypes);
     }
 }

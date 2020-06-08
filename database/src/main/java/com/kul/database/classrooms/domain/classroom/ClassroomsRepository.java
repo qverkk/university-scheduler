@@ -17,4 +17,6 @@ public interface ClassroomsRepository {
     void delete(String name, List<ClassroomType> classroomType);
 
     void delete(Long id);
+
+    Optional<Classroom> findById(Long id);
 }

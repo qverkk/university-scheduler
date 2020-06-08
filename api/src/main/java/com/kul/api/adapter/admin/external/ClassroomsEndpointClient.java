@@ -32,4 +32,8 @@ public interface ClassroomsEndpointClient {
     @RequestLine("GET /classroom/classrooms")
     @Headers("Content-Type: application/json")
     List<AllClassroomsResponse> getAllClassrooms();
+
+    @RequestLine("DELETE /classroom/delete/classroom/{id}")
+    @Headers("Content-Type: application/json")
+    void deleteClassroomById(@Param("id") long id);
 }

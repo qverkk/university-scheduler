@@ -107,4 +107,9 @@ public class JpaClassroomRepositoryFacade implements ClassroomsRepository {
     public void delete(Long id) {
         classroomRepository.deleteById(id);
     }
+
+    @Override
+    public Optional<Classroom> findById(Long id) {
+        return classroomRepository.findById(id).map(ClassroomEntityMapper::toDomain);
+    }
 }
