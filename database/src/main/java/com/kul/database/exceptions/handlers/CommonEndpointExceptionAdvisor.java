@@ -10,6 +10,7 @@ import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmission
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToEnableUsersException;
 import com.kul.database.usermanagement.domain.exceptions.InsufficientPersmissionsToGetAllUserData;
 import com.kul.database.usermanagement.domain.exceptions.NoSuchUserException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,16 @@ public class CommonEndpointExceptionAdvisor extends ResponseEntityExceptionHandl
                                 .stream()
                                 .map(e -> new ConstraintViolationError(e.getMessage(), e.getPropertyPath().toString()))
                                 .collect(Collectors.toList())
+                ));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<DataIntegrityViolationErrorException> handle(DataIntegrityViolationException exception, WebRequest webRequest) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new DataIntegrityViolationErrorException(
+                        "Cannot delete entities with children",
+                        exception.getClass().getSimpleName()
                 ));
     }
 

@@ -76,7 +76,7 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<ClassroomsInfoViewModel, String> classroomNameCol;
     @FXML
-    private TableColumn<ClassroomsInfoViewModel, Integer> classroomSizeCol;
+    private TableColumn<ClassroomsInfoViewModel, String> classroomSizeCol;
     @FXML
     private TableColumn<ClassroomsInfoViewModel, String> classroomTypesCol;
     @FXML
@@ -95,8 +95,12 @@ public class AdminController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         usersTable.setItems(adminViewModel.users());
         classroomTypesTable.setItems(adminViewModel.classroomTypes());
+        classroomsTable.setItems(adminViewModel.classrooms());
+
         initializeUserColumns();
         initializeClassroomTypesColumns();
+        initializeClassroomsColumns();
+
         adminViewModel.updateInfo();
         initializeErrorAlertListener();
     }
@@ -279,6 +283,12 @@ public class AdminController implements Initializable {
         actionsCol.setCellFactory(getActionsCellFactory());
     }
 
+    private void initializeClassroomsColumns() {
+        classroomNameCol.setCellValueFactory(param -> param.getValue().classroomName());
+        classroomSizeCol.setCellValueFactory(param -> param.getValue().classroomSize());
+        classroomTypesCol.setCellValueFactory(param -> param.getValue().classroomTypes());
+    }
+
     private Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>> getActionsCellFactory() {
         return new Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>>() {
             @Override
@@ -406,6 +416,16 @@ public class AdminController implements Initializable {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
+                if (
+                        stringListView.getItems().isEmpty() ||
+                                !classroomSize.getText().matches("\\d+") ||
+                                classroomName.getText().isEmpty()
+                ) {
+                    adminViewModel.responseMessageProperty().setValue("Classroom types has to have minimum 1 type \n" +
+                            "Classroom size has to be a number \n" +
+                            "Classroom name has to be filled");
+                    return null;
+                }
                 return new Classrooms(
                         null,
                         classroomName.getText(),
@@ -420,11 +440,12 @@ public class AdminController implements Initializable {
         if (newClassroom == null) {
             return;
         }
+        adminViewModel.addNewClassroom(newClassroom);
     }
 
     @FXML
     void refreshClassrooms() {
-
+        adminViewModel.refreshClassrooms();
     }
 
     @FXML

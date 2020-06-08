@@ -19,4 +19,12 @@ public class ClassroomTypesManagement {
     public void addNewClassroomType(String classroomTypeName) {
         classroomTypesRepository.addNewClassroomType(classroomTypeName);
     }
+
+    public void addNewClassroom(Classrooms newClassroom) {
+        classroomTypesRepository.addNewClassroom(newClassroom);
+    }
+
+    public List<Classrooms> getAllClassrooms() {
+        return classroomTypesRepository.getAllClassrooms();
+    }
 }

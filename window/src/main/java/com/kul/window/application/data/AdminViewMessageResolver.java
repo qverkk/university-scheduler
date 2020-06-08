@@ -9,4 +9,5 @@ interface AdminViewMessageResolver {
     String success();
     String nonValidTime();
     String classroomTypeAlreadyExists();
+    String entityHasChildren();
 }

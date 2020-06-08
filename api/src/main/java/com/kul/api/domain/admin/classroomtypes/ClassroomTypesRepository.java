@@ -8,4 +8,8 @@ public interface ClassroomTypesRepository {
     void removeClassroomTypeById(Long id);
 
     void addNewClassroomType(String classroomTypeName);
+
+    void addNewClassroom(Classrooms newClassroom);
+
+    List<Classrooms> getAllClassrooms();
 }

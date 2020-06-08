@@ -41,4 +41,9 @@ public class DefaultAdminViewMessageResolver implements AdminViewMessageResolver
     public String classroomTypeAlreadyExists() {
         return "This classroom type already exists! Please try a different one!";
     }
+
+    @Override
+    public String entityHasChildren() {
+        return "This entity has children, so it cannot be deleted";
+    }
 }
