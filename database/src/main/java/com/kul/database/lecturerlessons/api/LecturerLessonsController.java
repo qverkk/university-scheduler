@@ -89,10 +89,10 @@ public class LecturerLessonsController {
     }
 
     @DeleteMapping(
-            value = "/types/{lessonName}"
+            value = "/types/{lessonType}"
     )
-    public void deleteLessonType(@PathVariable String lessonName) {
-        lessonTypeService.deleteById(lessonName);
+    public void deleteLessonType(@PathVariable String lessonType) {
+        lessonTypeService.deleteByLessonType(lessonType);
     }
 
     @GetMapping(

@@ -4,10 +4,11 @@ import com.kul.api.adapter.admin.classroomtypes.AddNewClassroomTypeException;
 import com.kul.api.adapter.admin.classroomtypes.RemoveClassroomTypeException;
 import com.kul.api.adapter.admin.management.lecturer.preferences.LecutrerPreferenecesUpdateException;
 import com.kul.api.domain.admin.areaofstudies.AreaOfStudies;
-import com.kul.api.domain.admin.areaofstudies.AreaOfStudiesManagement;
+import com.kul.api.domain.admin.areaofstudies.LessonsManagement;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
+import com.kul.api.domain.admin.lessontypes.LessonTypes;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.api.domain.admin.management.ManagedUser;
 import com.kul.api.domain.admin.management.UserManagement;
@@ -36,10 +37,14 @@ public class AdminViewModel {
     private final List<ClassroomTypesInfoViewModel> classroomTypes = new LinkedList<>();
     private final List<ClassroomsInfoViewModel> classrooms = new LinkedList<>();
     private final List<AreaOfStudiesInfoViewModel> areaOfStudies = new LinkedList<>();
+    private final List<LessonTypesInfoViewModel> lessonTypes = new LinkedList<>();
+
     private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
     private final ObservableList<ClassroomsInfoViewModel> observableClassrooms = FXCollections.observableList(classrooms);
     private final ObservableList<ClassroomTypesInfoViewModel> observableClassroomTypes = FXCollections.observableList(classroomTypes);
     private final ObservableList<AreaOfStudiesInfoViewModel> observableAreaOfStudies = FXCollections.observableList(areaOfStudies);
+    private final ObservableList<LessonTypesInfoViewModel> observableLessonTypes = FXCollections.observableList(lessonTypes);
+
     private final AtomicBoolean fetchingLocked = new AtomicBoolean(false);
     private final ExecutorsFactory preconfiguredExecutors;
     private final UserManagement userManagement;
@@ -48,15 +53,15 @@ public class AdminViewModel {
     private final StringProperty responseMessage = new SimpleStringProperty();
     private final UpdatePreferenceViewModel updatePreferenceViewModel;
     private final AdminViewMessageResolver messageResolver = new DefaultAdminViewMessageResolver();
-    private final AreaOfStudiesManagement areaOfStudiesManagement;
+    private final LessonsManagement lessonsManagement;
 
-    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, ClassroomTypesManagement classroomTypesManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel, AreaOfStudiesManagement areaOfStudiesManagement) {
+    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, ClassroomTypesManagement classroomTypesManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel, LessonsManagement lessonsManagement) {
         this.preconfiguredExecutors = preconfiguredExecutors;
         this.userManagement = userManagement;
         this.classroomTypesManagement = classroomTypesManagement;
         this.currentUserInfo = currentUserInfo;
         this.updatePreferenceViewModel = updatePreferenceViewModel;
-        this.areaOfStudiesManagement = areaOfStudiesManagement;
+        this.lessonsManagement = lessonsManagement;
     }
 
     public StringProperty startTimeProperty() {
@@ -161,7 +166,7 @@ public class AdminViewModel {
     }
 
     private List<AreaOfStudiesInfoViewModel> getAllAreasOfStudies() {
-        final List<AreaOfStudies> requestedAreaOfStudies = areaOfStudiesManagement.getAllAreaOfStudies();
+        final List<AreaOfStudies> requestedAreaOfStudies = lessonsManagement.getAllAreaOfStudies();
         return requestedAreaOfStudies.stream().map(areas ->
                 new AreaOfStudiesInfoViewModel(
                         areas.getId(),
@@ -376,6 +381,7 @@ public class AdminViewModel {
         final ThreadPoolExecutor classroomTypesExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-classroom-types");
         final ThreadPoolExecutor classroomsExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-classrooms");
         final ThreadPoolExecutor areaOfStudiesExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-area-of-studies");
+        final ThreadPoolExecutor lessonTypesExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-lesson-types");
 
         Single.fromCallable(this::getAllUsers)
                 .subscribeOn(Schedulers.from(userExecutor))
@@ -416,6 +422,16 @@ public class AdminViewModel {
                     observableAreaOfStudies.addAll(areaOfStudies);
                     fetchingLocked.set(false);
                 });
+
+        Single.fromCallable(this::getAllLessonTypes)
+                .subscribeOn(Schedulers.from(lessonTypesExecutor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(lessonTypesExecutor::shutdown)
+                .subscribe(types -> {
+                    observableLessonTypes.clear();
+                    observableLessonTypes.addAll(types);
+                    fetchingLocked.set(false);
+                });
     }
 
     public void deleteClassroom(long id) {
@@ -445,7 +461,7 @@ public class AdminViewModel {
 
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("add-area-of-studies");
 
-        Completable.fromRunnable(() -> areaOfStudiesManagement.addNewAreaOfStudies(newAreaOfStudies))
+        Completable.fromRunnable(() -> lessonsManagement.addNewAreaOfStudies(newAreaOfStudies))
                 .subscribeOn(Schedulers.from(executor))
                 .andThen(Single.fromCallable(this::getAllAreasOfStudies))
                 .observeOn(preconfiguredExecutors.platformScheduler())
@@ -487,7 +503,7 @@ public class AdminViewModel {
         }
         final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("remove-area-of-studies");
 
-        Completable.fromRunnable(() -> areaOfStudiesManagement.removeAreaOfStudies(area, department))
+        Completable.fromRunnable(() -> lessonsManagement.removeAreaOfStudies(area, department))
                 .subscribeOn(Schedulers.from(executor))
                 .andThen(Single.fromCallable(this::getAllAreasOfStudies))
                 .observeOn(preconfiguredExecutors.platformScheduler())
@@ -501,5 +517,78 @@ public class AdminViewModel {
                     // {"message":"Area Informatyka department WMIAK","code":"NoSuchAreaOfStudy"}
                     // catch that
                 });
+    }
+
+    public void removeLessonType(String typeName) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("remove-lesson-type");
+
+        Completable.fromRunnable(() -> lessonsManagement.removeLessonType(typeName))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllLessonTypes))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(types -> {
+                    observableLessonTypes.clear();
+                    observableLessonTypes.addAll(types);
+                    fetchingLocked.set(false);
+                }, error -> {
+
+                });
+    }
+
+    private List<LessonTypesInfoViewModel> getAllLessonTypes() {
+        final List<LessonTypes> requestedUsers = lessonsManagement.getAllLessonTypes();
+        return requestedUsers.stream().map(u ->
+                new LessonTypesInfoViewModel(
+                        u.getId(),
+                        u.getType()
+                )
+        ).collect(Collectors.toList());
+    }
+
+    public void addNewLessonType(LessonTypes lessonType) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("add-lesson-type");
+
+        Completable.fromRunnable(() -> lessonsManagement.addNewLessonType(lessonType))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllLessonTypes))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(types -> {
+                    observableLessonTypes.clear();
+                    observableLessonTypes.addAll(types);
+                    fetchingLocked.set(false);
+                }, error -> {
+
+                });
+    }
+
+    public void refreshLessonTypes() {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-lesson-types");
+
+        Single.fromCallable(this::getAllLessonTypes)
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(types -> {
+                    observableLessonTypes.clear();
+                    observableLessonTypes.addAll(types);
+                    fetchingLocked.set(false);
+                });
+    }
+
+    public ObservableList<LessonTypesInfoViewModel> lessonTypes() {
+        return observableLessonTypes;
     }
 }

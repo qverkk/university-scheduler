@@ -1,10 +1,10 @@
 package com.kul.window.application.helpers;
 
-import com.kul.api.adapter.admin.areaofstudies.AreaOfStudiesRepositoryFacade;
+import com.kul.api.adapter.admin.areaofstudies.LessonsRepositoryFacade;
 import com.kul.api.adapter.admin.classroomtypes.ClassroomTypesRepositoryFacade;
 import com.kul.api.adapter.admin.external.*;
 import com.kul.api.adapter.admin.management.ManagementUserRepositoryFacade;
-import com.kul.api.domain.admin.areaofstudies.AreaOfStudiesManagement;
+import com.kul.api.domain.admin.areaofstudies.LessonsManagement;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
@@ -52,7 +52,7 @@ public class ApplicationWindowManager {
     public void openAdminPanel(UserInfoViewModel userInfo, ExistingUserToken existingUserToken) throws IOException {
         ManagementEndpointClient endpointClient = new ManagementEndpointClientFactory(existingUserToken).create();
         ClassroomsEndpointClient classroomEndpointClient = new ClassroomTypesEndpointClientFactory(existingUserToken).create();
-        AreaOfStudiesEndpointClient areaOfStudiesEndpointClient = new AreaOfStudiesEndpointClientFactory(existingUserToken).create();
+        LessonsEndpointClient areaOfStudiesEndpointClient = new AreaOfStudiesEndpointClientFactory(existingUserToken).create();
 
         UserManagement userManagement = new UserManagement(
                 new ManagementUserRepositoryFacade(endpointClient)
@@ -62,8 +62,8 @@ public class ApplicationWindowManager {
                 new ClassroomTypesRepositoryFacade(classroomEndpointClient)
         );
 
-        AreaOfStudiesManagement areaOfStudiesManagement = new AreaOfStudiesManagement(
-                new AreaOfStudiesRepositoryFacade(areaOfStudiesEndpointClient)
+        LessonsManagement areaOfStudiesManagement = new LessonsManagement(
+                new LessonsRepositoryFacade(areaOfStudiesEndpointClient)
         );
 
         changeWindow(

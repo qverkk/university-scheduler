@@ -15,7 +15,7 @@ public class AreaOfStudiesEndpointClientFactory {
         this.existingUserToken = existingUserToken;
     }
 
-    public AreaOfStudiesEndpointClient create() {
+    public LessonsEndpointClient create() {
         return Feign.builder()
                 .requestInterceptor(new AuthorizationInterceptor(existingUserToken))
                 .decoder(new GsonDecoder())
@@ -23,6 +23,6 @@ public class AreaOfStudiesEndpointClientFactory {
                 .errorDecoder(new JsonErrorAwareErrorDecoder())
                 .logger(new Logger.ErrorLogger())
                 .logLevel(Logger.Level.FULL)
-                .target(AreaOfStudiesEndpointClient.class, Constants.HOST_URL);
+                .target(LessonsEndpointClient.class, Constants.HOST_URL);
     }
 }
