@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.areaofstudies.AreaOfStudies;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
+import com.kul.api.domain.admin.lessontypes.LessonTypes;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.window.application.data.*;
 import javafx.collections.FXCollections;
@@ -98,6 +99,18 @@ public class AdminController implements Initializable {
     @FXML
     private JFXButton refreshAreaOfStudiesButton;
 
+    /**
+     * Lesson types
+     */
+    @FXML
+    private TableView<LessonTypesInfoViewModel> lessonTypesTable;
+    @FXML
+    private TableColumn<LessonTypesInfoViewModel, String> lessonTypeCol;
+    @FXML
+    private JFXButton addLessonTypeButton;
+    @FXML
+    private JFXButton refreshLessonTypesButton;
+
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -109,6 +122,7 @@ public class AdminController implements Initializable {
         classroomTypesTable.setItems(adminViewModel.classroomTypes());
         classroomsTable.setItems(adminViewModel.classrooms());
         areaOfStudiesTable.setItems(adminViewModel.areaOfStudies());
+        lessonTypesTable.setItems(adminViewModel.lessonTypes());
 
         initializeUserColumns();
         initializeClassroomTypesColumns();
@@ -116,9 +130,33 @@ public class AdminController implements Initializable {
         initializeClassroomsMenuActions();
         initializeAreaOfStudiesColumns();
         initializeAreaOfStudiesMenuActions();
+        initializeLessonTypesColumns();
+        initializeLessonTypesMenuActions();
 
         adminViewModel.updateInfo();
         initializeErrorAlertListener();
+    }
+
+    private void initializeLessonTypesMenuActions() {
+        final ContextMenu contextMenu = new ContextMenu();
+
+        final MenuItem delete = new MenuItem("Delete");
+
+        delete.setOnAction(actionEvent -> {
+            final LessonTypesInfoViewModel item = lessonTypesTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            adminViewModel.removeLessonType(item.typeName().get());
+        });
+
+        contextMenu.getItems().add(delete);
+
+        lessonTypesTable.setContextMenu(contextMenu);
+    }
+
+    private void initializeLessonTypesColumns() {
+        lessonTypeCol.setCellValueFactory(param -> param.getValue().typeName());
     }
 
     private void initializeAreaOfStudiesMenuActions() {
@@ -594,5 +632,44 @@ public class AdminController implements Initializable {
             return;
         }
         adminViewModel.addNewClassroomType(result);
+    }
+
+    @FXML
+    void refreshLessonTypes() {
+        adminViewModel.refreshLessonTypes();
+    }
+
+    @FXML
+    void addNewLessonType() {
+        Dialog<LessonTypes> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final TextField lessonType = new TextField();
+        final GridPane grid = new GridPane();
+        grid.addRow(0, new Label("Lesson type: "), lessonType);
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                String lessonTypeName = lessonType.getText();
+                if (lessonTypeName.isEmpty()) {
+                    adminViewModel.responseMessageProperty().setValue("Lesson type name must be filled");
+                    return null;
+                }
+                return new LessonTypes(
+                        null,
+                        lessonTypeName
+                );
+            }
+            return null;
+        });
+
+        LessonTypes result = dialog.showAndWait().orElse(null);
+        if (result == null) {
+            return;
+        }
+        adminViewModel.addNewLessonType(result);
     }
 }

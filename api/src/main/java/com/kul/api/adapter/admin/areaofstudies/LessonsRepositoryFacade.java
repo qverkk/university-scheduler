@@ -1,18 +1,19 @@
 package com.kul.api.adapter.admin.areaofstudies;
 
-import com.kul.api.adapter.admin.external.AreaOfStudiesEndpointClient;
+import com.kul.api.adapter.admin.external.LessonsEndpointClient;
 import com.kul.api.adapter.admin.external.ErrorResponseException;
 import com.kul.api.domain.admin.areaofstudies.AreaOfStudies;
-import com.kul.api.domain.admin.areaofstudies.AreaOfStudiesRepository;
+import com.kul.api.domain.admin.areaofstudies.LessonsRepository;
+import com.kul.api.domain.admin.lessontypes.LessonTypes;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AreaOfStudiesRepositoryFacade implements AreaOfStudiesRepository {
+public class LessonsRepositoryFacade implements LessonsRepository {
 
-    private final AreaOfStudiesEndpointClient client;
+    private final LessonsEndpointClient client;
 
-    public AreaOfStudiesRepositoryFacade(AreaOfStudiesEndpointClient client) {
+    public LessonsRepositoryFacade(LessonsEndpointClient client) {
         this.client = client;
     }
 
@@ -42,5 +43,23 @@ public class AreaOfStudiesRepositoryFacade implements AreaOfStudiesRepository {
     @Override
     public void removeAreaOfStudies(String area, String department) {
         client.deleteAreaOfStudies(area, department);
+    }
+
+    @Override
+    public void removeLessonType(String typeName) {
+        client.deleteLessonType(typeName);
+    }
+
+    @Override
+    public List<LessonTypes> getAllLessonTypes() {
+        return client.getLessonTypes().getLessonTypes().stream().map(types -> new LessonTypes(
+                types.getId(),
+                types.getType()
+        )).collect(Collectors.toList());
+    }
+
+    @Override
+    public LessonTypes addNewLessonType(LessonTypes lessonType) {
+        return client.addNewLessonType(lessonType);
     }
 }

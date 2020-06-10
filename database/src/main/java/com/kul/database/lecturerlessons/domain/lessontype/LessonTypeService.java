@@ -29,7 +29,7 @@ public class LessonTypeService {
         return lessonTypeRepository.save(LessonType.newLessonType(request.getType()));
     }
 
-    public void deleteById(String lessonName) {
-        lessonTypeRepository.delete(lessonName);
+    public void deleteByLessonType(String lessonType) {
+        lessonTypeRepository.delete(lessonType);
     }
 }
