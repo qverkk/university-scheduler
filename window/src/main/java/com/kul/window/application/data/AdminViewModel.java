@@ -3,6 +3,8 @@ package com.kul.window.application.data;
 import com.kul.api.adapter.admin.classroomtypes.AddNewClassroomTypeException;
 import com.kul.api.adapter.admin.classroomtypes.RemoveClassroomTypeException;
 import com.kul.api.adapter.admin.management.lecturer.preferences.LecutrerPreferenecesUpdateException;
+import com.kul.api.domain.admin.areaofstudies.AreaOfStudies;
+import com.kul.api.domain.admin.areaofstudies.AreaOfStudiesManagement;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
@@ -33,9 +35,11 @@ public class AdminViewModel {
     private final List<UserInfoViewModel> users = new LinkedList<>();
     private final List<ClassroomTypesInfoViewModel> classroomTypes = new LinkedList<>();
     private final List<ClassroomsInfoViewModel> classrooms = new LinkedList<>();
+    private final List<AreaOfStudiesInfoViewModel> areaOfStudies = new LinkedList<>();
     private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
     private final ObservableList<ClassroomsInfoViewModel> observableClassrooms = FXCollections.observableList(classrooms);
     private final ObservableList<ClassroomTypesInfoViewModel> observableClassroomTypes = FXCollections.observableList(classroomTypes);
+    private final ObservableList<AreaOfStudiesInfoViewModel> observableAreaOfStudies = FXCollections.observableList(areaOfStudies);
     private final AtomicBoolean fetchingLocked = new AtomicBoolean(false);
     private final ExecutorsFactory preconfiguredExecutors;
     private final UserManagement userManagement;
@@ -44,13 +48,15 @@ public class AdminViewModel {
     private final StringProperty responseMessage = new SimpleStringProperty();
     private final UpdatePreferenceViewModel updatePreferenceViewModel;
     private final AdminViewMessageResolver messageResolver = new DefaultAdminViewMessageResolver();
+    private final AreaOfStudiesManagement areaOfStudiesManagement;
 
-    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, ClassroomTypesManagement classroomTypesManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel) {
+    public AdminViewModel(ExecutorsFactory preconfiguredExecutors, UserManagement userManagement, ClassroomTypesManagement classroomTypesManagement, UserInfoViewModel currentUserInfo, UpdatePreferenceViewModel updatePreferenceViewModel, AreaOfStudiesManagement areaOfStudiesManagement) {
         this.preconfiguredExecutors = preconfiguredExecutors;
         this.userManagement = userManagement;
         this.classroomTypesManagement = classroomTypesManagement;
         this.currentUserInfo = currentUserInfo;
         this.updatePreferenceViewModel = updatePreferenceViewModel;
+        this.areaOfStudiesManagement = areaOfStudiesManagement;
     }
 
     public StringProperty startTimeProperty() {
@@ -150,6 +156,17 @@ public class AdminViewModel {
                 new ClassroomTypesInfoViewModel(
                         u.getId(),
                         u.getName()
+                )
+        ).collect(Collectors.toList());
+    }
+
+    private List<AreaOfStudiesInfoViewModel> getAllAreasOfStudies() {
+        final List<AreaOfStudies> requestedAreaOfStudies = areaOfStudiesManagement.getAllAreaOfStudies();
+        return requestedAreaOfStudies.stream().map(areas ->
+                new AreaOfStudiesInfoViewModel(
+                        areas.getId(),
+                        areas.getAreaOfStudiesName(),
+                        areas.getDepartmentName()
                 )
         ).collect(Collectors.toList());
     }
@@ -340,15 +357,15 @@ public class AdminViewModel {
     }
 
     private List<ClassroomsInfoViewModel> getAllClassrooms() {
-            final List<Classrooms> requestedUsers = classroomTypesManagement.getAllClassrooms();
-            return requestedUsers.stream().map(u ->
-                    new ClassroomsInfoViewModel(
-                            u.getId(),
-                            u.getName(),
-                            u.getClassroomTypes(),
-                            u.getClassroomSize()
-                    )
-            ).collect(Collectors.toList());
+        final List<Classrooms> requestedUsers = classroomTypesManagement.getAllClassrooms();
+        return requestedUsers.stream().map(u ->
+                new ClassroomsInfoViewModel(
+                        u.getId(),
+                        u.getName(),
+                        u.getClassroomTypes(),
+                        u.getClassroomSize()
+                )
+        ).collect(Collectors.toList());
     }
 
     public void updateInfo() {
@@ -358,6 +375,7 @@ public class AdminViewModel {
         final ThreadPoolExecutor userExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-user");
         final ThreadPoolExecutor classroomTypesExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-classroom-types");
         final ThreadPoolExecutor classroomsExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-classrooms");
+        final ThreadPoolExecutor areaOfStudiesExecutor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-info-area-of-studies");
 
         Single.fromCallable(this::getAllUsers)
                 .subscribeOn(Schedulers.from(userExecutor))
@@ -407,6 +425,72 @@ public class AdminViewModel {
                     fetchingLocked.set(false);
                 }, error -> {
 
+                });
+    }
+
+    public void addNewAreaOfStudies(AreaOfStudies newAreaOfStudies) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("add-area-of-studies");
+
+        Completable.fromRunnable(() -> areaOfStudiesManagement.addNewAreaOfStudies(newAreaOfStudies))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllAreasOfStudies))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(areasList -> {
+                    observableAreaOfStudies.clear();
+                    observableAreaOfStudies.addAll(areasList);
+                    fetchingLocked.set(false);
+                }, error -> {
+
+                });
+    }
+
+    public void refreshAreaOfStudies() {
+        // TODO
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-area-of-studies");
+
+        Single.fromCallable(this::getAllAreasOfStudies)
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(areaOfStudies -> {
+                    observableAreaOfStudies.clear();
+                    observableAreaOfStudies.addAll(areaOfStudies);
+                    fetchingLocked.set(false);
+                });
+    }
+
+    public ObservableList<AreaOfStudiesInfoViewModel> areaOfStudies() {
+        return observableAreaOfStudies;
+    }
+
+    public void deleteAreaOfStudy(String area, String department) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("remove-area-of-studies");
+
+        Completable.fromRunnable(() -> areaOfStudiesManagement.removeAreaOfStudies(area, department))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllAreasOfStudies))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(areas -> {
+                    observableAreaOfStudies.clear();
+                    observableAreaOfStudies.addAll(areas);
+                    fetchingLocked.set(false);
+                }, error -> {
+                    // TODO :
+                    // {"message":"Area Informatyka department WMIAK","code":"NoSuchAreaOfStudy"}
+                    // catch that
                 });
     }
 }

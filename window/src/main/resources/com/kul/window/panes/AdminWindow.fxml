@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -11,7 +15,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar>
         <menus>
@@ -101,6 +105,26 @@
                </content>
             </Tab>
           <Tab text="Subjects" />
+            <Tab text="Area of Studies">
+                <content>
+                    <VBox prefHeight="200.0" prefWidth="100.0">
+                        <children>
+                            <TableView fx:id="areaOfStudiesTable" prefHeight="500.0" prefWidth="200.0">
+                                <columns>
+                                    <TableColumn fx:id="areaOfStudiesNameCol" prefWidth="400.0" text="Area Of Studies" />
+                                    <TableColumn fx:id="departmentNameCol" prefWidth="400.0" text="Department Name" />
+                                </columns>
+                            </TableView>
+                            <HBox alignment="TOP_CENTER" prefHeight="50.0" prefWidth="200.0" spacing="50.0">
+                                <children>
+                                    <JFXButton fx:id="addAreaOfStudiesButton" buttonType="RAISED" onAction="#addAreaOfStudies" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Add new area of studies" />
+                                    <JFXButton fx:id="refreshAreaOfStudiesButton" buttonType="RAISED" onAction="#refreshAreaOfStudies" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+                </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

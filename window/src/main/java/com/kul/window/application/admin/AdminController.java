@@ -4,10 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
 import com.kul.api.domain.admin.management.LecturerPreferences;
-import com.kul.window.application.data.AdminViewModel;
-import com.kul.window.application.data.ClassroomTypesInfoViewModel;
-import com.kul.window.application.data.ClassroomsInfoViewModel;
-import com.kul.window.application.data.UserInfoViewModel;
+import com.kul.window.application.data.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -86,6 +83,20 @@ public class AdminController implements Initializable {
     @FXML
     private JFXButton refreshClassroomsButton;
 
+    /**
+     * Area of studies
+     */
+    @FXML
+    private TableView<AreaOfStudiesInfoViewModel> areaOfStudiesTable;
+    @FXML
+    private TableColumn<AreaOfStudiesInfoViewModel, String> areaOfStudiesNameCol;
+    @FXML
+    private TableColumn<AreaOfStudiesInfoViewModel, String> departmentNameCol;
+    @FXML
+    private JFXButton addAreaOfStudiesButton;
+    @FXML
+    private JFXButton refreshAreaOfStudiesButton;
+
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -96,14 +107,38 @@ public class AdminController implements Initializable {
         usersTable.setItems(adminViewModel.users());
         classroomTypesTable.setItems(adminViewModel.classroomTypes());
         classroomsTable.setItems(adminViewModel.classrooms());
+        areaOfStudiesTable.setItems(adminViewModel.areaOfStudies());
 
         initializeUserColumns();
         initializeClassroomTypesColumns();
         initializeClassroomsColumns();
         initializeClassroomsMenuActions();
+        initializeAreaOfStudiesColumns();
+        initializeAreaOfStudiesMenuActions();
 
         adminViewModel.updateInfo();
         initializeErrorAlertListener();
+    }
+
+    private void initializeAreaOfStudiesMenuActions() {
+        final ContextMenu contextMenu = new ContextMenu();
+
+        final MenuItem delete = new MenuItem("Delete");
+
+        delete.setOnAction(actionEvent -> {
+            final AreaOfStudiesInfoViewModel item = areaOfStudiesTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            adminViewModel.deleteAreaOfStudy(
+                    item.areaOfStudiesName().get(),
+                    item.departmentName().get()
+            );
+        });
+
+        contextMenu.getItems().addAll(delete);
+
+        areaOfStudiesTable.setContextMenu(contextMenu);
     }
 
     private void initializeClassroomsMenuActions() {
@@ -317,6 +352,11 @@ public class AdminController implements Initializable {
         classroomTypesCol.setCellValueFactory(param -> param.getValue().classroomTypes());
     }
 
+    private void initializeAreaOfStudiesColumns() {
+        areaOfStudiesNameCol.setCellValueFactory(param -> param.getValue().areaOfStudiesName());
+        departmentNameCol.setCellValueFactory(param -> param.getValue().departmentName());
+    }
+
     private Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>> getActionsCellFactory() {
         return new Callback<TableColumn<UserInfoViewModel, String>, TableCell<UserInfoViewModel, String>>() {
             @Override
@@ -379,6 +419,16 @@ public class AdminController implements Initializable {
     @FXML
     void refreshClassTypes() {
         adminViewModel.refreshClassTypes();
+    }
+
+    @FXML
+    void addAreaOfStudies() {
+        System.out.println("Add area of studies");
+    }
+
+    @FXML
+    void refreshAreaOfStudies() {
+        adminViewModel.refreshAreaOfStudies();
     }
 
     @FXML

@@ -1,11 +1,10 @@
 package com.kul.window.application.helpers;
 
+import com.kul.api.adapter.admin.areaofstudies.AreaOfStudiesRepositoryFacade;
 import com.kul.api.adapter.admin.classroomtypes.ClassroomTypesRepositoryFacade;
-import com.kul.api.adapter.admin.external.ClassroomTypesEndpointClientFactory;
-import com.kul.api.adapter.admin.external.ClassroomsEndpointClient;
-import com.kul.api.adapter.admin.external.ManagementEndpointClient;
-import com.kul.api.adapter.admin.external.ManagementEndpointClientFactory;
+import com.kul.api.adapter.admin.external.*;
 import com.kul.api.adapter.admin.management.ManagementUserRepositoryFacade;
+import com.kul.api.domain.admin.areaofstudies.AreaOfStudiesManagement;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.management.UserManagement;
 import com.kul.api.domain.user.authorization.ExistingUserToken;
@@ -53,6 +52,7 @@ public class ApplicationWindowManager {
     public void openAdminPanel(UserInfoViewModel userInfo, ExistingUserToken existingUserToken) throws IOException {
         ManagementEndpointClient endpointClient = new ManagementEndpointClientFactory(existingUserToken).create();
         ClassroomsEndpointClient classroomEndpointClient = new ClassroomTypesEndpointClientFactory(existingUserToken).create();
+        AreaOfStudiesEndpointClient areaOfStudiesEndpointClient = new AreaOfStudiesEndpointClientFactory(existingUserToken).create();
 
         UserManagement userManagement = new UserManagement(
                 new ManagementUserRepositoryFacade(endpointClient)
@@ -60,6 +60,10 @@ public class ApplicationWindowManager {
 
         ClassroomTypesManagement classroomTypesManagement = new ClassroomTypesManagement(
                 new ClassroomTypesRepositoryFacade(classroomEndpointClient)
+        );
+
+        AreaOfStudiesManagement areaOfStudiesManagement = new AreaOfStudiesManagement(
+                new AreaOfStudiesRepositoryFacade(areaOfStudiesEndpointClient)
         );
 
         changeWindow(
@@ -71,7 +75,8 @@ public class ApplicationWindowManager {
                                 userManagement,
                                 classroomTypesManagement,
                                 userInfo,
-                                new UpdatePreferenceViewModel()
+                                new UpdatePreferenceViewModel(),
+                                areaOfStudiesManagement
                         )
                 )
         );
