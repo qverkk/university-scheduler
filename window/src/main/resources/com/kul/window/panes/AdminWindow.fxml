@@ -140,6 +140,30 @@
                   </VBox>
                </content>
             </Tab>
+            <Tab text="Lessons">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <TableView fx:id="lessonsTable" prefHeight="500.0" prefWidth="200.0">
+                           <columns>
+                              <TableColumn fx:id="lessonsLecturerNameCol" prefWidth="175.0" text="Lecturers name" />
+                              <TableColumn fx:id="lessonsNameCol" prefWidth="150.0" text="Lesson name" />
+                              <TableColumn fx:id="lessonsAreaOfStudyCol" prefWidth="150.0" text="Area of study" />
+                              <TableColumn fx:id="lessonsSemesterCol" prefWidth="100.0" text="Semester" />
+                              <TableColumn fx:id="lessonsYearCol" prefWidth="75.0" text="Year" />
+                              <TableColumn fx:id="lessonsLessonTypeCol" prefWidth="150.0" text="Lesson type" />
+                           </columns>
+                        </TableView>
+                        <HBox alignment="TOP_CENTER" prefHeight="50.0" prefWidth="200.0" spacing="50.0">
+                           <children>
+                              <JFXButton fx:id="addNewLessonButton" buttonType="RAISED" onAction="#addNewLesson" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Add new lesson" />
+                              <JFXButton fx:id="refreshLessonsButton" buttonType="RAISED" onAction="#refreshLessons" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: gray;" text="Refresh" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

@@ -60,4 +60,9 @@ public class UserInfoViewModel {
     public boolean canContainPreferences() {
         return authority.get().equals(AuthorityEnum.PROWADZACY.displayName);
     }
+
+    @Override
+    public String toString() {
+        return firstName.get() + " " + lastName.get();
+    }
 }

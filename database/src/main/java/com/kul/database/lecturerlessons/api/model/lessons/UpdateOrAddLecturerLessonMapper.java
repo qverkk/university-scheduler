@@ -7,6 +7,7 @@ import com.kul.database.lecturerlessons.domain.StudyYear;
 import com.kul.database.lecturerlessons.domain.UpdateOrAddLecturerLesson;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudy;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
+import com.kul.database.usermanagement.domain.User;
 
 public class UpdateOrAddLecturerLessonMapper {
     public static UpdateOrAddLecturerLesson toAreaOfStudyDomain(UpdateLecturerLessonRequest request) {
@@ -21,9 +22,11 @@ public class UpdateOrAddLecturerLessonMapper {
     }
 
     public static UpdateLecturerLessonResponse fromDomain(LecturerLessons lecturerLessons) {
+        final User user = lecturerLessons.getUser();
         return new UpdateLecturerLessonResponse(
                 lecturerLessons.getId(),
-                lecturerLessons.getUser().getId(),
+                user.getId(),
+                user.getFirstName() + " " + user.getLastName(),
                 lecturerLessons.getLessonName(),
                 toAreaOfStudyResponse(lecturerLessons.getAreaOfStudy()),
                 lecturerLessons.getSemester(),

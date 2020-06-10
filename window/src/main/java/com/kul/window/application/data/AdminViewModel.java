@@ -8,6 +8,7 @@ import com.kul.api.domain.admin.areaofstudies.LessonsManagement;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypesManagement;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
+import com.kul.api.domain.admin.lessons.Lessons;
 import com.kul.api.domain.admin.lessontypes.LessonTypes;
 import com.kul.api.domain.admin.management.LecturerPreferences;
 import com.kul.api.domain.admin.management.ManagedUser;
@@ -38,12 +39,14 @@ public class AdminViewModel {
     private final List<ClassroomsInfoViewModel> classrooms = new LinkedList<>();
     private final List<AreaOfStudiesInfoViewModel> areaOfStudies = new LinkedList<>();
     private final List<LessonTypesInfoViewModel> lessonTypes = new LinkedList<>();
+    private final List<LessonsInfoViewModel> lessons = new LinkedList<>();
 
     private final ObservableList<UserInfoViewModel> observableUsers = FXCollections.observableList(users);
     private final ObservableList<ClassroomsInfoViewModel> observableClassrooms = FXCollections.observableList(classrooms);
     private final ObservableList<ClassroomTypesInfoViewModel> observableClassroomTypes = FXCollections.observableList(classroomTypes);
     private final ObservableList<AreaOfStudiesInfoViewModel> observableAreaOfStudies = FXCollections.observableList(areaOfStudies);
     private final ObservableList<LessonTypesInfoViewModel> observableLessonTypes = FXCollections.observableList(lessonTypes);
+    private final ObservableList<LessonsInfoViewModel> observableLessons = FXCollections.observableList(lessons);
 
     private final AtomicBoolean fetchingLocked = new AtomicBoolean(false);
     private final ExecutorsFactory preconfiguredExecutors;
@@ -590,5 +593,84 @@ public class AdminViewModel {
 
     public ObservableList<LessonTypesInfoViewModel> lessonTypes() {
         return observableLessonTypes;
+    }
+
+    public ObservableList<LessonsInfoViewModel> lessons() {
+        return observableLessons;
+    }
+
+    private List<LessonsInfoViewModel> getAllLessons() {
+        final List<Lessons> requestedUsers = lessonsManagement.getAllLessons();
+        return requestedUsers.stream().map(u ->
+                new LessonsInfoViewModel(
+                    u.getId(),
+                        u.getUserId(),
+                        u.getLecturersName(),
+                        u.getLessonName(),
+                        u.getAreaOfStudy().getDepartment() + " " + u.getAreaOfStudy().getArea(),
+                        u.getSemester().toString(),
+                        u.getYear().toString(),
+                        u.getLessonType().getType()
+                )
+        ).collect(Collectors.toList());
+    }
+
+    public void removeLessonById(Long id) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("remove-lesson");
+
+        Completable.fromRunnable(() -> lessonsManagement.removeLessonById(id))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllLessons))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(lessons -> {
+                    observableLessons.clear();
+                    observableLessons.addAll(lessons);
+                    fetchingLocked.set(false);
+                }, error -> {
+
+                });
+    }
+
+    public void refreshLessons() {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("fetch-lessons");
+
+        Single.fromCallable(this::getAllLessons)
+                .subscribeOn(Schedulers.from(executor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(lessons -> {
+                    observableLessons.clear();
+                    observableLessons.addAll(lessons);
+                    fetchingLocked.set(false);
+                });
+    }
+
+    public void addNewLesson(Lessons result) {
+        if (fetchingLocked.getAndSet(true)) {
+            return;
+        }
+
+        final ThreadPoolExecutor executor = preconfiguredExecutors.noQueueNamedSingleThreadExecutor("add-lesson");
+
+        Completable.fromRunnable(() -> lessonsManagement.addNewLesson(result))
+                .subscribeOn(Schedulers.from(executor))
+                .andThen(Single.fromCallable(this::getAllLessons))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(executor::shutdown)
+                .subscribe(lessons -> {
+                    observableLessons.clear();
+                    observableLessons.addAll(lessons);
+                    fetchingLocked.set(false);
+                }, error -> {
+
+                });
     }
 }

@@ -1,5 +1,6 @@
 package com.kul.api.domain.admin.areaofstudies;
 
+import com.kul.api.domain.admin.lessons.Lessons;
 import com.kul.api.domain.admin.lessontypes.LessonTypes;
 import lombok.AllArgsConstructor;
 
@@ -31,5 +32,17 @@ public class LessonsManagement {
 
     public void addNewLessonType(LessonTypes lessonType) {
         lessonsRepository.addNewLessonType(lessonType);
+    }
+
+    public void removeLessonById(Long id) {
+        lessonsRepository.removeLessonById(id);
+    }
+
+    public List<Lessons> getAllLessons() {
+        return lessonsRepository.getAllLessons();
+    }
+
+    public Lessons addNewLesson(Lessons result) {
+        return lessonsRepository.addnewLesson(result);
     }
 }

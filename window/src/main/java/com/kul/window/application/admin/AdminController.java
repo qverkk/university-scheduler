@@ -1,11 +1,19 @@
 package com.kul.window.application.admin;
 
+import com.jfoenix.controls.JFXAutoCompletePopup;
 import com.jfoenix.controls.JFXButton;
+import com.kul.api.adapter.admin.areaofstudies.FetchAreaOfStudiesResponse;
+import com.kul.api.adapter.admin.lessontypes.FetchLessonTypeResponse;
+import com.kul.api.data.AutoCompleteComboBoxListener;
 import com.kul.api.domain.admin.areaofstudies.AreaOfStudies;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
+import com.kul.api.domain.admin.lessons.Lessons;
+import com.kul.api.domain.admin.lessons.Semester;
+import com.kul.api.domain.admin.lessons.StudyYear;
 import com.kul.api.domain.admin.lessontypes.LessonTypes;
 import com.kul.api.domain.admin.management.LecturerPreferences;
+import com.kul.api.domain.user.authorization.UserInfo;
 import com.kul.window.application.data.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -111,6 +119,28 @@ public class AdminController implements Initializable {
     @FXML
     private JFXButton refreshLessonTypesButton;
 
+    /**
+     * Lessons
+     */
+    @FXML
+    private TableView<LessonsInfoViewModel> lessonsTable;
+    @FXML
+    private TableColumn<LessonsInfoViewModel, String> lessonsLecturerNameCol;
+    @FXML
+    private TableColumn<LessonsInfoViewModel, String> lessonsNameCol;
+    @FXML
+    private TableColumn<LessonsInfoViewModel, String> lessonsAreaOfStudyCol;
+    @FXML
+    private TableColumn<LessonsInfoViewModel, String> lessonsSemesterCol;
+    @FXML
+    private TableColumn<LessonsInfoViewModel, String> lessonsYearCol;
+    @FXML
+    private TableColumn<LessonsInfoViewModel, String> lessonsLessonTypeCol;
+    @FXML
+    private JFXButton addNewLessonButton;
+    @FXML
+    private JFXButton refreshLessonsButton;
+
 
     public AdminController(AdminViewModel adminViewModel) {
         this.adminViewModel = adminViewModel;
@@ -123,6 +153,7 @@ public class AdminController implements Initializable {
         classroomsTable.setItems(adminViewModel.classrooms());
         areaOfStudiesTable.setItems(adminViewModel.areaOfStudies());
         lessonTypesTable.setItems(adminViewModel.lessonTypes());
+        lessonsTable.setItems(adminViewModel.lessons());
 
         initializeUserColumns();
         initializeClassroomTypesColumns();
@@ -132,9 +163,39 @@ public class AdminController implements Initializable {
         initializeAreaOfStudiesMenuActions();
         initializeLessonTypesColumns();
         initializeLessonTypesMenuActions();
+        initializeLessonsColumns();
+        initializeLessonsMenuActions();
 
         adminViewModel.updateInfo();
         initializeErrorAlertListener();
+    }
+
+    private void initializeLessonsMenuActions() {
+        final ContextMenu contextMenu = new ContextMenu();
+
+        final MenuItem edit = new MenuItem("Edit");
+        final MenuItem delete = new MenuItem("Delete");
+
+        delete.setOnAction(actionEvent -> {
+            final LessonsInfoViewModel item = lessonsTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            adminViewModel.removeLessonById(item.id().get());
+        });
+
+        contextMenu.getItems().addAll(edit, delete);
+
+        lessonsTable.setContextMenu(contextMenu);
+    }
+
+    private void initializeLessonsColumns() {
+        lessonsLecturerNameCol.setCellValueFactory(param -> param.getValue().lecturersName());
+        lessonsNameCol.setCellValueFactory(param -> param.getValue().lessonName());
+        lessonsAreaOfStudyCol.setCellValueFactory(param -> param.getValue().areaOfStudy());
+        lessonsSemesterCol.setCellValueFactory(param -> param.getValue().semester());
+        lessonsYearCol.setCellValueFactory(param -> param.getValue().year());
+        lessonsLessonTypeCol.setCellValueFactory(param -> param.getValue().lessonType());
     }
 
     private void initializeLessonTypesMenuActions() {
@@ -671,5 +732,91 @@ public class AdminController implements Initializable {
             return;
         }
         adminViewModel.addNewLessonType(result);
+    }
+
+    @FXML
+    void addNewLesson() {
+        Dialog<Lessons> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final TextField lessonNameTf = new TextField();
+        final List<UserInfoViewModel> lecturers = adminViewModel.users().stream().filter(e -> e.authority().get().equals("Prowadzący")).collect(Collectors.toList());
+        final ObservableList<AreaOfStudiesInfoViewModel> areaOfStudiesList = adminViewModel.areaOfStudies();
+        final ObservableList<LessonTypesInfoViewModel> lessonTypesList = adminViewModel.lessonTypes();
+
+        final ComboBox<UserInfoViewModel> userInfoComboBox = new ComboBox<>(FXCollections.observableList(lecturers));
+        final ComboBox<AreaOfStudiesInfoViewModel> areaOfStudiesComboBox = new ComboBox<>(areaOfStudiesList);
+        final ComboBox<LessonTypesInfoViewModel> lessonTypesComboBox = new ComboBox<>(lessonTypesList);
+        final ComboBox<Semester> semesterComboBox = new ComboBox<>();
+        final ComboBox<StudyYear> studyYearComboBox = new ComboBox<>();
+
+        semesterComboBox.getItems().addAll(Semester.values());
+        semesterComboBox.getSelectionModel().selectFirst();
+        studyYearComboBox.getItems().addAll(StudyYear.values());
+        studyYearComboBox.getSelectionModel().selectFirst();
+
+
+        new AutoCompleteComboBoxListener<>(userInfoComboBox);
+        new AutoCompleteComboBoxListener<>(areaOfStudiesComboBox);
+        new AutoCompleteComboBoxListener<>(lessonTypesComboBox);
+
+        final GridPane grid = new GridPane();
+        grid.addRow(0, new Label("Lesson name: "), lessonNameTf);
+        grid.addRow(1, new Label("Lecturer: "), userInfoComboBox);
+        grid.addRow(2, new Label("Area of study and department: "), areaOfStudiesComboBox);
+        grid.addRow(3, new Label("Lesson type: "), lessonTypesComboBox);
+        grid.addRow(4, new Label("Semester: "), semesterComboBox);
+        grid.addRow(5, new Label("Study year: "), studyYearComboBox);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                String lessonName = lessonNameTf.getText();
+
+                final UserInfoViewModel user = lecturers.get(userInfoComboBox.getSelectionModel().getSelectedIndex());
+                final AreaOfStudiesInfoViewModel areaOfStudies = areaOfStudiesList.get(areaOfStudiesComboBox.getSelectionModel().getSelectedIndex());
+                final LessonTypesInfoViewModel lessonType = lessonTypesList.get(lessonTypesComboBox.getSelectionModel().getSelectedIndex());
+
+                if (lessonName.isEmpty() || user == null || areaOfStudies == null || lessonType == null) {
+                    adminViewModel.responseMessageProperty().setValue("Lesson name must be filled \n" +
+                            "User must be selected \n" +
+                            "Area of studies must be selected \n" +
+                            "And finally lesson type must be selected");
+                    return null;
+                }
+                return new Lessons(
+                        null,
+                        user.id().get(),
+                        null,
+                        lessonName,
+                        new FetchAreaOfStudiesResponse(
+                                areaOfStudies.id().get(),
+                                areaOfStudies.areaOfStudiesName().get(),
+                                areaOfStudies.departmentName().get()
+                        ),
+                        new FetchLessonTypeResponse(
+                                lessonType.id().get(),
+                                lessonType.typeName().get()
+                        ),
+                        semesterComboBox.getSelectionModel().getSelectedItem(),
+                        studyYearComboBox.getSelectionModel().getSelectedItem()
+                );
+            }
+            return null;
+        });
+
+        Lessons result = dialog.showAndWait().orElse(null);
+        if (result == null) {
+            return;
+        }
+        adminViewModel.addNewLesson(result);
+    }
+
+    @FXML
+    void refreshLessons() {
+        adminViewModel.refreshLessons();
     }
 }
