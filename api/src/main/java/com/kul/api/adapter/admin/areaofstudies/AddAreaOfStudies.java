@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class AddAreaOfStudies {
-    String name;
+    String area;
     String department;
 }

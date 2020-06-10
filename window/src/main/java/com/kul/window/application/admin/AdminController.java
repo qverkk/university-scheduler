@@ -1,6 +1,7 @@
 package com.kul.window.application.admin;
 
 import com.jfoenix.controls.JFXButton;
+import com.kul.api.domain.admin.areaofstudies.AreaOfStudies;
 import com.kul.api.domain.admin.classroomtypes.ClassroomTypes;
 import com.kul.api.domain.admin.classroomtypes.Classrooms;
 import com.kul.api.domain.admin.management.LecturerPreferences;
@@ -423,7 +424,41 @@ public class AdminController implements Initializable {
 
     @FXML
     void addAreaOfStudies() {
-        System.out.println("Add area of studies");
+        Dialog<AreaOfStudies> dialog = new Dialog<>();
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        final TextField areaOfStudies = new TextField();
+        final TextField departmentName = new TextField();
+        final GridPane grid = new GridPane();
+        grid.addRow(0, new Label("Area of studies: "), areaOfStudies);
+        grid.addRow(1, new Label("Department name: "), departmentName);
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                String area = areaOfStudies.getText();
+                String department = departmentName.getText();
+                if (area.isEmpty() || department.isEmpty()) {
+                    adminViewModel.responseMessageProperty().setValue("Area of study must be filled \n" +
+                            "Department name must be filled");
+                    return null;
+                }
+                return new AreaOfStudies(
+                        null,
+                        area,
+                        department
+                );
+            }
+            return null;
+        });
+
+        AreaOfStudies result = dialog.showAndWait().orElse(null);
+        if (result == null) {
+            return;
+        }
+        adminViewModel.addNewAreaOfStudies(result);
     }
 
     @FXML

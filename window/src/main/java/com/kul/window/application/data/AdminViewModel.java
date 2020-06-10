@@ -406,6 +406,16 @@ public class AdminViewModel {
                     observableClassrooms.addAll(classrooms);
                     fetchingLocked.set(false);
                 });
+
+        Single.fromCallable(this::getAllAreasOfStudies)
+                .subscribeOn(Schedulers.from(areaOfStudiesExecutor))
+                .observeOn(preconfiguredExecutors.platformScheduler())
+                .doFinally(areaOfStudiesExecutor::shutdown)
+                .subscribe(areaOfStudies -> {
+                    observableAreaOfStudies.clear();
+                    observableAreaOfStudies.addAll(areaOfStudies);
+                    fetchingLocked.set(false);
+                });
     }
 
     public void deleteClassroom(long id) {
@@ -450,7 +460,6 @@ public class AdminViewModel {
     }
 
     public void refreshAreaOfStudies() {
-        // TODO
         if (fetchingLocked.getAndSet(true)) {
             return;
         }
