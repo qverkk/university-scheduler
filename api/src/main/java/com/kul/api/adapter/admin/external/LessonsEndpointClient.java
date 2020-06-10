@@ -3,8 +3,12 @@ package com.kul.api.adapter.admin.external;
 import com.kul.api.adapter.admin.areaofstudies.AddAreaOfStudies;
 import com.kul.api.adapter.admin.areaofstudies.AddAreaOfStudiesResponse;
 import com.kul.api.adapter.admin.areaofstudies.FetchAllAreaOfStudiesResponse;
+import com.kul.api.adapter.admin.lessons.FetchAllLessonsResponse;
+import com.kul.api.adapter.admin.lessons.UpdateLecturerLessonResponse;
+import com.kul.api.adapter.admin.lessons.UpdateOrAddLecturerRequest;
 import com.kul.api.adapter.admin.lessontypes.FetchAllLessonTypesResponse;
 import com.kul.api.domain.admin.lessontypes.LessonTypes;
+import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -36,4 +40,16 @@ public interface LessonsEndpointClient {
     @RequestLine("POST /lessons/types")
     @Headers("Content-Type: application/json")
     LessonTypes addNewLessonType(LessonTypes lessonType);
+
+    @RequestLine("DELETE /lessons/delete/{id}")
+    @Headers("Content-Type: application/json")
+    void deleteLessonById(@Param("id") Long id);
+
+    @RequestLine("GET /lessons/fetch/all")
+    @Headers("Content-Type: application/json")
+    FetchAllLessonsResponse fetchAllLessons();
+
+    @RequestLine("PUT /lessons/update")
+    @Headers("Content-Type: application/json")
+    UpdateLecturerLessonResponse updateOrAddLesson(UpdateOrAddLecturerRequest request);
 }

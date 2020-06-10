@@ -24,4 +24,9 @@ public class LessonTypesInfoViewModel {
     public LongBinding id() {
         return Bindings.selectLong(id);
     }
+
+    @Override
+    public String toString() {
+        return lessonTypeName.get();
+    }
 }

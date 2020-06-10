@@ -1,5 +1,6 @@
 package com.kul.api.domain.admin.areaofstudies;
 
+import com.kul.api.domain.admin.lessons.Lessons;
 import com.kul.api.domain.admin.lessontypes.LessonTypes;
 
 import java.util.List;
@@ -16,4 +17,10 @@ public interface LessonsRepository {
     List<LessonTypes> getAllLessonTypes();
 
     LessonTypes addNewLessonType(LessonTypes lessonType);
+
+    void removeLessonById(Long id);
+
+    List<Lessons> getAllLessons();
+
+    Lessons addnewLesson(Lessons result);
 }

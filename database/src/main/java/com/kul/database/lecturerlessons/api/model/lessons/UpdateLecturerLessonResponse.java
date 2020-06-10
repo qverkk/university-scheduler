@@ -10,6 +10,7 @@ import lombok.Value;
 public class UpdateLecturerLessonResponse {
     Long id;
     Long userId;
+    String lecturersName;
     String lessonName;
     AreaOfStudyResponse areaOfStudy;
     Semester semester;

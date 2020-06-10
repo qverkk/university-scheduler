@@ -2,6 +2,7 @@ package com.kul.database.lecturerlessons.api;
 
 import com.kul.database.lecturerlessons.api.model.areaofstudies.AddOrUpdateAreaOfStudiesRequest;
 import com.kul.database.lecturerlessons.api.model.areaofstudies.AddOrUpdateAreaOfStudiesResponse;
+import com.kul.database.lecturerlessons.api.model.areaofstudies.AreaOfStudyResponse;
 import com.kul.database.lecturerlessons.api.model.areaofstudies.FetchAreaOfStudiesResponse;
 import com.kul.database.lecturerlessons.api.model.lessons.*;
 import com.kul.database.lecturerlessons.api.model.lessontypes.AddLessonTypeRequest;
@@ -14,6 +15,7 @@ import com.kul.database.lecturerlessons.domain.LecturerLessonsService;
 import com.kul.database.lecturerlessons.domain.areaofstudy.AreaOfStudyService;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonType;
 import com.kul.database.lecturerlessons.domain.lessontype.LessonTypeService;
+import com.kul.database.usermanagement.domain.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -100,15 +102,26 @@ public class LecturerLessonsController {
     )
     public FetchAllLecturerLessonsResponse fetchAllLecturerLessons() {
         List<LecturerLessons> lecturerLessons = lecturerLessonsService.fetchAllLecturerLessons();
-        List<LecturerLessonsResponse> response = lecturerLessons.stream().map(l -> new LecturerLessonsResponse(
-                l.getId(),
-                l.getUser(),
-                l.getLessonName(),
-                l.getAreaOfStudy(),
-                l.getLessonType(),
-                l.getSemester(),
-                l.getYear()
-        )).collect(Collectors.toList());
+        List<LecturerLessonsResponse> response = lecturerLessons.stream().map(l -> {
+            final User user = l.getUser();
+            return new LecturerLessonsResponse(
+                    l.getId(),
+                    user.getId(),
+                    user.getFirstName() + " " + user.getLastName(),
+                    l.getLessonName(),
+                    new AreaOfStudyResponse(
+                            l.getAreaOfStudy().getId(),
+                            l.getAreaOfStudy().getArea(),
+                            l.getAreaOfStudy().getDepartment()
+                    ),
+                    new LessonTypeResponse(
+                            l.getLessonType().getId(),
+                            l.getLessonType().getType()
+                    ),
+                    l.getSemester(),
+                    l.getYear()
+            );
+        }).collect(Collectors.toList());
         return new FetchAllLecturerLessonsResponse(response);
     }
 
@@ -117,15 +130,26 @@ public class LecturerLessonsController {
     )
     public FetchLecturerLessonsResponse fetchLecturerLessons(@PathVariable Long userId) {
         List<LecturerLessons> lecturerLessons = lecturerLessonsService.fetchAllLecturerLessons(userId);
-        List<LecturerLessonsResponse> response = lecturerLessons.stream().map(l -> new LecturerLessonsResponse(
-                l.getId(),
-                l.getUser(),
-                l.getLessonName(),
-                l.getAreaOfStudy(),
-                l.getLessonType(),
-                l.getSemester(),
-                l.getYear()
-        )).collect(Collectors.toList());
+        List<LecturerLessonsResponse> response = lecturerLessons.stream().map(l -> {
+            final User user = l.getUser();
+            return new LecturerLessonsResponse(
+                    l.getId(),
+                    user.getId(),
+                    user.getFirstName() + " " + user.getLastName(),
+                    l.getLessonName(),
+                    new AreaOfStudyResponse(
+                            l.getAreaOfStudy().getId(),
+                            l.getAreaOfStudy().getArea(),
+                            l.getAreaOfStudy().getDepartment()
+                    ),
+                    new LessonTypeResponse(
+                            l.getLessonType().getId(),
+                            l.getLessonType().getType()
+                    ),
+                    l.getSemester(),
+                    l.getYear()
+            );
+        }).collect(Collectors.toList());
         return new FetchLecturerLessonsResponse(response);
     }
 

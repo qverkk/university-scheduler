@@ -31,4 +31,9 @@ public class AreaOfStudiesInfoViewModel {
     public StringBinding departmentName() {
         return Bindings.selectString(departmentName);
     }
+
+    @Override
+    public String toString() {
+        return departmentName.get() + " " + areaOfStudiesName.get();
+    }
 }
